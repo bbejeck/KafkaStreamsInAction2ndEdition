@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package proto_files;
+option java_package = "bbejeck.chapter_3.proto";
+option java_outer_classname = "ExchangeProto";
+
+message Exchange {
+    string item = 1;
+    double amount = 2;
+    string new_item = 3;
+}

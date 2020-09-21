@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Exchange",
+  "description": "A JSON schema of onf of the transaction type objects",
+  "javaType": "bbejeck.chapter_3.json.Exchange",
+  "type": "object",
+  "properties": {
+    "item": {
+      "type": "string"
+    },
+    "new_item": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    }
+  }
+}
+

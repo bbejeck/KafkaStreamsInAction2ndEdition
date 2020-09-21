@@ -1,0 +1,16 @@
+{
+  "type": "record",
+  "namespace": "bbejeck.chapter_3.avro",
+  "name": "Transaction",
+
+  "fields" : [
+    {"name": "txn_type", "type": [
+      "bbejeck.chapter_3.avro.Purchase",
+      "bbejeck.chapter_3.avro.Return",
+      "bbejeck.chapter_3.avro.Exchange"
+    ]},
+
+    {"name": "identifier", "type": "long"}
+  ]
+
+}

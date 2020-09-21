@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto_files;
+
+import "purchase.proto";   
+import "return.proto";
+import "exchange.proto";
+
+option java_package = "bbejeck.chapter_3.proto";
+option java_outer_classname = "TransactionProto";
+
+message TransactionType {
+
+    string identifier = 1;
+
+    oneof txt_type {
+        Purchase purchase = 2;
+        Return return = 3;
+        Exchange exchange = 4;
+    }
+}

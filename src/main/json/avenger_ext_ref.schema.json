@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Avenger with an external schema reference", 
+  "description": "A JSON schema with refs to external schemas",
+  "javaType": "bbejeck.chapter_3.json.ComplexAvenger",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "realName": {
+      "type": "string"
+    },
+    "movies": {
+      "type": "array",
+      "items": {
+        "$ref": "avenger_movie.schema.json"
+      }
+    }
+  }
+}

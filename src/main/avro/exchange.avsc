@@ -1,0 +1,10 @@
+{
+  "type":"record",
+  "namespace": "bbejeck.chapter_3.avro",
+  "name":"Exchange",
+  "fields": [
+    {"name": "item", "type": "string"},
+    {"name": "amount", "type": "double"},
+    {"name": "new_item", "type": "string"}
+  ]
+}

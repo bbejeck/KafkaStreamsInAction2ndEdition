@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AvengerMovie",
+  "description": "A JSON schema of AvengerMovie object",
+  "javaType": "bbejeck.chapter_3.json.AvengerMovie",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "year": {
+      "type": "string"
+    },
+    "producer": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "year",
+    "producer"
+  ]
+}

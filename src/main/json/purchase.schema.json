@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Purchase",
+  "description": "A JSON schema of onf of the transaction type objects",
+  "javaType": "bbejeck.chapter_3.json.Purchase",
+  "type": "object",
+  "properties": {
+    "item": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    }
+  }
+}
+

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package proto_files;
+
+option java_package = "bbejeck.chapter_3.proto";
+option java_outer_classname = "AvengerMovieProto";
+
+message AvengerMovie {
+    string title = 1;
+    string year = 2;
+    string producer = 3;
+}

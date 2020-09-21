@@ -1,0 +1,21 @@
+{
+  "schema": "{\"type\": \"record\", \"namespace\": \"bbejeck.chapter_3\", \"name\": \"transaction\", \"fields\": [ { \"name\": \"txn_type\", \"type\": [ \"bbejeck.chapter_3.Purchase\", \"bbejeck.chapter_3.Return\", \"bbejeck.chapter_3.Exchange\" ] }, { \"name\": \"identifier\", \"type\": \"long\" } ]}",
+  "schemaType": "AVRO",
+  "references": [
+    {
+      "name": "bbejeck.chapter_3.Purchase",
+      "subject": "purchase",
+      "version": 1
+    },
+    {
+      "name": "bbejeck.chapter_3.Return",
+      "subject": "return",
+      "version": 1
+    },
+    {
+      "name": "bbejeck.chapter_3.Exchange",
+      "subject": "exchange",
+      "version": 1
+    }
+  ]
+}

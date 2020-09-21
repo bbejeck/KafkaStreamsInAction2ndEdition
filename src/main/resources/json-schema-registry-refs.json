@@ -1,0 +1,21 @@
+{
+  "schema": "{\"schema\" : \"http://json-schema.org/draft-07/schema#\",\"title\" : \"JSON schema example\",\"description\" : \"Schema imports with JSON\",\"javaType\" = \"transactionInfo\" \"oneOf\": [{ \"$ref\" : \"purchase.schema.json\" },{ \"$ref\" : \"return.schema.json\" },{ \"$ref\" : \"exchange.schema.json\" }] }",
+  "schemaType": "JSON",
+  "references": [
+    {
+      "name": "purchase.schema.json",
+      "subject": "purchase",
+      "version": 1
+    },
+    {
+      "name": "return.schema.json",
+      "subject": "return",
+      "version": 1
+    },
+    {
+      "name": "exchange.schema.json",
+      "subject": "exchange",
+      "version": 1
+    }
+  ]
+}

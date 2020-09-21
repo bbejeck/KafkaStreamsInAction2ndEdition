@@ -37,4 +37,5 @@ build
 *.ipr
 *.iws
 /settings.gradle
+.idea/
 

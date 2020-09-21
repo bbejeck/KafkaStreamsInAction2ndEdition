@@ -1,0 +1,10 @@
+{
+  "namespace": "bbejeck.chapter_3",
+  "type": "record",
+  "name": "Avenger",
+  "fields": [
+    {"name": "movie", "type": "string"},
+    {"name": "hero", "type": "string"},
+    {"name": "villan", "type": "string"}
+    ]
+}

@@ -1,10 +1,12 @@
 {
   "namespace": "bbejeck.chapter_3",
   "type": "record",
-  "name": "Avenger",
+  "name": "AvengerAvro",
   "fields": [
-    {"name": "movie", "type": "string"},
-    {"name": "hero", "type": "string"},
-    {"name": "villan", "type": "string"}
+    {"name": "name", "type": "string"},
+    {"name": "real_name", "type": "string"},
+    {"name": "movies", "type":
+                      {"type": "array", "items": "string"}
+    }
     ]
 }

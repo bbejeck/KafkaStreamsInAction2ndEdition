@@ -30,22 +30,17 @@ public class AvroProduceConsumeExample {
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
 
 
+        //Admin client create topic
+        
         final AvengerAvro avenger = AvengerAvro.newBuilder().setName("Black Widow")
                 .setRealName("Natasha Romanova")
                 .setMovies(Arrays.asList("Avengers", "Infinity Wars", "End Game")).build();
 
-        final SchemaRegistryClient client = new CachedSchemaRegistryClient("localhost:8081", 10);
-
-        //Admin client to create the topic
-        //Make as test using test containers?
-        client.register("avro-avengers-value", new AvroSchema(avenger.getSchema()));
-
         final ProducerRecord<String, AvengerAvro> avengerRecord = new ProducerRecord<>("avro-avengers", avenger);
 
-        final KafkaProducer<String, AvengerAvro> producer = new KafkaProducer<>(producerProps);
-        producer.send(avengerRecord);
-        producer.flush();
-        producer.close();
+        try (final KafkaProducer<String, AvengerAvro> producer = new KafkaProducer<>(producerProps)) {
+             producer.send(avengerRecord);
+        }
 
         final Properties specificProperties = getConsumerProps("specific-group", true);
 

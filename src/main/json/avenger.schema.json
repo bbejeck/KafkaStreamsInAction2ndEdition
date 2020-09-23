@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Avenger",
   "description": "A JSON schema of Avenger object",
-  "javaType": "bbejeck.chapter_3.json.SimpleAvenger",
+  "javaType": "bbejeck.chapter_3.json.SimpleAvengerJson",
   "type": "object",
   "properties": {
     "name": {

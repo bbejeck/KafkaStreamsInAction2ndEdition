@@ -24,7 +24,7 @@ import java.util.Properties;
  * Date: 9/22/20
  * Time: 10:48 PM
  */
-public class JsonProduceConsumeExample {
+public class JsonSchemaProduceConsumeExample {
 
     public static void main(String[] args) {
         final Properties producerProps = new Properties();

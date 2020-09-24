@@ -54,6 +54,7 @@ dependencies {
     implementation "io.confluent:kafka-avro-serializer:5.5.1"
     implementation "io.confluent:kafka-protobuf-serializer:5.5.1"
     implementation "io.confluent:kafka-json-serializer:5.5.1"
+    implementation "io.confluent:kafka-json-schema-serializer:5.5.1"
     implementation "io.confluent:kafka-schema-registry-client:5.5.1"
     implementation "io.confluent:kafka-json-schema-provider:5.5.1"
     implementation "io.confluent:kafka-protobuf-provider:5.5.1"
@@ -72,9 +73,10 @@ protobuf {
 jsonSchema2Pojo {
     targetPackage = 'bbejeck.json.generated'
     generateBuilders = true
+    annotationStyle = "JACKSON2"
     source = files("${project.projectDir}/src/main/json")
     targetDirectory = file("${project.buildDir}/generated-main-json-java")
-    includeJsr303Annotations = true
+    includeJsr303Annotations = false
     propertyWordDelimiters = ['_'] as char[]
 }
 

@@ -1,6 +1,7 @@
 package bbejeck.chapter_3;
 
 import bbejeck.chapter_3.proto.AvengerSimpleProtos;
+import bbejeck.utils.Topics;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
@@ -17,6 +18,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -31,19 +33,20 @@ public class ProtobufProduceConsumeExample {
         producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaProtobufSerializer.class);
-        producerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "localhost:8081");
+        producerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
 
-
+        final String topicName = "proto-avengers";
+        Topics.create(topicName);
         //Admin client create topic
 
         final AvengerSimpleProtos.AvengerSimple avenger = AvengerSimpleProtos.AvengerSimple.newBuilder()
                 .setName("Black Widow")
                 .setRealName("Natasha Romanova")
-                .setMovies(0,"Avengers")
-                .setMovies(1, "Infinity Wars")
-                .setMovies(2,"End Game").build();
+                .addMovies("Avengers")
+                .addMovies("Infinity Wars")
+                .addMovies("End Game").build();
 
-        final ProducerRecord<String, AvengerSimpleProtos.AvengerSimple> avengerRecord = new ProducerRecord<>("proto-avengers", avenger);
+        final ProducerRecord<String, AvengerSimpleProtos.AvengerSimple> avengerRecord = new ProducerRecord<>(topicName, avenger);
 
         try (final KafkaProducer<String, AvengerSimpleProtos.AvengerSimple> producer = new KafkaProducer<>(producerProps)) {
             producer.send(avengerRecord);
@@ -52,6 +55,7 @@ public class ProtobufProduceConsumeExample {
         final Properties specificProperties = getConsumerProps("specific-group", true);
 
         final KafkaConsumer<String, AvengerSimpleProtos.AvengerSimple> specificConsumer = new KafkaConsumer<>(specificProperties);
+        specificConsumer.subscribe(Collections.singletonList(topicName));
 
         ConsumerRecords<String, AvengerSimpleProtos.AvengerSimple> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
         specificConsumerRecords.forEach(cr -> {
@@ -62,6 +66,7 @@ public class ProtobufProduceConsumeExample {
 
         final Properties genericProperties = getConsumerProps("generic-group", false);
         final KafkaConsumer<String, DynamicMessage> dynamicMessageConsumer = new KafkaConsumer<>(genericProperties);
+        dynamicMessageConsumer.subscribe(Collections.singletonList(topicName));
 
         ConsumerRecords<String, DynamicMessage> dynamicConsumerRecords = dynamicMessageConsumer.poll(Duration.ofSeconds(5));
         dynamicConsumerRecords.forEach(dm -> {
@@ -82,7 +87,7 @@ public class ProtobufProduceConsumeExample {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "localhost:8081");
+        props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);
         if (protoSpecific) {

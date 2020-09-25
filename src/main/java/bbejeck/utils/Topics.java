@@ -13,6 +13,8 @@ import java.util.Properties;
  */
 public class Topics {
 
+    private Topics() {}
+
     public static void create(final Properties props,
                               final String name,
                               final int partitions,

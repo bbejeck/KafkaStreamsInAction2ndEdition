@@ -58,6 +58,9 @@ dependencies {
     implementation "io.confluent:kafka-schema-registry-client:5.5.1"
     implementation "io.confluent:kafka-json-schema-provider:5.5.1"
     implementation "io.confluent:kafka-protobuf-provider:5.5.1"
+    implementation "org.apache.logging.log4j:log4j-api:2.7"
+    implementation "org.apache.logging.log4j:log4j-core:2.7"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.7"
 
     
     // Use JUnit Jupiter API for testing.

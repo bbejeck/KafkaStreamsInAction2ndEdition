@@ -1,8 +1,7 @@
 syntax = "proto3";
 
-package proto_files;
+package bbejeck.chapter_3.proto;
 
-option java_package = "bbejeck.chapter_3.proto";
 option java_outer_classname = "AvengerMovieProto";
 
 message AvengerMovie {

@@ -19,7 +19,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,7 +44,6 @@ public class ProtobufMultipleEventTopicExample {
         producerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
 
         TransactionTypeProtos.TransactionType transactionType = TransactionTypeProtos.TransactionType.newBuilder().build();
-
         final String topicName = "proto-multi-events";
         Topics.create(topicName);
 
@@ -123,7 +121,7 @@ public class ProtobufMultipleEventTopicExample {
         props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);
-        props.put(KafkaProtobufDeserializerConfig.DERIVE_TYPE_CONFIG, true);
+        //props.put(KafkaProtobufDeserializerConfig.DERIVE_TYPE_CONFIG, true);
         props.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, TransactionTypeProtos.TransactionType.class);
         return props;
     }

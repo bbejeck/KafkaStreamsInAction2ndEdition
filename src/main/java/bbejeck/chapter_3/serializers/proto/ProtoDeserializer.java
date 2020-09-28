@@ -1,12 +1,16 @@
 package bbejeck.chapter_3.serializers.proto;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import com.google.protobuf.Parser;
+import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
+
+import static bbejeck.chapter_3.serializers.SerializationConfig.PROTO_KEY_CLASS_NAME;
+import static bbejeck.chapter_3.serializers.SerializationConfig.PROTO_VALUE_CLASS_NAME;
 
 /**
  * User: Bill Bejeck
@@ -14,24 +18,38 @@ import java.util.Map;
  * Time: 9:27 PM
  */
 public class ProtoDeserializer<T extends Message> implements Deserializer<T> {
-    final Parser<T> parser;
 
-    public ProtoDeserializer(Parser<T> parser) {
-        this.parser = parser;
+    private Method parseFromMethod;
+
+    public ProtoDeserializer() {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T deserialize(String topic, byte[] data) {
+        if (data == null) {
+            return null;
+        }
         try {
-            return parser.parseFrom(data);
-        } catch (InvalidProtocolBufferException e) {
+            return (T) parseFromMethod.invoke(null, data);
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new SerializationException(e);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void configure(Map<String, ?> configs, boolean isKey) {
-
+        final String protoClassConfig = (isKey) ? PROTO_KEY_CLASS_NAME : PROTO_VALUE_CLASS_NAME;
+        final Class<T> protoClass = (Class<T>)configs.get(protoClassConfig);
+        if (protoClass == null) {
+            throw new ConfigException("No class provided for " + protoClassConfig);
+        }
+        try {
+            parseFromMethod = protoClass.getDeclaredMethod("parseFrom", byte[].class);
+        } catch (NoSuchMethodException e) {
+            throw new ConfigException(e.getMessage());
+        }
     }
 
     @Override

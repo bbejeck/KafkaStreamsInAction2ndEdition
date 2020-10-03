@@ -87,3 +87,17 @@ test {
     // Use junit platform for unit tests
     useJUnitPlatform()
 }
+
+
+//Schema Registry section
+schemaRegistry {
+    url = 'https://localhost:8081'
+// optional set these if you have Schema Regsitry set up for authentication
+//    credentials {
+//        username = 'basicauthentication-username'
+//        password = 'basicauthentication-password'
+//    }
+
+
+
+}

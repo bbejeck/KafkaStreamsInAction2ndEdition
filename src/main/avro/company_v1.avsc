@@ -1,0 +1,13 @@
+{
+  "namespace": "bbejeck.chapter_3.avro",
+  "type": "record",
+  "name": "CompanyAvro",
+  "fields": [
+    {"name": "name", "type": "string"},
+    {"name": "id", "type": "string"},
+    {"name": "executives", "type":
+    {"type": "array", "items": "string"},
+      "default": []
+    }
+  ]
+}

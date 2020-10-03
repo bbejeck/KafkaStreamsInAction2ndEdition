@@ -1,0 +1,1 @@
+{"schema": "{ \"namespace\": \"bbejeck.chapter_3.avro\", \"type\": \"record\", \"name\": \"AvengerAvro\", \"fields\": [ {\"name\": \"name\", \"type\": \"string\"}, {\"name\": \"real_name\", \"type\": \"string\"}, {\"name\": \"movies\", \"type\": {\"type\": \"array\", \"items\": \"string\"}, \"default\": [] } ] }", "schemaType": "AVRO"}

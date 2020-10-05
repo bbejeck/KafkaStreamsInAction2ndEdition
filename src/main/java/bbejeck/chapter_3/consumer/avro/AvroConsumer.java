@@ -1,7 +1,7 @@
 package bbejeck.chapter_3.consumer.avro;
 
 import bbejeck.chapter_3.avro.AvengerAvro;
-import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
+import bbejeck.chapter_3.consumer.BaseConsumer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import org.apache.avro.generic.GenericRecord;
@@ -14,32 +14,33 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: Bill Bejeck
  * Date: 10/3/20
  * Time: 3:03 PM
  */
-public class AvroConsumer {
+public class AvroConsumer extends BaseConsumer<String, AvengerAvro> {
 
     private static final Logger LOG = LogManager.getLogger(AvroConsumer.class);
 
-    public static void main(String[] args) {
-        final String topicName = "avro-avengers";
-
-        runSpecificConsumer(topicName);
-
-        runGenericConsumer(topicName);
+    public AvroConsumer() {
+        super(StringDeserializer.class, KafkaAvroDeserializer.class);
     }
 
-    private static void runGenericConsumer(String topicName) {
-        final Properties genericProperties = getConsumerProps("generic-group", false);
+    private  void runGenericConsumer(String topicName) {
+        Map<String, Object> genericOverrideConfigs = new HashMap<>();
+        genericOverrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"generic-group");
+        genericOverrideConfigs.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, false);
+
+        Map<String,Object> genericConfigs = overrideConfigs(genericOverrideConfigs);
         LOG.info("Getting ready to consume generic records");
         boolean notDoneConsuming = true;
         int noRecordsCount = 0;
 
-        try(final KafkaConsumer<String, GenericRecord> genericConsumer = new KafkaConsumer<>(genericProperties)) {
+        try(final KafkaConsumer<String, GenericRecord> genericConsumer = new KafkaConsumer<>(genericConfigs)) {
             genericConsumer.subscribe(Collections.singletonList(topicName));
             while (notDoneConsuming) {
                 ConsumerRecords<String, GenericRecord> genericConsumerRecords = genericConsumer.poll(Duration.ofSeconds(5));
@@ -66,8 +67,11 @@ public class AvroConsumer {
         }
     }
 
-    private static void runSpecificConsumer(String topicName) {
-        final Properties specificProperties = getConsumerProps("specific-group", true);
+    private void runSpecificConsumer(String topicName) {
+        Map<String, Object> specificConfigs = new HashMap<>();
+        specificConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"specific-group");
+        specificConfigs.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
+        final Map<String, Object> specificProperties = overrideConfigs(specificConfigs);
 
         boolean notDoneConsuming = true;
         int noRecordsCount = 0;
@@ -94,16 +98,10 @@ public class AvroConsumer {
         }
     }
 
-    static Properties getConsumerProps(final String groupId, final boolean avroSpecific) {
-        final Properties props = new Properties();
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
-        props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, avroSpecific);
-
-        return props;
+    public static void main(String[] args) {
+        final String topicName = "avro-avengers";
+        AvroConsumer avroConsumer = new AvroConsumer();
+        avroConsumer.runSpecificConsumer(topicName);
+        avroConsumer.runGenericConsumer(topicName);
     }
 }

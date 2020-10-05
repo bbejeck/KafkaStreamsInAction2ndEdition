@@ -1,4 +1,3 @@
-rootProject.name = 'ksa_2nd_kafka_event_streaming'
+rootProject.name = 'kafka-event-streaming'
 
-include 'sr-compatibility-backward'
-
+include 'sr-compatibility-backward' , 'sr-compatibility-forward'

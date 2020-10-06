@@ -1,0 +1,37 @@
+{
+  "namespace": "bbejeck.chapter_3.avro",
+  "type": "record",
+  "name": "AvengerAvro",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "yearPublished",
+      "type": "int",
+      "default": 0
+    },
+    {
+      "name": "realName",
+      "type": "string",
+      "default": "unknown"
+    },
+    {
+      "name": "partners",
+      "type": {
+         "type": "array",
+        "items": "string"
+      },
+      "default": []
+    },
+    {
+      "name": "nemeses",
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
+      "default": []
+    }
+  ]
+}

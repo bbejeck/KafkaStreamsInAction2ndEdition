@@ -3,14 +3,24 @@
   "type": "record",
   "name": "AvengerAvro",
   "fields": [
-    {"name": "name", "type": "string"},
-    {"name": "powers", "type":
-    {"type": "array", "items": "string"},
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "powers",
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
       "default": []
     },
-    {"name": "movies", "type":
-                      {"type": "array", "items": "string"},                     
-      "default": []
+    {
+      "name": "nemeses",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
     }
-    ]
+  ]
 }

@@ -1,7 +1,7 @@
 package bbejeck.chapter_3.consumer.avro;
 
 import bbejeck.chapter_3.avro.AvengerAvro;
-import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
+import bbejeck.chapter_3.consumer.BaseConsumer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -13,30 +13,33 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: Bill Bejeck
  * Date: 10/3/20
  * Time: 3:03 PM
  */
-public class AvroConsumer {
+public class AvroConsumer extends BaseConsumer<String, AvengerAvro> {
 
     private static final Logger LOG = LogManager.getLogger(AvroConsumer.class);
 
-    public static void main(String[] args) {
-        final String topicName = "avro-avengers";
-        runSpecificConsumer(topicName);
+    public AvroConsumer() {
+        super(StringDeserializer.class, KafkaAvroDeserializer.class);
     }
-    
-    private static void runSpecificConsumer(String topicName) {
-        final Properties specificProperties = getConsumerProps("backward-compatibility-group");
+
+    public void runSpecificConsumer(String topicName) {
+        final Map<String, Object> configs = new HashMap<>();
+        configs.put(ConsumerConfig.GROUP_ID_CONFIG,"schema-migrated-group");
+        configs.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
+        final Map<String, Object> consumerConfig = overrideConfigs(configs);
 
         boolean notDoneConsuming = true;
         int noRecordsCount = 0;
 
         LOG.info("Start consuming specific records");
-        try(final KafkaConsumer<String, AvengerAvro> specificConsumer = new KafkaConsumer<>(specificProperties)) {
+        try(final KafkaConsumer<String, AvengerAvro> specificConsumer = new KafkaConsumer<>(consumerConfig)) {
             specificConsumer.subscribe(Collections.singletonList(topicName));
             while(notDoneConsuming) {
                 ConsumerRecords<String, AvengerAvro> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
@@ -45,7 +48,7 @@ public class AvroConsumer {
                 }
                 specificConsumerRecords.forEach(cr -> {
                     AvengerAvro avenger = cr.value();
-                    LOG.info("Found Avro avenger " + avenger.getName() + " with powers " + avenger.getPowers());
+                    LOG.info("Found Avro avenger {} with powers {}", avenger.getName(), avenger.getPowers());
                 });
 
               if (noRecordsCount >= 2) {
@@ -57,16 +60,9 @@ public class AvroConsumer {
         }
     }
 
-    static Properties getConsumerProps(final String groupId) {
-        final Properties props = new Properties();
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
-        props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
-
-        return props;
+    public static void main(String[] args) {
+        final String topicName = "avro-avengers";
+        final AvroConsumer avroConsumer = new AvroConsumer();
+        avroConsumer.runSpecificConsumer(topicName);
     }
 }

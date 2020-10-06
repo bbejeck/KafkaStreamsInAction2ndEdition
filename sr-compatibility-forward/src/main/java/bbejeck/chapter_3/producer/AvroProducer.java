@@ -11,9 +11,9 @@ import java.util.List;
  * Date: 10/5/20
  * Time: 9:43 AM
  */
-public class AvroForwardCompatProducer extends BaseProducer<String, AvengerAvro> {
+public class AvroProducer extends BaseProducer<String, AvengerAvro> {
 
-    public AvroForwardCompatProducer() {
+    public AvroProducer() {
         super(StringSerializer.class, KafkaAvroSerializer.class);
     }
 

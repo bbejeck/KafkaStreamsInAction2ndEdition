@@ -20,9 +20,9 @@ import java.util.Properties;
  * Date: 10/3/20
  * Time: 3:21 PM
  */
-public class AvroBackwardCompatProducer {
+public class AvroProducer {
 
-    private static final Logger LOG = LogManager.getLogger(AvroBackwardCompatProducer.class);
+    private static final Logger LOG = LogManager.getLogger(AvroProducer.class);
 
     public static void main(String[] args) {
         final Properties producerProps = new Properties();

@@ -9,9 +9,9 @@ import org.apache.kafka.common.serialization.StringDeserializer;
  * Date: 10/5/20
  * Time: 9:48 AM
  */
-public class AvroForwardCompatConsumer extends BaseConsumer<String, AvengerAvro> {
+public class AvroConsumer extends BaseConsumer<String, AvengerAvro> {
 
-    public AvroForwardCompatConsumer() {
+    public AvroConsumer() {
         super(StringDeserializer.class, KafkaAvroDeserializer.class);
     }
 

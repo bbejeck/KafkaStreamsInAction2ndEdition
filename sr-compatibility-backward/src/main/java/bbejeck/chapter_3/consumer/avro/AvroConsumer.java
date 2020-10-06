@@ -20,9 +20,9 @@ import java.util.Properties;
  * Date: 10/3/20
  * Time: 3:03 PM
  */
-public class AvroBackwardCompatConsumer {
+public class AvroConsumer {
 
-    private static final Logger LOG = LogManager.getLogger(AvroBackwardCompatConsumer.class);
+    private static final Logger LOG = LogManager.getLogger(AvroConsumer.class);
 
     public static void main(String[] args) {
         final String topicName = "avro-avengers";

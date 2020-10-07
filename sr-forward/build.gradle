@@ -98,11 +98,11 @@ schemaRegistry {
 //    }
 
     compatibility {
-        subject('avro-avengers-value', "sr-compatibility-forward/src/main/avro/avenger_v3.avsc", 'AVRO')
+        subject('avro-avengers-value', "sr-forward/src/main/avro/avenger_v3.avsc", 'AVRO')
     }
 
     register {
-        subject('avro-avengers-value', 'sr-compatibility-forward/src/main/avro/avenger_v3.avsc', 'AVRO')
+        subject('avro-avengers-value', 'sr-forward/src/main/avro/avenger_v3.avsc', 'AVRO')
     }
 
     config {

@@ -1,6 +1,7 @@
-package bbejeck.chapter_3.producer;
+package bbejeck.chapter_3.producer.avro;
 
 import bbejeck.chapter_3.avro.AvengerAvro;
+import bbejeck.chapter_3.producer.BaseProducer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.logging.log4j.LogManager;

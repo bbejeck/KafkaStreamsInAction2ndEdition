@@ -1,6 +1,7 @@
-package bbejeck.chapter_3.consumer;
+package bbejeck.chapter_3.consumer.avro;
 
 import bbejeck.chapter_3.avro.AvengerAvro;
+import bbejeck.chapter_3.consumer.BaseConsumer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

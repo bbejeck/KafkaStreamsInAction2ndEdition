@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -35,8 +36,8 @@ public class AvroProducer extends BaseProducer<String, AvengerAvro> {
                 .setPowers(Arrays.asList("Strength", "Spider-Sense", "Climb walls")).build();
 
        final AvengerAvro antMan = AvengerAvro.newBuilder().setName("Ant Man")
-               .setNemeses(Arrays.asList("Yellowjacket"))
-               .setPowers(Arrays.asList("size-shifting")).build();
+               .setNemeses(Collections.singletonList("Yellowjacket"))
+               .setPowers(Collections.singletonList("size-shifting")).build();
 
        List<AvengerAvro> avengersV3 = Arrays.asList(ironMan, spiderMan, antMan);
        LOG.info("created avengers version 3 {}", avengersV3);

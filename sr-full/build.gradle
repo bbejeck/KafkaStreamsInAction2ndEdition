@@ -108,4 +108,15 @@ schemaRegistry {
         subject('avro-avengers-value', 'FULL')
     }
 
+
+    task runProducer(type: JavaExec){
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.producer.avro.AvroProducer"
+    }
+
+    task runConsumer(type: JavaExec){
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
+    }
+
 }

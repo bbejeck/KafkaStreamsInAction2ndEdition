@@ -42,7 +42,6 @@ repositories {
 apply plugin: "com.commercehub.gradle.plugin.avro"
 
 dependencies {
-    implementation rootProject
     implementation "org.apache.avro:avro:1.10.0"
     implementation "com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39"
     implementation 'javax.validation:validation-api:1.1.0.CR2'

@@ -1,0 +1,10 @@
+{
+  "type":"record",
+  "namespace": "bbejeck.chapter_3.avro",
+  "name":"PersonAvro",
+  "fields": [
+    {"name": "name", "type":"string"},
+    {"name": "address", "type": "string"},
+    {"name": "age", "type": "int"}
+  ]
+}

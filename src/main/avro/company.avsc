@@ -4,10 +4,9 @@
   "name": "CompanyAvro",
   "fields": [
     {"name": "name", "type": "string"},
-    {"name": "id", "type": "string"},
     {"name": "executives", "type":
-    {"type": "array", "items": "string"},
-      "default": []
-    }
+         {"type": "array", "items": "bbejeck.chapter_3.avro.PersonAvro"},
+           "default": []
+       }
   ]
 }

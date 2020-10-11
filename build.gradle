@@ -104,10 +104,25 @@ schemaRegistry {
     
     register {
         subject('avro-avengers-value','src/main/avro/avenger.avsc', 'AVRO')
+        subject('person','src/main/avro/person.avsc', 'AVRO')
+        subject('college-value','src/main/avro/college.avsc', 'AVRO').addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
+        subject('company-value','src/main/avro/company.avsc', 'AVRO').addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
     }
 
     config {
         subject('avro-avengers-value', 'BACKWARD')
+    }
+
+
+
+    task runAvroProducer(type: JavaExec){
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.producer.avro.AvroProducer"
+    }
+
+    task runAvroConsumer(type: JavaExec){
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
     }
 
 }

@@ -5,7 +5,7 @@
   "fields": [
     {"name": "name", "type": "string"},
     {"name": "powers", "type":
-    {"type": "array", "items": "string"},
+                      {"type": "array", "items": "string"},
       "default": []
     },
     {"name": "movies", "type":

@@ -1,0 +1,12 @@
+{
+  "namespace": "bbejeck.chapter_3.avro",
+  "type": "record",
+  "name": "CollegeAvro",
+  "fields": [
+    {"name": "name", "type": "string"},
+    {"name": "professors", "type":
+    {"type": "array", "items": "bbejeck.chapter_3.avro.PersonAvro"},
+      "default": []
+    }
+  ]
+}

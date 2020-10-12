@@ -109,4 +109,23 @@ schemaRegistry {
         subject('avro-avengers-value', 'FORWARD')
     }
 
+
+    task runAvroProducer(type: JavaExec){
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.producer.avro.AvroProducer"
+    }
+
+    task runOldSchemaAvroConsumer(type: JavaExec){
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
+        args 'previous'
+    }
+
+
+    task runNewSchemaAvroConsumer(type: JavaExec){
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
+        args 'current'
+    }
+
 }

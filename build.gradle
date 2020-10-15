@@ -105,8 +105,11 @@ schemaRegistry {
     register {
         subject('avro-avengers-value','src/main/avro/avenger.avsc', 'AVRO')
         subject('person','src/main/avro/person.avsc', 'AVRO')
-        subject('college-value','src/main/avro/college.avsc', 'AVRO').addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
-        subject('company-value','src/main/avro/company.avsc', 'AVRO').addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
+        subject('college-value','src/main/avro/college.avsc', 'AVRO')
+                .addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
+        subject('company-value','src/main/avro/company.avsc', 'AVRO')
+                .addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
+        
     }
 
     config {
@@ -123,6 +126,26 @@ schemaRegistry {
     task runAvroConsumer(type: JavaExec){
         classpath sourceSets.main.runtimeClasspath
         main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
+    }
+
+    task runCompanyProducer(type: JavaExec) {
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.producer.avro.ReferenceCompanyProducer"
+    }
+
+    task runCompanyConsumer(type: JavaExec) {
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.consumer.avro.ReferenceCompanyConsumer"
+    }
+
+    task runCollegeProducer(type: JavaExec) {
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.producer.avro.ReferenceCollegeProducer"
+    }
+
+    task runCollegeConsumer(type: JavaExec) {
+        classpath sourceSets.main.runtimeClasspath
+        main = "bbejeck.chapter_3.consumer.avro.ReferenceCollegeConsumer"
     }
 
 }

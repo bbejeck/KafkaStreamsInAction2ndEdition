@@ -109,7 +109,14 @@ schemaRegistry {
                 .addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
         subject('company-value','src/main/avro/company.avsc', 'AVRO')
                 .addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
-        
+
+        subject('exchange','src/main/avro/exchange.avsc', 'AVRO')
+        subject('return','src/main/avro/return.avsc', 'AVRO')
+        subject('purchase','src/main/avro/purchase.avsc', 'AVRO')
+        subject('transaction-value', 'src/main/avro/transaction-union-refs.avsc','AVRO')
+                .addReference("bbejeck.chapter_3.avro.Return", "return", 1)
+                .addReference("bbejeck.chapter_3.avro.Exchange", "exchange", 1)
+                .addReference("bbejeck.chapter_3.avro.Purchase", "purchase", 1)
     }
 
     config {

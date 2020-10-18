@@ -109,12 +109,12 @@ schemaRegistry {
     }
 
 
-    task runProducer(type: JavaExec){
+    task runAvroProducer(type: JavaExec){
         classpath sourceSets.main.runtimeClasspath
         main = "bbejeck.chapter_3.producer.avro.AvroProducer"
     }
 
-    task runConsumer(type: JavaExec){
+    task runAvroConsumer(type: JavaExec){
         classpath sourceSets.main.runtimeClasspath
         main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
     }

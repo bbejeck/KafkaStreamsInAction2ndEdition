@@ -115,17 +115,10 @@ schemaRegistry {
         main = "bbejeck.chapter_3.producer.avro.AvroProducer"
     }
 
-    task runOldSchemaAvroConsumer(type: JavaExec){
+    task runAvroConsumer(type: JavaExec){
         classpath sourceSets.main.runtimeClasspath
         main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
         args 'previous'
-    }
-
-
-    task runNewSchemaAvroConsumer(type: JavaExec){
-        classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
-        args 'current'
     }
 
 }

@@ -48,17 +48,20 @@ public class AvroConsumer extends BaseConsumer {
         overrideConfigs.clear();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"generic-group");
         overrideConfigs.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, false);
+        final StringBuilder consumerRecordBuilder = new StringBuilder();
 
         Consumer<ConsumerRecords<String, GenericRecord>> genericRecordsHandler = consumerRecords -> consumerRecords.forEach(cr -> {
-            GenericRecord genericRecord = cr.value();
+            final GenericRecord genericRecord = cr.value();
 
             if (genericRecord.hasField("name")) {
-                LOG.info("Found generic Avro avenger " + genericRecord.get("name"));
+                consumerRecordBuilder.append("Found generic Avro avenger ").append(genericRecord.get("name"));
             }
 
             if (genericRecord.hasField("real_name")) {
-                LOG.info(" with real name " + genericRecord.get("real_name"));
+                consumerRecordBuilder.append(" with real name ").append(genericRecord.get("real_name"));
             }
+            LOG.info(consumerRecordBuilder.toString());
+            consumerRecordBuilder.setLength(0);
         });
         
         avroConsumer.runConsumer(overrideConfigs, topicName, genericRecordsHandler);

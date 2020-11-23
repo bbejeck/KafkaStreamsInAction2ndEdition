@@ -1,0 +1,5 @@
+# After broker container start to install tree
+apt-get update && apt-get install tree
+
+# To get a shell on the broker container
+docker exec -it broker /bin/bash

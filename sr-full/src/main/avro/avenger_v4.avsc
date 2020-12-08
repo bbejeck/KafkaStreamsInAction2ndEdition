@@ -8,6 +8,14 @@
       "type": "string"
     },
     {
+      "name": "nemeses",
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
+      "default": []
+    },
+    {
       "name": "yearPublished",
       "type": "int",
       "default": 0
@@ -19,14 +27,6 @@
     },
     {
       "name": "partners",
-      "type": {
-         "type": "array",
-        "items": "string"
-      },
-      "default": []
-    },
-    {
-      "name": "nemeses",
       "type": {
         "type": "array",
         "items": "string"

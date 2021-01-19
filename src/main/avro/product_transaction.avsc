@@ -1,0 +1,14 @@
+{
+  "type":"record",
+  "namespace": "bbejeck.chapter_4.avro",
+  "name":"ProductTransaction",
+  "fields": [
+    {"name": "product_name", "type":"string"},
+    {"name": "price", "type": "double"},
+    {"name": "timestamp", "type":"long"},
+    {"name": "customer_name", "type": "string"},
+    {"name": "quantity", "type": "int"}
+  ]
+}
+
+

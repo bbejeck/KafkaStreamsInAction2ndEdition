@@ -61,7 +61,7 @@ dependencies {
         exclude group:'org.apache.kafka', module: 'kafka-clients'
         exclude group:'org.apache.kafka', module: 'kafka-streams'
     }
-    
+
     implementation "io.confluent:kafka-avro-serializer:5.5.1"
     implementation "io.confluent:kafka-protobuf-serializer:5.5.1"
     implementation "io.confluent:kafka-json-serializer:5.5.1"
@@ -73,11 +73,9 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-api:2.7"
     implementation "org.apache.logging.log4j:log4j-core:2.7"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.7"
-    // Use JUnit Jupiter API for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
-    // Use JUnit Jupiter Engine for testing.
+    testImplementation(platform('org.junit:junit-bom:5.7.0'))
+    testImplementation('org.junit.jupiter:junit-jupiter')   
     testImplementation "org.apache.kafka:kafka-streams-test-utils:2.7.0"
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
 }
 
 protobuf {
@@ -97,6 +95,9 @@ jsonSchema2Pojo {
 test {
     // Use junit platform for unit tests
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 

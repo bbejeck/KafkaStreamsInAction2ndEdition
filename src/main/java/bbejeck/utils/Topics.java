@@ -2,6 +2,7 @@ package bbejeck.utils;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
+import scala.sys.Prop;
 
 import java.util.Collections;
 import java.util.Properties;
@@ -21,6 +22,12 @@ public class Topics {
                               final short replication) {
         try (final AdminClient adminClient = AdminClient.create(props)) {
            adminClient.createTopics(Collections.singletonList(new NewTopic(name, partitions, replication)));
+        }
+    }
+
+    public static void delete(final Properties props, final String name) {
+        try (final AdminClient adminClient = AdminClient.create(props)) {
+            adminClient.deleteTopics(Collections.singletonList(name));
         }
     }
 

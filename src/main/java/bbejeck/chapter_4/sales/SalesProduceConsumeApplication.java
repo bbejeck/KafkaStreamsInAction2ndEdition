@@ -1,4 +1,4 @@
-package bbejeck.chapter_4;
+package bbejeck.chapter_4.sales;
 
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;

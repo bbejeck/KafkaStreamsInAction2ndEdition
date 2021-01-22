@@ -1,4 +1,4 @@
-package bbejeck.chapter_4;
+package bbejeck.chapter_4.sales;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
 import bbejeck.utils.DataGenerator;

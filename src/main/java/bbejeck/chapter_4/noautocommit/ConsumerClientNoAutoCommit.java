@@ -47,7 +47,7 @@ public class ConsumerClientNoAutoCommit {
                 ConsumerRecords<String, ProductTransaction> consumerRecords = consumer.poll(Duration.ofSeconds(5));
                 if (!consumerRecords.isEmpty()) {
                     try {
-                        LOG.info("Putting records into the process queue");
+                        LOG.info("Putting records {} into the process queue", consumerRecords.count());
                         productQueue.offer(consumerRecords, 60, TimeUnit.SECONDS);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();

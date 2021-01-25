@@ -76,13 +76,11 @@ public class TransactionalConsumeProduceTest {
 
         try (KafkaProducer<String, StockTransaction> producer = new KafkaProducer<>(getProducerProps())) {
             Collection<StockTransaction> stockTransactions = DataGenerator.generateStockTransaction(NUM_GENERATED_RECORDS);
-            stockTransactions.forEach(txn -> {
-                producer.send(new ProducerRecord<>(sourceTopic, txn), (metadata, exception) -> {
-                    if (exception != null) {
-                        LOG.error("Error producing record {}", metadata, exception);
-                    }
-                });
-            });
+            stockTransactions.forEach(txn -> producer.send(new ProducerRecord<>(sourceTopic, txn), (metadata, exception) -> {
+                if (exception != null) {
+                    LOG.error("Error producing record {}", metadata, exception);
+                }
+            }));
         }
     }
 

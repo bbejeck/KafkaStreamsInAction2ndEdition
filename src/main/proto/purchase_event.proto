@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package bbejeck.chapter_4.proto;
+option java_outer_classname = "PurchaseEventProto";
+
+message PurchaseEvent {
+  string item = 1;
+  double amount = 2;
+  string user_id = 3;
+  int64 timestamp = 4;
+}

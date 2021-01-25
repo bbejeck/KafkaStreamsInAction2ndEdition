@@ -1,0 +1,12 @@
+{
+  "type":"record",
+  "namespace": "bbejeck.chapter_4.avro",
+  "name":"BrokerSummary",
+  "fields": [
+    {"name": "symbol", "type":"string"},
+    {"name": "broker", "type": "string"},
+    {"name": "shares", "type": "int"}
+  ]
+}
+
+

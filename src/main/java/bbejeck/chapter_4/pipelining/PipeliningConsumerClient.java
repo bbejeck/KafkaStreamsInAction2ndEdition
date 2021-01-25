@@ -1,4 +1,4 @@
-package bbejeck.chapter_4.noautocommit;
+package bbejeck.chapter_4.pipelining;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -22,17 +22,17 @@ import java.util.concurrent.TimeUnit;
  * Date: 1/18/21
  * Time: 6:53 PM
  */
-public class ConsumerClientNoAutoCommit {
+public class PipeliningConsumerClient {
 
-    private static final Logger LOG = LogManager.getLogger(ConsumerClientNoAutoCommit.class);
+    private static final Logger LOG = LogManager.getLogger(PipeliningConsumerClient.class);
     final Map<String,Object> consumerConfigs;
     volatile boolean keepConsuming = true;
     private final ArrayBlockingQueue<ConsumerRecords<String, ProductTransaction>> productQueue;
     private final ConcurrentLinkedDeque<Map<TopicPartition, OffsetAndMetadata>> offsetsQueue;
 
-    public ConsumerClientNoAutoCommit(final Map<String, Object> consumerConfigs,
-                                      final ArrayBlockingQueue<ConsumerRecords<String, ProductTransaction>> productQueue,
-                                      final ConcurrentLinkedDeque<Map<TopicPartition, OffsetAndMetadata>> offsetsQueue) {
+    public PipeliningConsumerClient(final Map<String, Object> consumerConfigs,
+                                    final ArrayBlockingQueue<ConsumerRecords<String, ProductTransaction>> productQueue,
+                                    final ConcurrentLinkedDeque<Map<TopicPartition, OffsetAndMetadata>> offsetsQueue) {
         this.consumerConfigs = consumerConfigs;
         this.productQueue = productQueue;
         this.offsetsQueue = offsetsQueue;

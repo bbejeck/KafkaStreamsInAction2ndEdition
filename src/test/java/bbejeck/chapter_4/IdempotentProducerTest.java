@@ -53,7 +53,7 @@ public class IdempotentProducerTest {
     private KafkaConsumer<String, Integer> consumer;
 
     @Container
-    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0")).withReuse(true);
+    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"));
 
     @BeforeEach
     public void createTopic() {

@@ -1,4 +1,4 @@
-package bbejeck.chapter_4.noautocommit;
+package bbejeck.chapter_4.pipelining;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
 import bbejeck.utils.DataGenerator;
@@ -16,13 +16,13 @@ import java.util.Map;
  * Date: 1/18/21
  * Time: 7:44 PM
  */
-public class ProducerClientNoAutoCommit {
-    private static final Logger LOG = LogManager.getLogger(ProducerClientNoAutoCommit.class);
+public class PipeliningProducerClient {
+    private static final Logger LOG = LogManager.getLogger(PipeliningProducerClient.class);
     final Map<String,Object> producerConfigs;
     volatile boolean keepProducing = true;
 
 
-    public ProducerClientNoAutoCommit(Map<String, Object> producerConfigs) {
+    public PipeliningProducerClient(Map<String, Object> producerConfigs) {
         this.producerConfigs = producerConfigs;
     }
 
@@ -32,7 +32,7 @@ public class ProducerClientNoAutoCommit {
             LOG.info("Created producer instance with {}", producerConfigs);
             while(keepProducing) {
                 // The DataGenerator is a stub for getting records from a point-of-sale service
-                Collection<ProductTransaction> purchases = DataGenerator.generateProductTransactions(10);
+                Collection<ProductTransaction> purchases = DataGenerator.generateProductTransactions(25);
                 LOG.info("Received {} sales data records", purchases.size());
                 purchases.forEach(purchase -> {
                     ProducerRecord<String, ProductTransaction> producerRecord = new ProducerRecord<>(topicName, purchase.getCustomerName(), purchase);

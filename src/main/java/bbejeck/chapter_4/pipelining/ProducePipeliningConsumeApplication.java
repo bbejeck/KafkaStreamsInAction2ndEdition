@@ -1,4 +1,4 @@
-package bbejeck.chapter_4.noautocommit;
+package bbejeck.chapter_4.pipelining;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
 import bbejeck.utils.Topics;
@@ -29,9 +29,9 @@ import java.util.concurrent.Executors;
  * Date: 1/18/21
  * Time: 12:02 PM
  */
-public class ProduceConsumeApplicationNoAutoCommit {
+public class ProducePipeliningConsumeApplication {
 
-    private static final Logger LOG = LogManager.getLogger(ProduceConsumeApplicationNoAutoCommit.class);
+    private static final Logger LOG = LogManager.getLogger(ProducePipeliningConsumeApplication.class);
     private static final String TOPIC_NAME = "no-auto-commit-application";
     private static final ExecutorService executorService = Executors.newFixedThreadPool(3);
 
@@ -47,16 +47,16 @@ public class ProduceConsumeApplicationNoAutoCommit {
         ArrayBlockingQueue<ConsumerRecords<String, ProductTransaction>> productQueue = new ArrayBlockingQueue<>(25);
 
         ConcurrentRecordProcessor recordProcessor = new ConcurrentRecordProcessor(offsetQueue, productQueue);
-        ProducerClientNoAutoCommit producerClientNoAutoCommit = new ProducerClientNoAutoCommit(getProducerConfigs());
-        ConsumerClientNoAutoCommit consumerClientNoAutoCommit = new ConsumerClientNoAutoCommit(getConsumerConfigs(), productQueue, offsetQueue);
+        PipeliningProducerClient pipeliningProducerClient = new PipeliningProducerClient(getProducerConfigs());
+        PipeliningConsumerClient pipeliningConsumerClient = new PipeliningConsumerClient(getConsumerConfigs(), productQueue, offsetQueue);
 
         LOG.info("Getting ready to start concurrent no auto-commit processing application, hit CNTL+C to stop");
 
-        Runnable producerThread = producerClientNoAutoCommit::runProducer;
+        Runnable producerThread = pipeliningProducerClient::runProducer;
         executorService.submit(producerThread);
         LOG.info("Started producer thread");
 
-        Runnable consumerThread = consumerClientNoAutoCommit::runConsumer;
+        Runnable consumerThread = pipeliningConsumerClient::runConsumer;
         executorService.submit(consumerThread);
         LOG.info("Started consumer thread");
 
@@ -66,8 +66,8 @@ public class ProduceConsumeApplicationNoAutoCommit {
 
         Runtime.getRuntime().addShutdownHook(new Thread(()-> {
             LOG.info("Starting shutdown");
-            producerClientNoAutoCommit.close();
-            consumerClientNoAutoCommit.close();
+            pipeliningProducerClient.close();
+            pipeliningConsumerClient.close();
             executorService.shutdownNow();
             stopLatch.countDown();
             LOG.info("All done now");
@@ -79,7 +79,7 @@ public class ProduceConsumeApplicationNoAutoCommit {
     static Map<String, Object> getConsumerConfigs() {
         final Map<String, Object> consumerConfigs = new HashMap<>();
         consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        consumerConfigs.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 300_000);
+        consumerConfigs.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10);
         consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, "product-non-auto-commit-group");
         consumerConfigs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");

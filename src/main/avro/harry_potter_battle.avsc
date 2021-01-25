@@ -1,0 +1,15 @@
+{
+  "type":"record",
+  "namespace": "bbejeck.chapter_4.avro",
+  "name":"HarryPotterBattle",
+  "fields": [
+    {"name": "symbol", "type":"string"},
+    {"name": "share_price", "type": "double"},
+    {"name": "timestamp", "type":"long"},
+    {"name": "customer_name", "type": "string"},
+    {"name": "broker", "type": "string"},
+    {"name": "shares", "type": "int"}
+  ]
+}
+
+

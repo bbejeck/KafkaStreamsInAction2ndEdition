@@ -1,4 +1,4 @@
-package bbejeck.chapter_4.noautocommit;
+package bbejeck.chapter_4.pipelining;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -50,7 +50,7 @@ public class ConcurrentRecordProcessor {
                              pt.getProductName(),
                              pt.getQuantity() * pt.getPrice());
                      TopicPartition topicPartition = new TopicPartition(record.topic(), record.partition());
-                     OffsetAndMetadata offsetAndMetadata = new OffsetAndMetadata(record.offset(), record.leaderEpoch(), null);
+                     OffsetAndMetadata offsetAndMetadata = new OffsetAndMetadata(record.offset() + 1);
                      offsets.put(topicPartition, offsetAndMetadata);
                      try {
                          //Simulate a long time to process each record

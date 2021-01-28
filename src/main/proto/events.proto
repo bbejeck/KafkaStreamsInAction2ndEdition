@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package bbejeck.chapter_4.proto;
+
+import "purchase_event.proto";
+import "login_event.proto";
+import "search_event.proto";
+
+option java_outer_classname = "EventsProto";
+
+message Events {
+
+  oneof type {
+    PurchaseEvent purchase_event = 1;
+    LogInEvent login_event = 2;
+    SearchEvent search_event = 3;
+  }
+  string key = 4;
+}

@@ -1,6 +1,7 @@
 package bbejeck.chapter_4.pipelining;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
@@ -8,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -33,25 +35,27 @@ public class ConcurrentRecordProcessor {
 
     public void process() {
          while(keepProcessing) {
-             ConsumerRecords<String, ProductTransaction> records;
+             ConsumerRecords<String, ProductTransaction> consumerRecords;
              try {
-                 records = productQueue.poll(10, TimeUnit.SECONDS);
+                 consumerRecords = productQueue.poll(10, TimeUnit.SECONDS);
              } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
                   keepProcessing = false;
                   continue;
              }
-             if (records !=null) {
+             if (consumerRecords !=null) {
                  Map<TopicPartition, OffsetAndMetadata> offsets = new HashMap<>();
-                 records.forEach(record -> {
-                     ProductTransaction pt = record.value();
-                     LOG.info("Processing order for {} with product {} for a total sale of {}",
-                             record.key(),
-                             pt.getProductName(),
-                             pt.getQuantity() * pt.getPrice());
-                     TopicPartition topicPartition = new TopicPartition(record.topic(), record.partition());
-                     OffsetAndMetadata offsetAndMetadata = new OffsetAndMetadata(record.offset() + 1);
-                     offsets.put(topicPartition, offsetAndMetadata);
+                 consumerRecords.partitions().forEach(topicPartition -> {
+                     List<ConsumerRecord<String,ProductTransaction>> topicPartitionRecords = consumerRecords.records(topicPartition);
+                     topicPartitionRecords.forEach(record -> {
+                                 ProductTransaction pt = record.value();
+                                 LOG.info("Processing order for {} with product {} for a total sale of {}",
+                                         record.key(),
+                                         pt.getProductName(),
+                                         pt.getQuantity() * pt.getPrice());
+                             });
+                     long lastOffset = topicPartitionRecords.get(topicPartitionRecords.size() - 1).offset();
+                     offsets.put(topicPartition, new OffsetAndMetadata(lastOffset + 1));
                      try {
                          //Simulate a long time to process each record
                          Thread.sleep(500);

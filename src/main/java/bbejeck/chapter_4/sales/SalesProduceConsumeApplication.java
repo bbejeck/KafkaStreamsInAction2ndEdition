@@ -1,5 +1,7 @@
 package bbejeck.chapter_4.sales;
 
+import bbejeck.chapter_4.avro.ProductTransaction;
+import bbejeck.common.DataSource;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
@@ -35,8 +37,9 @@ public class SalesProduceConsumeApplication {
         Topics.create(TOPIC_NAME);
         LOG.info("Created topic {}", TOPIC_NAME);
         CountDownLatch stopLatch = new CountDownLatch(1);
+        DataSource<ProductTransaction> salesDataSource = new SalesDataSource();
         
-        SalesProducerClient salesProducerClient = new SalesProducerClient(getProducerConfigs());
+        SalesProducerClient salesProducerClient = new SalesProducerClient(getProducerConfigs(), salesDataSource);
         SalesConsumerClient salesConsumerClient = new SalesConsumerClient(getConsumerConfigs());
 
         LOG.info("Getting ready to start sales processing application, hit CNTL+C to stop");

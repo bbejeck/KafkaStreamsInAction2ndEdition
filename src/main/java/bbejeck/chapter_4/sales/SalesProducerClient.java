@@ -1,7 +1,7 @@
 package bbejeck.chapter_4.sales;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
-import bbejeck.utils.DataGenerator;
+import bbejeck.common.DataSource;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -18,12 +18,16 @@ import java.util.Map;
  */
 public class SalesProducerClient {
     private static final Logger LOG = LogManager.getLogger(SalesProducerClient.class);
-    final Map<String,Object> producerConfigs;
-    volatile boolean keepProducing = true;
+    private final Map<String,Object> producerConfigs;
+    private final DataSource<ProductTransaction> salesDataSource;
+    private volatile boolean keepProducing = true;
 
 
-    public SalesProducerClient(Map<String, Object> producerConfigs) {
+
+    public SalesProducerClient(final Map<String, Object> producerConfigs,
+                               final DataSource<ProductTransaction> salesDataSource) {
         this.producerConfigs = producerConfigs;
+        this.salesDataSource = salesDataSource;
     }
 
     public void runProducer() {
@@ -31,8 +35,7 @@ public class SalesProducerClient {
             final String topicName = (String)producerConfigs.get("topic.name");
             LOG.info("Created producer instance with {}", producerConfigs);
             while(keepProducing) {
-                // The DataGenerator is a stub for getting records from a point-of-sale service
-                Collection<ProductTransaction> purchases = DataGenerator.generateProductTransactions(5);
+                Collection<ProductTransaction> purchases = salesDataSource.fetch();
                 LOG.info("Received sales data");
                 purchases.forEach(purchase -> {
                     ProducerRecord<String, ProductTransaction> producerRecord = new ProducerRecord<>(topicName, purchase.getCustomerName(), purchase);

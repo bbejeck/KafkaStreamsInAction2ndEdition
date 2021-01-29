@@ -1,6 +1,7 @@
 package bbejeck.chapter_4.pipelining;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
+import bbejeck.common.RecordProcessor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,24 +23,40 @@ import java.util.concurrent.TimeUnit;
  * Date: 1/21/21
  * Time: 8:01 PM
  */
-public class ConcurrentRecordProcessor {
+public class ConcurrentRecordProcessor implements RecordProcessor<String, ProductTransaction > {
        private static final Logger LOG = LogManager.getLogger(ConcurrentRecordProcessor.class);
        private final ConcurrentLinkedDeque<Map<TopicPartition, OffsetAndMetadata>> offsetQueue;
        private final ArrayBlockingQueue<ConsumerRecords<String, ProductTransaction>> productQueue;
        private volatile boolean keepProcessing = true;
+       private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public ConcurrentRecordProcessor(final ConcurrentLinkedDeque<Map<TopicPartition, OffsetAndMetadata>> offsetQueue,
                                      final ArrayBlockingQueue<ConsumerRecords<String, ProductTransaction>> productQueue) {
         this.offsetQueue = offsetQueue;
         this.productQueue = productQueue;
+        executorService.submit(this::process);
     }
 
+    @Override
+    public void processRecords(ConsumerRecords<String, ProductTransaction> records) {
+        try {
+            LOG.info("Putting records {} into the process queue", records.count());
+            productQueue.offer(records, 20, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    @Override
+    public Map<TopicPartition, OffsetAndMetadata> getOffsets() {
+        return offsetQueue.poll();
+    }
 
     public void process() {
          while(keepProcessing) {
              ConsumerRecords<String, ProductTransaction> consumerRecords;
              try {
-                 consumerRecords = productQueue.poll(10, TimeUnit.SECONDS);
+                 consumerRecords = productQueue.poll(20, TimeUnit.SECONDS);
              } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
                   keepProcessing = false;
@@ -47,21 +66,9 @@ public class ConcurrentRecordProcessor {
                  Map<TopicPartition, OffsetAndMetadata> offsets = new HashMap<>();
                  consumerRecords.partitions().forEach(topicPartition -> {
                      List<ConsumerRecord<String,ProductTransaction>> topicPartitionRecords = consumerRecords.records(topicPartition);
-                     topicPartitionRecords.forEach(record -> {
-                                 ProductTransaction pt = record.value();
-                                 LOG.info("Processing order for {} with product {} for a total sale of {}",
-                                         record.key(),
-                                         pt.getProductName(),
-                                         pt.getQuantity() * pt.getPrice());
-                             });
+                     topicPartitionRecords.forEach(this::doProcessRecord);
                      long lastOffset = topicPartitionRecords.get(topicPartitionRecords.size() - 1).offset();
                      offsets.put(topicPartition, new OffsetAndMetadata(lastOffset + 1));
-                     try {
-                         //Simulate a long time to process each record
-                         Thread.sleep(500);
-                     } catch (InterruptedException e) {
-                         Thread.currentThread().interrupt();
-                     }
                  });
                  LOG.info("putting offsets and metadata {} in queue", offsets);
                  offsetQueue.offer(offsets);
@@ -71,7 +78,22 @@ public class ConcurrentRecordProcessor {
          }
     }
 
+    private void doProcessRecord(ConsumerRecord<String, ProductTransaction> record) {
+        ProductTransaction pt = record.value();
+        LOG.info("Processing order for {} with product {} for a total sale of {}",
+                record.key(),
+                pt.getProductName(),
+                pt.getQuantity() * pt.getPrice());
+        try {
+            //Simulate a long time to process each record
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     public void close() {
         keepProcessing = false;
+        executorService.shutdownNow();
     }
 }

@@ -1,6 +1,7 @@
 package bbejeck.chapter_4.pipelining;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
+import bbejeck.common.RecordProcessor;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -13,9 +14,6 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.TimeUnit;
 
 /**
  * User: Bill Bejeck
@@ -25,46 +23,37 @@ import java.util.concurrent.TimeUnit;
 public class PipeliningConsumerClient {
 
     private static final Logger LOG = LogManager.getLogger(PipeliningConsumerClient.class);
-    final Map<String,Object> consumerConfigs;
+    private final Map<String, Object> consumerConfigs;
+    private final RecordProcessor<String, ProductTransaction> recordProcessor;
     volatile boolean keepConsuming = true;
-    private final ArrayBlockingQueue<ConsumerRecords<String, ProductTransaction>> productQueue;
-    private final ConcurrentLinkedDeque<Map<TopicPartition, OffsetAndMetadata>> offsetsQueue;
 
     public PipeliningConsumerClient(final Map<String, Object> consumerConfigs,
-                                    final ArrayBlockingQueue<ConsumerRecords<String, ProductTransaction>> productQueue,
-                                    final ConcurrentLinkedDeque<Map<TopicPartition, OffsetAndMetadata>> offsetsQueue) {
+                                    final RecordProcessor<String, ProductTransaction> recordProcessor) {
         this.consumerConfigs = consumerConfigs;
-        this.productQueue = productQueue;
-        this.offsetsQueue = offsetsQueue;
+        this.recordProcessor = recordProcessor;
     }
 
     public void runConsumer() {
         LOG.info("Starting runConsumer method using properties {}", consumerConfigs);
-        List<String> topicNames = Arrays.asList(((String)consumerConfigs.get("topic.names")).split(","));
+        List<String> topicNames = Arrays.asList(((String) consumerConfigs.get("topic.names")).split(","));
         try (final Consumer<String, ProductTransaction> consumer = new KafkaConsumer<>(consumerConfigs)) {
             consumer.subscribe(topicNames);
             while (keepConsuming) {
                 ConsumerRecords<String, ProductTransaction> consumerRecords = consumer.poll(Duration.ofSeconds(5));
                 if (!consumerRecords.isEmpty()) {
-                    try {
-                        LOG.info("Putting records {} into the process queue", consumerRecords.count());
-                        productQueue.offer(consumerRecords, 60, TimeUnit.SECONDS);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        keepConsuming = false;
-                        continue;
-                    }
-                    Map<TopicPartition, OffsetAndMetadata> offsetsAndMetadata = offsetsQueue.poll();
+                    LOG.info("Passing records {} to the processor", consumerRecords.count());
+                    recordProcessor.processRecords(consumerRecords);
+                    Map<TopicPartition, OffsetAndMetadata> offsetsAndMetadata = recordProcessor.getOffsets();
                     if (offsetsAndMetadata != null) {
                         LOG.info("Batch completed now committing the offsets {}", offsetsAndMetadata);
                         consumer.commitSync(offsetsAndMetadata);
                     } else {
                         LOG.info("Nothing to commit at this point");
                     }
-                  } else {
+                } else {
                     LOG.info("No records returned from poll");
                 }
-                }
+            }
             LOG.info("All done consuming records now");
         }
     }

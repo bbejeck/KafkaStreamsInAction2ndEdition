@@ -48,7 +48,8 @@ public class ProducePipeliningConsumeApplication {
 
         ConcurrentRecordProcessor recordProcessor = new ConcurrentRecordProcessor(offsetQueue, productQueue);
         PipeliningProducerClient pipeliningProducerClient = new PipeliningProducerClient(getProducerConfigs());
-        PipeliningConsumerClient pipeliningConsumerClient = new PipeliningConsumerClient(getConsumerConfigs(), productQueue, offsetQueue);
+        
+        PipeliningConsumerClient pipeliningConsumerClient = new PipeliningConsumerClient(getConsumerConfigs(),recordProcessor);
 
         LOG.info("Getting ready to start concurrent no auto-commit processing application, hit CNTL+C to stop");
 

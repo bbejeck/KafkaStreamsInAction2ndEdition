@@ -40,8 +40,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * User: Bill Bejeck
@@ -50,11 +52,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 
 @Testcontainers
-public class TransactionalConsumeProduceTest {
+public class TransactionalConsumeTransformProduceTest {
 
     private final String sourceTopic = "stock-transactions-topic";
     private final String outputTopic = "broker-summary-topic";
-    private static final Logger LOG = LogManager.getLogger(TransactionalConsumeProduceTest.class);
+    private static final Logger LOG = LogManager.getLogger(TransactionalConsumeTransformProduceTest.class);
     private static final int NUM_GENERATED_RECORDS = 25;
     private static final int EXPECTED_NUMBER_TRANSACTIONS = 3;
 
@@ -113,6 +115,7 @@ public class TransactionalConsumeProduceTest {
 
             producer.initTransactions();
             int recordsRead = 0;
+            AtomicLong lastOffset = new AtomicLong();
 
             while (recordsRead < NUM_GENERATED_RECORDS) {
                 consumer.subscribe(Collections.singletonList(sourceTopic));
@@ -120,31 +123,28 @@ public class TransactionalConsumeProduceTest {
                 if (!consumerRecords.isEmpty()) {
                     recordsRead += consumerRecords.count();
                     Map<TopicPartition, OffsetAndMetadata> offsets = new HashMap<>();
-
                     producer.beginTransaction();
-                    consumerRecords.forEach(record -> {
-                        TopicPartition topicPartition = new TopicPartition(record.topic(), record.partition());
-                        OffsetAndMetadata offsetAndMetadata = new OffsetAndMetadata(record.offset() + 1);
-                        offsets.put(topicPartition, offsetAndMetadata);
-
-                        StockTransaction stockTransaction = record.value();
-                        BrokerSummary brokerSummary = BrokerSummary.newBuilder()
-                                .setBroker(stockTransaction.getBroker())
-                                .setShares(stockTransaction.getShares())
-                                .setSymbol(stockTransaction.getSymbol()).build();
-
-                        // Adding this for verification later in the test
-                        expectedBrokerSummaryRecords.add(brokerSummary);
-
-                        producer.send(new ProducerRecord<>(outputTopic, brokerSummary));
+                    consumerRecords.partitions().forEach(topicPartition -> {
+                        consumerRecords.records(topicPartition).forEach(record -> {
+                            lastOffset.set(record.offset());
+                            StockTransaction stockTransaction = record.value();
+                            BrokerSummary brokerSummary = BrokerSummary.newBuilder()
+                                    .setBroker(stockTransaction.getBroker())
+                                    .setShares(stockTransaction.getShares())
+                                    .setSymbol(stockTransaction.getSymbol()).build();
+                            // Adding this for verification later in the test
+                            expectedBrokerSummaryRecords.add(brokerSummary);
+                            producer.send(new ProducerRecord<>(outputTopic, brokerSummary));
+                        });
+                        offsets.put(topicPartition, new OffsetAndMetadata(lastOffset.get() + 1L));
                     });
                     try {
                         producer.sendOffsetsToTransaction(offsets, consumer.groupMetadata());
                         producer.commitTransaction();
                         numberTransactions += 1;
                     } catch (KafkaException e){
-                        LOG.error("Transaction failed ", e);
-                        break;
+                        // Since this is a test case for any exception we'll consider it a failure
+                        fail("Transaction failed with " + e.getMessage());
                     }
                 }
             }

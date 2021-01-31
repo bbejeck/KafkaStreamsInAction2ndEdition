@@ -7,6 +7,10 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.errors.AuthorizationException;
+import org.apache.kafka.common.errors.OutOfOrderSequenceException;
+import org.apache.kafka.common.errors.ProducerFencedException;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -40,10 +44,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 
 @Testcontainers
-public class TransactionalProducerTest {
+public class TransactionalProducerConsumerTest {
 
     private final String topicName = "transactional-topic";
-    private static final Logger LOG = LogManager.getLogger(TransactionalProducerTest.class);
+    private static final Logger LOG = LogManager.getLogger(TransactionalProducerConsumerTest.class);
 
     @Container
     public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"))
@@ -73,9 +77,17 @@ public class TransactionalProducerTest {
     public void testProduceTransactions() {
         try (KafkaProducer<String, Integer> producer = getProducer()) {
             producer.initTransactions();
-            producer.beginTransaction();
-            produceRecords(producer);
-            producer.commitTransaction();
+            try {
+                producer.beginTransaction();
+                produceRecords(producer);
+                producer.commitTransaction();
+            } catch (ProducerFencedException | OutOfOrderSequenceException | AuthorizationException e) {
+                e.printStackTrace();
+                producer.close();
+            } catch (KafkaException e) {
+                e.printStackTrace();
+                producer.abortTransaction();
+            }
         }
 
         List<Integer> expectedRecords = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -90,16 +102,23 @@ public class TransactionalProducerTest {
     public void testConsumeOnlyOnceAfterAbortReadCommitted() throws Exception {
         try (KafkaProducer<String, Integer> producer = getProducer()) {
             producer.initTransactions();
-            producer.beginTransaction();
-            produceRecords(producer);
-            Thread.sleep(5000L);
-            // simulate an error locally need to abort and re-send
-            producer.abortTransaction();
-
-            // re-try
-            producer.beginTransaction();
-            produceRecords(producer);
-            producer.commitTransaction();
+            try {
+                producer.beginTransaction();
+                produceRecords(producer);
+                Thread.sleep(5000L);
+                // simulate an error locally need to abort and re-send
+                producer.abortTransaction();
+                // re-try
+                producer.beginTransaction();
+                produceRecords(producer);
+                producer.commitTransaction();
+            } catch (ProducerFencedException | OutOfOrderSequenceException | AuthorizationException e) {
+                e.printStackTrace();
+                producer.close();
+            } catch (KafkaException e) {
+                e.printStackTrace();
+                producer.abortTransaction();
+            }
         }
 
         List<Integer> expectedRecords = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -115,15 +134,23 @@ public class TransactionalProducerTest {
     public void testConsumeAllRecordsAfterAbortReadCommitted() throws Exception {
         try (KafkaProducer<String, Integer> producer = getProducer()) {
             producer.initTransactions();
-            producer.beginTransaction();
-            produceRecords(producer);
-            Thread.sleep(5000L);
-            // simulate an error locally need to abort and re-send
-            producer.abortTransaction();
+            try {
+                producer.beginTransaction();
+                produceRecords(producer);
+                Thread.sleep(5000L);
+                // simulate an error locally need to abort and re-send
+                producer.abortTransaction();
 
-            producer.beginTransaction();
-            produceRecords(producer);
-            producer.commitTransaction();
+                producer.beginTransaction();
+                produceRecords(producer);
+                producer.commitTransaction();
+            } catch (ProducerFencedException | OutOfOrderSequenceException | AuthorizationException e) {
+                e.printStackTrace();
+                producer.close();
+            } catch (KafkaException e) {
+                e.printStackTrace();
+                producer.abortTransaction();
+            }
         }
 
         // Since the consumer is sets "read_uncommitted" it gets both failed and successful transactional data
@@ -139,13 +166,7 @@ public class TransactionalProducerTest {
         int numberRecordsToProduce = 10;
         int counter = 0;
         while (counter < numberRecordsToProduce) {
-            producer.send(new ProducerRecord<>(topicName, counter++), (metadata, exception) -> {
-                if (exception != null) {
-                    LOG.error("Produce failed with", exception);
-                } else {
-                    LOG.info("Produced record to offset {}", metadata.offset());
-                }
-            });
+            producer.send(new ProducerRecord<>(topicName, counter++));
         }
     }
 

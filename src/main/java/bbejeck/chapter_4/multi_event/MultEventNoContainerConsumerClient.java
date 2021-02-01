@@ -1,6 +1,5 @@
 package bbejeck.chapter_4.multi_event;
 
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -58,15 +57,11 @@ public class MultEventNoContainerConsumerClient {
 
     private String getEventType(final DynamicMessage event) {
         allEvents.add(event);
-        Descriptors.Descriptor descriptor = event.getDescriptorForType();
-        if (descriptor.findFieldByName("login_time") != null) {
-            logins.add(event);
-        } else if (descriptor.findFieldByName("searched_item") != null) {
-            searches.add(event);
-        } else if (descriptor.findFieldByName("purchased_item") != null) {
-            purchases.add(event);
-        } else {
-            throw new IllegalStateException("Unrecognized type of event " + event);
+        switch (event.getDescriptorForType().getName()) {
+            case "LoginEvent" -> logins.add(event);
+            case "SearchEvent" -> searches.add(event);
+            case "PurchaseEvent" -> purchases.add(event);
+            default -> LOG.info("Found unrecognized type {}", event);
         }
         return event.toString();
     }

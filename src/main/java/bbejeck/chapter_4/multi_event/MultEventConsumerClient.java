@@ -29,7 +29,7 @@ public class MultEventConsumerClient {
     volatile boolean keepConsuming = true;
 
     List<PurchaseEventProto.PurchaseEvent> purchases = new ArrayList<>();
-    List<LoginEventProto.LogInEvent> logins = new ArrayList<>();
+    List<LoginEventProto.LoginEvent> logins = new ArrayList<>();
     List<SearchEventProto.SearchEvent> searches = new ArrayList<>();
     List<EventsProto.Events> eventsList = new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class MultEventConsumerClient {
     private String getEventType(final EventsProto.Events event) {
         eventsList.add(event);
         if(event.hasLoginEvent()) {
-            LoginEventProto.LogInEvent login = event.getLoginEvent();
+            LoginEventProto.LoginEvent login = event.getLoginEvent();
             logins.add(login);
             return login.toString();
         } else if (event.hasSearchEvent()) {

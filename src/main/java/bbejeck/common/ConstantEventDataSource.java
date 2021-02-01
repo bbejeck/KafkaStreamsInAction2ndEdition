@@ -20,12 +20,12 @@ public class ConstantEventDataSource implements DataSource<EventsProto.Events> {
     public Collection<EventsProto.Events> fetch() {
         List<EventsProto.Events> events = new ArrayList<>();
         SearchEventProto.SearchEvent.Builder searchBuilder = SearchEventProto.SearchEvent.newBuilder();
-        LoginEventProto.LogInEvent.Builder logInBuilder = LoginEventProto.LogInEvent.newBuilder();
+        LoginEventProto.LoginEvent.Builder logInBuilder = LoginEventProto.LoginEvent.newBuilder();
         PurchaseEventProto.PurchaseEvent.Builder purchaseBuilder = PurchaseEventProto.PurchaseEvent.newBuilder();
 
         SearchEventProto.SearchEvent searchEvent = searchBuilder.setSearchedItem("fish-eggs").setUserId("grogu").setTimestamp(500).build();
         SearchEventProto.SearchEvent searchEventII = searchBuilder.setSearchedItem("gum").setUserId("grogu").setTimestamp(600).build();
-        LoginEventProto.LogInEvent logInEvent = logInBuilder.setLoginTime(400).setUserId("grogu").build();
+        LoginEventProto.LoginEvent logInEvent = logInBuilder.setLoginTime(400).setUserId("grogu").build();
         PurchaseEventProto.PurchaseEvent purchaseEvent = purchaseBuilder.setPurchasedItem("Uncle Ed's Fish Eggs")
                                                                         .setTimestamp(700)
                                                                         .setAmount(25.00)

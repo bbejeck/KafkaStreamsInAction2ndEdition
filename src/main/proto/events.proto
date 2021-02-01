@@ -12,7 +12,7 @@ message Events {
 
   oneof type {
     PurchaseEvent purchase_event = 1;
-    LogInEvent login_event = 2;
+    LoginEvent login_event = 2;
     SearchEvent search_event = 3;
   }
   string key = 4;

@@ -63,7 +63,7 @@ public class MultiEventNoContainerProduceConsumeTest {
     }
 
     @Test
-    @DisplayName("should produce and consume multiple events with no enclosing class per topic")
+    @DisplayName("should produce and consume multiple events on a single topic with DynamicRecords")
     public void produceConsumeMultipleEventsNoOuterClassFromSameTopic() {
         MultiEventNoContainerProducerClient producerClient = new MultiEventNoContainerProducerClient(getProducerProps(), eventsDataSource);
         producerClient.runProducerOnce();

@@ -3,7 +3,7 @@ syntax = "proto3";
 package bbejeck.chapter_4.proto;
 option java_outer_classname = "LoginEventProto";
 
-message LogInEvent {
+message LoginEvent {
   string user_id = 1;
   int64 login_time = 2;
 }

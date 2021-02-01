@@ -60,8 +60,8 @@ public class MultiEventNoContainerProducerClient {
             return ((PurchaseEventProto.PurchaseEvent)eventObject).getUserId();
         } else if (eventObject instanceof SearchEventProto.SearchEvent) {
             return ((SearchEventProto.SearchEvent)eventObject).getUserId();
-        } else if (eventObject instanceof LoginEventProto.LogInEvent) {
-            return ((LoginEventProto.LogInEvent)eventObject).getUserId();
+        } else if (eventObject instanceof LoginEventProto.LoginEvent) {
+            return ((LoginEventProto.LoginEvent)eventObject).getUserId();
         } else {
             throw new IllegalStateException("Unrecognized type " + eventObject.getClass());
         }

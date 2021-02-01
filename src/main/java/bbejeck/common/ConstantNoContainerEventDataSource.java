@@ -1,6 +1,5 @@
 package bbejeck.common;
 
-import bbejeck.chapter_4.proto.EventsProto;
 import bbejeck.chapter_4.proto.LoginEventProto;
 import bbejeck.chapter_4.proto.PurchaseEventProto;
 import bbejeck.chapter_4.proto.SearchEventProto;
@@ -14,11 +13,11 @@ import java.util.List;
  * Date: 1/26/21
  * Time: 7:38 PM
  */
-public class ConstantEventDataSource implements DataSource<EventsProto.Events> {
+public class ConstantNoContainerEventDataSource implements DataSource<Object> {
 
     @Override
-    public Collection<EventsProto.Events> fetch() {
-        List<EventsProto.Events> events = new ArrayList<>();
+    public Collection<Object> fetch() {
+        List<Object> events = new ArrayList<>();
         SearchEventProto.SearchEvent.Builder searchBuilder = SearchEventProto.SearchEvent.newBuilder();
         LoginEventProto.LogInEvent.Builder logInBuilder = LoginEventProto.LogInEvent.newBuilder();
         PurchaseEventProto.PurchaseEvent.Builder purchaseBuilder = PurchaseEventProto.PurchaseEvent.newBuilder();
@@ -31,14 +30,10 @@ public class ConstantEventDataSource implements DataSource<EventsProto.Events> {
                                                                         .setAmount(25.00)
                                                                         .setUserId("grogu").build();
 
-        EventsProto.Events.Builder eventBuilder = EventsProto.Events.newBuilder();
-        events.add(eventBuilder.setKey(searchEvent.getUserId()).setSearchEvent(searchEvent).build());
-        eventBuilder.clear();
-        events.add(eventBuilder.setKey(logInEvent.getUserId()).setLoginEvent(logInEvent).build());
-        eventBuilder.clear();
-        events.add(eventBuilder.setKey(searchEventII.getUserId()).setSearchEvent(searchEventII).build());
-        eventBuilder.clear();
-        events.add(eventBuilder.setKey(purchaseEvent.getUserId()).setPurchaseEvent(purchaseEvent).build());
+        events.add(searchEvent);
+        events.add(logInEvent);
+        events.add(searchEventII);
+        events.add(purchaseEvent);
         
         return events;
     }

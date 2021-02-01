@@ -4,7 +4,7 @@ package bbejeck.chapter_4.proto;
 option java_outer_classname = "SearchEventProto";
 
 message SearchEvent {
-  string item = 1;
+  string searched_item = 1;
   string user_id = 2;
   int64 timestamp = 3;
 }

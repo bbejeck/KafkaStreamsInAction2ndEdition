@@ -5,5 +5,5 @@ option java_outer_classname = "LoginEventProto";
 
 message LogInEvent {
   string user_id = 1;
-  int64 timestamp = 2;
+  int64 login_time = 2;
 }

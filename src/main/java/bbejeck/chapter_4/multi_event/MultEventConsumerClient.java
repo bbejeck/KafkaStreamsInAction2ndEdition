@@ -45,7 +45,7 @@ public class MultEventConsumerClient {
             consumer.subscribe(topicNames);
             while (keepConsuming) {
                 ConsumerRecords<String, EventsProto.Events> consumerRecords = consumer.poll(Duration.ofSeconds(5));
-                consumerRecords.forEach(record -> LOG.info("Found event {} for user {}", getEventType(record.value()), record.key()));
+                consumerRecords.forEach(record -> LOG.info("Found event {} for user {}", getEventTypeByEnum(record.value()), record.key()));
                 if (runOnce) {
                     close();
                 }
@@ -57,6 +57,26 @@ public class MultEventConsumerClient {
     public void runConsumerOnce() {
         runOnce = true;
         runConsumer();
+    }
+
+    private String getEventTypeByEnum(final EventsProto.Events event){
+        eventsList.add(event);
+        String typeString = null;
+        switch (event.getTypeCase()) {
+            case LOGIN_EVENT -> {
+                logins.add(event.getLoginEvent());
+                typeString = event.getLoginEvent().toString();
+            }
+            case SEARCH_EVENT -> {
+                searches.add(event.getSearchEvent());
+                typeString = event.getLoginEvent().toString();
+            }
+            case PURCHASE_EVENT ->  {
+                purchases.add(event.getPurchaseEvent());
+                typeString = event.getPurchaseEvent().toString();
+            }
+        }
+        return typeString;
     }
 
     private String getEventType(final EventsProto.Events event) {

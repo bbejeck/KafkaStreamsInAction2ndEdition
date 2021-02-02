@@ -1,9 +1,8 @@
 package bbejeck.chapter_4.multi_event;
 
-import bbejeck.chapter_4.proto.LoginEventProto;
-import bbejeck.chapter_4.proto.PurchaseEventProto;
-import bbejeck.chapter_4.proto.SearchEventProto;
 import bbejeck.common.DataSource;
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.DynamicMessage;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -21,26 +20,26 @@ import java.util.Map;
 public class MultiEventNoContainerProducerClient {
     private static final Logger LOG = LogManager.getLogger(MultiEventNoContainerProducerClient.class);
     final Map<String,Object> producerConfigs;
-    final DataSource<Object> dataSource;
+    final DataSource<DynamicMessage> dataSource;
     volatile boolean keepProducing = true;
     private boolean runOnce;
 
 
     public MultiEventNoContainerProducerClient(final Map<String, Object> producerConfigs,
-                                               final DataSource<Object> dataSource) {
+                                               final DataSource<DynamicMessage> dataSource) {
         this.producerConfigs = producerConfigs;
         this.dataSource = dataSource;
     }
 
     public void runProducer() {
-        try (Producer<String, Object> producer = new KafkaProducer<>(producerConfigs)) {
+        try (Producer<String, DynamicMessage> producer = new KafkaProducer<>(producerConfigs)) {
             final String topicName = (String)producerConfigs.get("topic.name");
             LOG.info("Created producer instance with {}", producerConfigs);
             while(keepProducing) {
-                Collection<Object> events = dataSource.fetch();
+                Collection<DynamicMessage> events = dataSource.fetch();
                 events.forEach(event -> {
                     String key = extractKey(event);
-                    ProducerRecord<String, Object> producerRecord = new ProducerRecord<>(topicName, key, event);
+                    ProducerRecord<String, DynamicMessage> producerRecord = new ProducerRecord<>(topicName, key, event);
                     producer.send(producerRecord, (metadata, exception) -> {
                         if (exception != null) {
                             LOG.error("Error producing records ", exception);
@@ -55,16 +54,13 @@ public class MultiEventNoContainerProducerClient {
         }
     }
 
-    private String extractKey(Object eventObject) {
-        if (eventObject instanceof PurchaseEventProto.PurchaseEvent) {
-            return ((PurchaseEventProto.PurchaseEvent)eventObject).getUserId();
-        } else if (eventObject instanceof SearchEventProto.SearchEvent) {
-            return ((SearchEventProto.SearchEvent)eventObject).getUserId();
-        } else if (eventObject instanceof LoginEventProto.LoginEvent) {
-            return ((LoginEventProto.LoginEvent)eventObject).getUserId();
-        } else {
-            throw new IllegalStateException("Unrecognized type " + eventObject.getClass());
+    private String extractKey(DynamicMessage eventObject) {
+        Descriptors.Descriptor descriptor = eventObject.getDescriptorForType();
+        Descriptors.FieldDescriptor userIdFieldDescriptor = descriptor.findFieldByName("user_id");
+        if (userIdFieldDescriptor != null) {
+             return (String) eventObject.getField(userIdFieldDescriptor);
         }
+        return null;
     }
 
     public void runProducerOnce() {

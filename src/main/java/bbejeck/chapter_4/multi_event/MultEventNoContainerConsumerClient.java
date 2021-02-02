@@ -1,5 +1,8 @@
 package bbejeck.chapter_4.multi_event;
 
+import bbejeck.chapter_4.proto.LoginEventProto;
+import bbejeck.chapter_4.proto.PurchaseEventProto;
+import bbejeck.chapter_4.proto.SearchEventProto;
 import com.google.protobuf.DynamicMessage;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -28,6 +31,9 @@ public class MultEventNoContainerConsumerClient {
     List<DynamicMessage> purchases = new ArrayList<>();
     List<DynamicMessage> logins = new ArrayList<>();
     List<DynamicMessage> searches = new ArrayList<>();
+    final String loginEventName = LoginEventProto.LoginEvent.getDescriptor().getFullName();
+    final String purchaseEventName = PurchaseEventProto.PurchaseEvent.getDescriptor().getFullName();
+    final String searchEventName = SearchEventProto.SearchEvent.getDescriptor().getFullName();
 
     public MultEventNoContainerConsumerClient(final Map<String,Object> consumerConfigs) {
         this.consumerConfigs = consumerConfigs;
@@ -57,11 +63,15 @@ public class MultEventNoContainerConsumerClient {
 
     private String getEventType(final DynamicMessage event) {
         allEvents.add(event);
-        switch (event.getDescriptorForType().getName()) {
-            case "LoginEvent" -> logins.add(event);
-            case "SearchEvent" -> searches.add(event);
-            case "PurchaseEvent" -> purchases.add(event);
-            default -> LOG.info("Found unrecognized type {}", event);
+        String eventFullName = event.getDescriptorForType().getFullName();
+        if (eventFullName.equals(loginEventName)) {
+            logins.add(event);
+        } else if(eventFullName.equals(searchEventName)) {
+            searches.add(event);
+        } else if(eventFullName.equals(purchaseEventName)) {
+            purchases.add(event);
+        } else {
+            throw new IllegalStateException("Unrecognized type " + eventFullName);
         }
         return event.toString();
     }

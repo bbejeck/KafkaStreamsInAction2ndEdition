@@ -1,8 +1,9 @@
 package bbejeck.chapter_4.multi_event;
 
-import bbejeck.common.ConstantNoContainerEventDataSource;
+import bbejeck.common.ConstantDynamicMessageEventDataSource;
 import bbejeck.common.DataSource;
 import bbejeck.utils.Topics;
+import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer;
@@ -41,7 +42,7 @@ public class MultiEventNoContainerProduceConsumeTest {
 
     private final String outputTopic = "multi-events-no-container-topic";
     private static final Logger LOG = LogManager.getLogger(MultiEventNoContainerProduceConsumeTest.class);
-    final DataSource<Object> eventsDataSource = new ConstantNoContainerEventDataSource();
+    final DataSource<DynamicMessage> eventsDataSource = new ConstantDynamicMessageEventDataSource();
 
 
     @Container

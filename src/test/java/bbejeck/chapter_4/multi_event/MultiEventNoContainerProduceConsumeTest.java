@@ -1,9 +1,7 @@
 package bbejeck.chapter_4.multi_event;
 
 import bbejeck.common.ConstantDynamicMessageEventDataSource;
-import bbejeck.common.DataSource;
 import bbejeck.utils.Topics;
-import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer;
@@ -12,8 +10,6 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,13 +19,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 /**
  * User: Bill Bejeck
@@ -41,8 +35,7 @@ public class MultiEventNoContainerProduceConsumeTest {
 
 
     private final String outputTopic = "multi-events-no-container-topic";
-    private static final Logger LOG = LogManager.getLogger(MultiEventNoContainerProduceConsumeTest.class);
-    final DataSource<DynamicMessage> eventsDataSource = new ConstantDynamicMessageEventDataSource();
+    final ConstantDynamicMessageEventDataSource eventsDataSource = new ConstantDynamicMessageEventDataSource();
 
 
     @Container
@@ -69,12 +62,10 @@ public class MultiEventNoContainerProduceConsumeTest {
         MultiEventNoContainerProducerClient producerClient = new MultiEventNoContainerProducerClient(getProducerProps(), eventsDataSource);
         producerClient.runProducerOnce();
 
-        MultEventNoContainerConsumerClient consumerClient = new MultEventNoContainerConsumerClient(getConsumerProps());
+        MultiEventNoContainerConsumerClient consumerClient = new MultiEventNoContainerConsumerClient(getConsumerProps());
         consumerClient.runConsumerOnce();
 
-        List<Object> expectedEvents = new ArrayList<>(eventsDataSource.fetch());
-
-        assertEquals(expectedEvents, consumerClient.allEvents);
+        assertIterableEquals(eventsDataSource.getSentEvents(), consumerClient.allEvents);
     }
 
 

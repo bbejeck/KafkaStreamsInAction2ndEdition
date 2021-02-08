@@ -15,12 +15,13 @@ import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -28,12 +29,12 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -47,7 +48,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TransactionalProducerConsumerTest {
 
     private final String topicName = "transactional-topic";
-    private static final Logger LOG = LogManager.getLogger(TransactionalProducerConsumerTest.class);
 
     @Container
     public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"))
@@ -90,16 +90,19 @@ public class TransactionalProducerConsumerTest {
             }
         }
 
-        List<Integer> expectedRecords = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+        List<Integer> expectedRecords = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
         try (KafkaConsumer<String, Integer> consumer = getConsumer("read_committed")) {
             List<Integer> consumedRecordsList = consumeRecords(consumer);
             assertEquals(expectedRecords, consumedRecordsList);
         }
     }
 
-    @Test
-    @DisplayName("should only consume records once with aborted transaction")
-    public void testConsumeOnlyOnceAfterAbortReadCommitted() throws Exception {
+    @DisplayName("Consumer isolation level tests")
+    @ParameterizedTest(name="should consume {2} records with aborted transaction")
+    @MethodSource("testParameters")
+    public void testConsumeOnlyOnceAfterAbortReadCommitted(final List<Integer> expectedRecords,
+                                                           final String isolationLevel,
+                                                           final String recordType) throws Exception {
         try (KafkaProducer<String, Integer> producer = getProducer()) {
             producer.initTransactions();
             try {
@@ -121,47 +124,12 @@ public class TransactionalProducerConsumerTest {
             }
         }
 
-        List<Integer> expectedRecords = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-        try (KafkaConsumer<String, Integer> consumer = getConsumer("read_committed")) {
+        try (KafkaConsumer<String, Integer> consumer = getConsumer(isolationLevel)) {
             List<Integer> consumedRecordsList = consumeRecords(consumer);
             assertEquals(expectedRecords, consumedRecordsList);
         }
     }
-
-
-    @Test
-    @DisplayName("should only consume all records since read_uncommitted with aborted transaction")
-    public void testConsumeAllRecordsAfterAbortReadCommitted() throws Exception {
-        try (KafkaProducer<String, Integer> producer = getProducer()) {
-            producer.initTransactions();
-            try {
-                producer.beginTransaction();
-                produceRecords(producer);
-                Thread.sleep(5000L);
-                // simulate an error locally need to abort and re-send
-                producer.abortTransaction();
-
-                producer.beginTransaction();
-                produceRecords(producer);
-                producer.commitTransaction();
-            } catch (ProducerFencedException | OutOfOrderSequenceException | AuthorizationException e) {
-                e.printStackTrace();
-                producer.close();
-            } catch (KafkaException e) {
-                e.printStackTrace();
-                producer.abortTransaction();
-            }
-        }
-
-        // Since the consumer is sets "read_uncommitted" it gets both failed and successful transactional data
-        List<Integer> expectedRecords = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-        try (KafkaConsumer<String, Integer> consumer = getConsumer("read_uncommitted")) {
-            List<Integer> consumedRecordsList = consumeRecords(consumer);
-            assertEquals(expectedRecords, consumedRecordsList);
-        }
-    }
-
-
+    
     private void produceRecords(final KafkaProducer<String, Integer> producer) {
         int numberRecordsToProduce = 10;
         int counter = 0;
@@ -186,6 +154,15 @@ public class TransactionalProducerConsumerTest {
             }
         }
         return consumedRecordsList;
+    }
+
+    private static Stream<Arguments> testParameters() {
+        var expectedAnswers = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+        var expectedAnswersReadUncommitted =  List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+        return Stream.of(
+                Arguments.of(expectedAnswers, "read_committed", "committed"),
+                Arguments.of(expectedAnswersReadUncommitted, "read_uncommitted", "committed and aborted")
+        );
     }
 
 

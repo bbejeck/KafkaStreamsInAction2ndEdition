@@ -21,11 +21,11 @@ import java.util.Map;
  * Date: 1/18/21
  * Time: 6:53 PM
  */
-public class MultEventNoContainerConsumerClient {
+public class MultiEventNoContainerConsumerClient {
 
-    private static final Logger LOG = LogManager.getLogger(MultEventNoContainerConsumerClient.class);
+    private static final Logger LOG = LogManager.getLogger(MultiEventNoContainerConsumerClient.class);
     private boolean runOnce = false;
-    final Map<String,Object> consumerConfigs;
+    final Map<String, Object> consumerConfigs;
     volatile boolean keepConsuming = true;
     List<DynamicMessage> allEvents = new ArrayList<>();
     List<DynamicMessage> purchases = new ArrayList<>();
@@ -35,13 +35,13 @@ public class MultEventNoContainerConsumerClient {
     final String purchaseEventName = PurchaseEventProto.PurchaseEvent.getDescriptor().getFullName();
     final String searchEventName = SearchEventProto.SearchEvent.getDescriptor().getFullName();
 
-    public MultEventNoContainerConsumerClient(final Map<String,Object> consumerConfigs) {
+    public MultiEventNoContainerConsumerClient(final Map<String, Object> consumerConfigs) {
         this.consumerConfigs = consumerConfigs;
     }
 
     public void runConsumer() {
         LOG.info("Starting runConsumer method using properties {}", consumerConfigs);
-        List<String> topicNames = Arrays.asList(((String)consumerConfigs.get("topic.names")).split(","));
+        List<String> topicNames = Arrays.asList(((String) consumerConfigs.get("topic.names")).split(","));
         try (final Consumer<String, DynamicMessage> consumer = new KafkaConsumer<>(consumerConfigs)) {
             LOG.info("Subscribing to {}", topicNames);
             consumer.subscribe(topicNames);

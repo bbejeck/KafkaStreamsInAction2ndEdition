@@ -7,7 +7,6 @@ import bbejeck.chapter_4.proto.SearchEventProto;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * User: Bill Bejeck
@@ -18,20 +17,31 @@ public class ConstantEventDataSource implements DataSource<EventsProto.Events> {
 
     @Override
     public Collection<EventsProto.Events> fetch() {
-        List<EventsProto.Events> events = new ArrayList<>();
-        SearchEventProto.SearchEvent.Builder searchBuilder = SearchEventProto.SearchEvent.newBuilder();
-        LoginEventProto.LoginEvent.Builder logInBuilder = LoginEventProto.LoginEvent.newBuilder();
-        PurchaseEventProto.PurchaseEvent.Builder purchaseBuilder = PurchaseEventProto.PurchaseEvent.newBuilder();
+        var events = new ArrayList<EventsProto.Events>();
+        var searchBuilder = SearchEventProto.SearchEvent.newBuilder();
+        var logInBuilder = LoginEventProto.LoginEvent.newBuilder();
+        var purchaseBuilder = PurchaseEventProto.PurchaseEvent.newBuilder();
 
-        SearchEventProto.SearchEvent searchEvent = searchBuilder.setSearchedItem("fish-eggs").setUserId("grogu").setTimestamp(500).build();
-        SearchEventProto.SearchEvent searchEventII = searchBuilder.setSearchedItem("gum").setUserId("grogu").setTimestamp(600).build();
-        LoginEventProto.LoginEvent logInEvent = logInBuilder.setLoginTime(400).setUserId("grogu").build();
-        PurchaseEventProto.PurchaseEvent purchaseEvent = purchaseBuilder.setPurchasedItem("Uncle Ed's Fish Eggs")
+        var searchEvent = searchBuilder.setSearchedItem("fish-eggs")
+                .setUserId("grogu")
+                .setTimestamp(500)
+                .build();
+
+        var searchEventII = searchBuilder.setSearchedItem("gum")
+                .setUserId("grogu")
+                .setTimestamp(600)
+                .build();
+
+        var logInEvent = logInBuilder.setLoginTime(400)
+                .setUserId("grogu")
+                .build();
+
+        var purchaseEvent = purchaseBuilder.setPurchasedItem("Uncle Ed's Fish Eggs")
                                                                         .setTimestamp(700)
                                                                         .setAmount(25.00)
                                                                         .setUserId("grogu").build();
 
-        EventsProto.Events.Builder eventBuilder = EventsProto.Events.newBuilder();
+        var eventBuilder = EventsProto.Events.newBuilder();
         events.add(eventBuilder.setKey(searchEvent.getUserId()).setSearchEvent(searchEvent).build());
         eventBuilder.clear();
         events.add(eventBuilder.setKey(logInEvent.getUserId()).setLoginEvent(logInEvent).build());

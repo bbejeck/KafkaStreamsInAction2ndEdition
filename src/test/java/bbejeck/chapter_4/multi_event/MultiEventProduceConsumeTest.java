@@ -69,7 +69,7 @@ public class MultiEventProduceConsumeTest {
         MultiEventProducerClient producerClient = new MultiEventProducerClient(getProducerProps(), eventsDataSource);
         producerClient.runProducerOnce();
 
-        MultEventConsumerClient consumerClient = new MultEventConsumerClient(getConsumerProps());
+        MultiEventConsumerClient consumerClient = new MultiEventConsumerClient(getConsumerProps());
         consumerClient.runConsumerOnce();
 
         List<EventsProto.Events> expectedEvents = new ArrayList<>(eventsDataSource.fetch());

@@ -16,30 +16,34 @@ import java.util.List;
  */
 public class ConstantDynamicMessageEventDataSource implements DataSource<DynamicMessage> {
 
+    private final List<DynamicMessage> sentEvents = new ArrayList<>();
+
     @Override
     public Collection<DynamicMessage> fetch() {
-        List<DynamicMessage> events = new ArrayList<>();
-        SearchEventProto.SearchEvent.Builder searchBuilder = SearchEventProto.SearchEvent.newBuilder();
-        LoginEventProto.LoginEvent.Builder logInBuilder = LoginEventProto.LoginEvent.newBuilder();
-        PurchaseEventProto.PurchaseEvent.Builder purchaseBuilder = PurchaseEventProto.PurchaseEvent.newBuilder();
+        var events = new ArrayList<DynamicMessage>();
+        var searchBuilder = SearchEventProto.SearchEvent.newBuilder();
+        var logInBuilder = LoginEventProto.LoginEvent.newBuilder();
+        var purchaseBuilder = PurchaseEventProto.PurchaseEvent.newBuilder();
 
-        SearchEventProto.SearchEvent searchEvent = searchBuilder.setSearchedItem("fish-eggs").setUserId("grogu").setTimestamp(500).build();
-        SearchEventProto.SearchEvent searchEventII = searchBuilder.setSearchedItem("gum").setUserId("grogu").setTimestamp(600).build();
-        LoginEventProto.LoginEvent logInEvent = logInBuilder.setLoginTime(400).setUserId("grogu").build();
-        PurchaseEventProto.PurchaseEvent purchaseEvent = purchaseBuilder.setPurchasedItem("Uncle Ed's Fish Eggs")
-                                                                        .setTimestamp(700)
-                                                                        .setAmount(25.00)
-                                                                        .setUserId("grogu").build();
+        var searchEvent = searchBuilder.setSearchedItem("fish-eggs").setUserId("grogu").setTimestamp(500).build();
+        var searchEventII = searchBuilder.setSearchedItem("gum").setUserId("grogu").setTimestamp(600).build();
+        var logInEvent = logInBuilder.setLoginTime(400).setUserId("grogu").build();
+        var purchaseEvent = purchaseBuilder.setPurchasedItem("Uncle Ed's Fish Eggs")
+                .setTimestamp(700)
+                .setAmount(25.00)
+                .setUserId("grogu").build();
 
-
-        DynamicMessage.Builder dynamicSearchEventBuilder = DynamicMessage.newBuilder(searchEvent);
-
+        var dynamicSearchEventBuilder = DynamicMessage.newBuilder(searchEvent);
         events.add(dynamicSearchEventBuilder.build());
         dynamicSearchEventBuilder.clear();
         events.add(DynamicMessage.newBuilder(logInEvent).build());
         events.add(dynamicSearchEventBuilder.mergeFrom(searchEventII).build());
         events.add(DynamicMessage.newBuilder(purchaseEvent).build());
-        
+        sentEvents.addAll(events);
         return events;
+    }
+
+    public List<DynamicMessage> getSentEvents() {
+        return new ArrayList<>(sentEvents);
     }
 }

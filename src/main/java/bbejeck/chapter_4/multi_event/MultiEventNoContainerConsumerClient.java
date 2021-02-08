@@ -28,12 +28,17 @@ public class MultiEventNoContainerConsumerClient {
     final Map<String, Object> consumerConfigs;
     volatile boolean keepConsuming = true;
     List<DynamicMessage> allEvents = new ArrayList<>();
-    List<DynamicMessage> purchases = new ArrayList<>();
-    List<DynamicMessage> logins = new ArrayList<>();
-    List<DynamicMessage> searches = new ArrayList<>();
+    List<PurchaseEventProto.PurchaseEvent> purchases = new ArrayList<>();
+    List<LoginEventProto.LoginEvent> logins = new ArrayList<>();
+    List<SearchEventProto.SearchEvent> searches = new ArrayList<>();
+
     final String loginEventName = LoginEventProto.LoginEvent.getDescriptor().getFullName();
     final String purchaseEventName = PurchaseEventProto.PurchaseEvent.getDescriptor().getFullName();
     final String searchEventName = SearchEventProto.SearchEvent.getDescriptor().getFullName();
+
+    final LoginEventProto.LoginEvent.Builder loginBuilder = LoginEventProto.LoginEvent.newBuilder();
+    final PurchaseEventProto.PurchaseEvent.Builder purchaseBuilder = PurchaseEventProto.PurchaseEvent.newBuilder();
+    final SearchEventProto.SearchEvent.Builder searchBuilder = SearchEventProto.SearchEvent.newBuilder();
 
     public MultiEventNoContainerConsumerClient(final Map<String, Object> consumerConfigs) {
         this.consumerConfigs = consumerConfigs;
@@ -65,16 +70,39 @@ public class MultiEventNoContainerConsumerClient {
         allEvents.add(event);
         String eventFullName = event.getDescriptorForType().getFullName();
         if (eventFullName.equals(loginEventName)) {
-            logins.add(event);
+            logins.add(convertToLogin(event));
         } else if(eventFullName.equals(searchEventName)) {
-            searches.add(event);
+            searches.add(convertToSearch(event));
         } else if(eventFullName.equals(purchaseEventName)) {
-            purchases.add(event);
+            purchases.add(convertToPurchase(event));
         } else {
             throw new IllegalStateException("Unrecognized type " + eventFullName);
         }
         return event.toString();
     }
+
+    private LoginEventProto.LoginEvent convertToLogin(final DynamicMessage message) {
+          loginBuilder.clear();
+          var fields = message.getAllFields();
+          fields.forEach(loginBuilder::setField);
+          return loginBuilder.build();
+    }
+
+    private PurchaseEventProto.PurchaseEvent convertToPurchase(final DynamicMessage message) {
+        purchaseBuilder.clear();
+        var fields = message.getAllFields();
+        fields.forEach(purchaseBuilder::setField);
+        return purchaseBuilder.build();
+    }
+
+    private SearchEventProto.SearchEvent convertToSearch(final DynamicMessage message) {
+        searchBuilder.clear();
+        var fields = message.getAllFields();
+        fields.forEach(searchBuilder::setField);
+        return searchBuilder.build();
+    }
+
+
 
     public void close() {
         LOG.info("Received signal to close");

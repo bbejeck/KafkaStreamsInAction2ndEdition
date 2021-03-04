@@ -25,17 +25,17 @@ public class AvroProducer extends BaseProducer<String, AvengerAvro> {
 
     @Override
     public List<AvengerAvro> getRecords() {
-        final AvengerAvro blackWidow = AvengerAvro.newBuilder().setName("Black Widow")
+        final var blackWidow = AvengerAvro.newBuilder().setName("Black Widow")
                 .setRealName("Natasha Romanova")
-                .setMovies(Arrays.asList("Avengers", "Infinity Wars", "End Game")).build();
+                .setMovies(List.of("Avengers", "Infinity Wars", "End Game")).build();
 
-        final AvengerAvro hulk = AvengerAvro.newBuilder().setName("Hulk")
+        final var hulk = AvengerAvro.newBuilder().setName("Hulk")
                 .setRealName("Dr. Bruce Banner")
-                .setMovies(Arrays.asList("Avengers", "Ragnarok", "Infinity Wars")).build();
+                .setMovies(List.of("Avengers", "Ragnarok", "Infinity Wars")).build();
 
-        final AvengerAvro thor = AvengerAvro.newBuilder().setName("Thor")
+        final var thor = AvengerAvro.newBuilder().setName("Thor")
                 .setRealName("Thor")
-                .setMovies(Arrays.asList("Dark Universe","Ragnarok", "Avengers" )).build();
+                .setMovies(List.of("Dark Universe","Ragnarok", "Avengers" )).build();
         
         List<AvengerAvro> avengers = Arrays.asList(blackWidow, hulk, thor);
         LOG.info("Created avengers {}", avengers);

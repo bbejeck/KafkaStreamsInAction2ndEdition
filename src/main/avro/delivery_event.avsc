@@ -1,0 +1,11 @@
+{
+  "type":"record",
+  "namespace": "bbejeck.chapter_3.avro",
+  "name":"DeliveryEvent",
+  "fields": [
+    {"name": "id", "type":"string"},
+    {"name": "package_id", "type": "string"},
+    {"name": "customer_id", "type": "string"},
+    {"name": "time", "type": "long"}
+  ]
+}

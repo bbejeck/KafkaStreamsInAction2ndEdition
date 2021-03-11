@@ -1,0 +1,11 @@
+{
+  "type":"record",
+  "namespace": "bbejeck.chapter_3.avro",
+  "name":"PlaneEvent",
+  "fields": [
+    {"name": "id", "type":"string"},
+    {"name": "package_id", "type": "string"},
+    {"name": "airport_code", "type": "string"},
+    {"name": "time", "type": "long"}
+  ]
+}

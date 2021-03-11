@@ -1,0 +1,11 @@
+{
+  "type":"record",
+  "namespace": "bbejeck.chapter_3.avro",
+  "name":"TruckEvent",
+  "fields": [
+    {"name": "id", "type":"string"},
+    {"name": "package_id", "type": "string"},
+    {"name": "warehouse_id", "type":  "string"},
+    {"name": "time", "type": "long"}
+  ]
+}

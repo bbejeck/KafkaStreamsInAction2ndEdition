@@ -133,6 +133,14 @@ schemaRegistry {
                 .addReference("bbejeck.chapter_3.avro.Return", "return", 1)
                 .addReference("bbejeck.chapter_3.avro.Exchange", "exchange", 1)
                 .addReference("bbejeck.chapter_3.avro.Purchase", "purchase", 1)
+
+        subject('truck_event','src/main/avro/truck_event.avsc', 'AVRO')
+        subject('plane_event','src/main/avro/plane_event.avsc', 'AVRO')
+        subject('delivery_event','src/main/avro/delivery_event.avsc', 'AVRO')
+        subject('inventory-events-value', 'src/main/avro/all_events.avsc','AVRO')
+                .addReference("bbejeck.chapter_3.avro.TruckEvent", "truck_event", 1)
+                .addReference("bbejeck.chapter_3.avro.PlaneEvent", "plane_event", 1)
+                .addReference("bbejeck.chapter_3.avro.DeliveryEvent", "delivery_event", 1)
     }
 
     config {

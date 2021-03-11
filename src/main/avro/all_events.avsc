@@ -1,0 +1,5 @@
+[
+  "bbejeck.chapter_3.avro.TruckEvent",
+  "bbejeck.chapter_3.avro.PlaneEvent",
+  "bbejeck.chapter_3.avro.DeliveryEvent"
+]

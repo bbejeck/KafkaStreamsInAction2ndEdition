@@ -52,7 +52,7 @@ public class AvroConsumer extends BaseConsumer {
 
         Consumer<ConsumerRecords<String, GenericRecord>> genericRecordsHandler = consumerRecords -> consumerRecords.forEach(cr -> {
             final GenericRecord genericRecord = cr.value();
-
+            genericRecord.getSchema().getFullName();
             if (genericRecord.hasField("name")) {
                 consumerRecordBuilder.append("Found generic Avro avenger ").append(genericRecord.get("name"));
             }

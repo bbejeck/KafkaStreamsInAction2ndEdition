@@ -1,6 +1,5 @@
-package bbejeck.serializers.json;
+package bbejeck.serializers;
 
-import bbejeck.serializers.SerializationConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.SerializationException;

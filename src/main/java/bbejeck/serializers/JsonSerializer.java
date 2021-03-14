@@ -1,4 +1,4 @@
-package bbejeck.serializers.json;
+package bbejeck.serializers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,6 +1,7 @@
 package bbejeck.serializers.proto;
 
 import bbejeck.chapter_3.proto.AvengerSimpleProtos;
+import bbejeck.serializers.ProtoDeserializer;
 import bbejeck.serializers.SerializationConfig;
 import org.junit.jupiter.api.Test;
 

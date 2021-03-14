@@ -1,6 +1,5 @@
-package bbejeck.serializers.proto;
+package bbejeck.serializers;
 
-import bbejeck.serializers.SerializationConfig;
 import com.google.protobuf.Message;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.SerializationException;

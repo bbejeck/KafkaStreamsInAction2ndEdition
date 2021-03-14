@@ -1,4 +1,4 @@
-package bbejeck.serializers.proto;
+package bbejeck.serializers;
 
 import com.google.protobuf.Message;
 import org.apache.kafka.common.serialization.Serializer;

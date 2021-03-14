@@ -1,5 +1,6 @@
-package bbejeck.chapter_3.serializers.proto;
+package bbejeck.serializers.proto;
 
+import bbejeck.serializers.SerializationConfig;
 import com.google.protobuf.Message;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.SerializationException;
@@ -8,9 +9,6 @@ import org.apache.kafka.common.serialization.Deserializer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
-
-import static bbejeck.chapter_3.serializers.SerializationConfig.PROTO_KEY_CLASS_NAME;
-import static bbejeck.chapter_3.serializers.SerializationConfig.PROTO_VALUE_CLASS_NAME;
 
 /**
  * User: Bill Bejeck
@@ -40,7 +38,7 @@ public class ProtoDeserializer<T extends Message> implements Deserializer<T> {
     @Override
     @SuppressWarnings("unchecked")
     public void configure(Map<String, ?> configs, boolean isKey) {
-        final String protoClassConfig = (isKey) ? PROTO_KEY_CLASS_NAME : PROTO_VALUE_CLASS_NAME;
+        final String protoClassConfig = (isKey) ? SerializationConfig.KEY_CLASS_NAME : SerializationConfig.VALUE_CLASS_NAME;
         final Class<T> protoClass = (Class<T>)configs.get(protoClassConfig);
         if (protoClass == null) {
             throw new ConfigException("No class provided for " + protoClassConfig);
@@ -50,10 +48,5 @@ public class ProtoDeserializer<T extends Message> implements Deserializer<T> {
         } catch (NoSuchMethodException e) {
             throw new ConfigException(e.getMessage());
         }
-    }
-
-    @Override
-    public void close() {
-
     }
 }

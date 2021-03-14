@@ -1,8 +1,8 @@
 package bbejeck.chapter_4.multi_event;
 
 import bbejeck.chapter_4.proto.EventsProto;
-import bbejeck.common.ConstantEventDataSource;
-import bbejeck.common.DataSource;
+import bbejeck.data.ConstantEventDataSource;
+import bbejeck.data.DataSource;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;

@@ -1,6 +1,6 @@
 package bbejeck.chapter_4.multi_event;
 
-import bbejeck.common.DataSource;
+import bbejeck.data.DataSource;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import org.apache.kafka.clients.producer.KafkaProducer;

@@ -1,4 +1,4 @@
-package bbejeck.common;
+package bbejeck.data;
 
 import java.util.Collection;
 

@@ -1,7 +1,7 @@
 package bbejeck.chapter_4.sales;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
-import bbejeck.common.DataSource;
+import bbejeck.data.DataSource;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;

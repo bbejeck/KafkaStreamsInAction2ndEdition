@@ -1,4 +1,4 @@
-package bbejeck.utils;
+package bbejeck.data;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
 import bbejeck.chapter_4.avro.StockTransaction;

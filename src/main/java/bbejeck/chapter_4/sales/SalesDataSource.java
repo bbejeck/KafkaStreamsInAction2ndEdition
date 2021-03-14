@@ -1,8 +1,8 @@
 package bbejeck.chapter_4.sales;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
-import bbejeck.common.DataSource;
-import bbejeck.utils.DataGenerator;
+import bbejeck.data.DataGenerator;
+import bbejeck.data.DataSource;
 
 import java.util.Collection;
 

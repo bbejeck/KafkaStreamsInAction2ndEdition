@@ -1,7 +1,7 @@
 package bbejeck.chapter_4.multi_event;
 
 import bbejeck.chapter_4.proto.EventsProto;
-import bbejeck.common.DataSource;
+import bbejeck.data.DataSource;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;

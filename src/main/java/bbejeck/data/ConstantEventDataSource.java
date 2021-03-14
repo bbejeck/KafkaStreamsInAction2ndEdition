@@ -1,4 +1,4 @@
-package bbejeck.common;
+package bbejeck.data;
 
 import bbejeck.chapter_4.proto.EventsProto;
 import bbejeck.chapter_4.proto.LoginEventProto;

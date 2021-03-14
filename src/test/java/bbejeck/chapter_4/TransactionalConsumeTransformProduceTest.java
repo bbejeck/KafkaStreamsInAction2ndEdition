@@ -2,7 +2,7 @@ package bbejeck.chapter_4;
 
 import bbejeck.chapter_4.avro.BrokerSummary;
 import bbejeck.chapter_4.avro.StockTransaction;
-import bbejeck.utils.DataGenerator;
+import bbejeck.data.DataGenerator;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;

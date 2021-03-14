@@ -1,4 +1,4 @@
-package bbejeck.common;
+package bbejeck.data;
 
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;

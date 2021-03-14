@@ -1,7 +1,7 @@
 package bbejeck.chapter_4.pipelining;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
-import bbejeck.utils.DataGenerator;
+import bbejeck.data.DataGenerator;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;

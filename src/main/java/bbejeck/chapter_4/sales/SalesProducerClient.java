@@ -1,7 +1,7 @@
 package bbejeck.chapter_4.sales;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
-import bbejeck.common.DataSource;
+import bbejeck.data.DataSource;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;

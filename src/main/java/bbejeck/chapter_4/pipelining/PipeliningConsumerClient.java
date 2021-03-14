@@ -1,7 +1,7 @@
 package bbejeck.chapter_4.pipelining;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
-import bbejeck.common.RecordProcessor;
+import bbejeck.data.RecordProcessor;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;

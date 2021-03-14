@@ -1,7 +1,7 @@
-package bbejeck.chapter_3.serializers.proto;
+package bbejeck.serializers.proto;
 
 import bbejeck.chapter_3.proto.AvengerSimpleProtos;
-import bbejeck.chapter_3.serializers.SerializationConfig;
+import bbejeck.serializers.SerializationConfig;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ class ProtoDeserializerTest {
         byte[] avengerBytes = avenger.toByteArray();
 
         Map configs = new HashMap<>();
-        configs.put(SerializationConfig.PROTO_VALUE_CLASS_NAME, AvengerSimpleProtos.AvengerSimple.class);
+        configs.put(SerializationConfig.VALUE_CLASS_NAME, AvengerSimpleProtos.AvengerSimple.class);
         
         ProtoDeserializer<AvengerSimpleProtos.AvengerSimple> deserializer = new ProtoDeserializer<>();
         deserializer.configure(configs, false);

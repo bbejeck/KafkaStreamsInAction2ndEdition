@@ -1,9 +1,7 @@
-package bbejeck.chapter_3.serializers.proto;
+package bbejeck.serializers.proto;
 
 import com.google.protobuf.Message;
 import org.apache.kafka.common.serialization.Serializer;
-
-import java.util.Map;
 
 /**
  * User: Bill Bejeck
@@ -18,15 +16,5 @@ public class ProtoSerializer<T extends Message> implements Serializer<T> {
             return null;
         }
         return data.toByteArray();
-    }
-
-    @Override
-    public void configure(Map<String, ?> configs, boolean isKey) {
-
-    }
-
-    @Override
-    public void close() {
-
     }
 }

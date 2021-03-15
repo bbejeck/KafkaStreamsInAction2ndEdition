@@ -10,11 +10,11 @@ import org.apache.kafka.common.serialization.Serializer;
  * Date: 3/13/21
  * Time: 9:02 PM
  */
-public class JsonSerializer<T> implements Serializer<T> {
+public class ObjectSerializer<T> implements Serializer<T> {
 
     final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JsonSerializer() {
+    public ObjectSerializer() {
     }
 
     @Override

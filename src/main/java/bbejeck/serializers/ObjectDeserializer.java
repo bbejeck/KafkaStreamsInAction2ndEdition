@@ -13,12 +13,12 @@ import java.util.Map;
  * Date: 3/13/21
  * Time: 9:16 PM
  */
-public class JsonDeserializer<T> implements Deserializer<T> {
+public class ObjectDeserializer<T> implements Deserializer<T> {
 
     final ObjectMapper objectMapper = new ObjectMapper();
     private Class<T> objectClass;
 
-    public JsonDeserializer() {
+    public ObjectDeserializer() {
     }
 
     @Override
@@ -33,10 +33,10 @@ public class JsonDeserializer<T> implements Deserializer<T> {
     @Override
     @SuppressWarnings("unchecked")
     public void configure(Map<String, ?> configs, boolean isKey) {
-        final String jsonClassConfig = (isKey) ? SerializationConfig.KEY_CLASS_NAME : SerializationConfig.VALUE_CLASS_NAME;
-        objectClass = (Class<T>)configs.get(jsonClassConfig);
+        final String objectClassConfig = (isKey) ? SerializationConfig.KEY_CLASS_NAME : SerializationConfig.VALUE_CLASS_NAME;
+        objectClass = (Class<T>)configs.get(objectClassConfig);
         if (objectClass == null) {
-            throw new ConfigException("No class provided for " + jsonClassConfig);
+            throw new ConfigException("No class provided for " + objectClassConfig);
         }
     }
 }

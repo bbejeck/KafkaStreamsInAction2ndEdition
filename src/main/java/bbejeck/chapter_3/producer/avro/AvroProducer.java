@@ -23,8 +23,7 @@ public class AvroProducer extends BaseProducer<String, AvengerAvro> {
         super(StringSerializer.class, KafkaAvroSerializer.class);
     }
 
-    @Override
-    public List<AvengerAvro> getRecords() {
+    static List<AvengerAvro> getRecords() {
         final var blackWidow = AvengerAvro.newBuilder().setName("Black Widow")
                 .setRealName("Natasha Romanova")
                 .setMovies(List.of("Avengers", "Infinity Wars", "End Game")).build();
@@ -45,7 +44,7 @@ public class AvroProducer extends BaseProducer<String, AvengerAvro> {
     public static void main(String[] args) {
         AvroProducer avroProducer = new AvroProducer();
         LOG.info("Sending avengers in version one format");
-        avroProducer.send("avro-avengers");
+        avroProducer.send("avro-avengers", getRecords());
         LOG.info("Done sending avengers, closing down now");
     }
 }

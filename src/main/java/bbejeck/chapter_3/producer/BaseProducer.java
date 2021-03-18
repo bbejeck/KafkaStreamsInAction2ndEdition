@@ -26,15 +26,12 @@ public abstract class BaseProducer<K, V> {
         this.keySerializer = keySerializer;
         this.valueSerializer = valueSerializer;
     }
-
-    public abstract List<V> getRecords();
-
+    
     public void overrideConfigs(final Map<String, Object> overrideConfigs) {
          this.overrideConfigs = overrideConfigs;
     }
 
-    public void send(final String topicName) {
-        List<V> records = getRecords();
+    public void send(final String topicName, List<V> records) {
         Map<String, Object> producerConfigs = producerConfig(overrideConfigs);
         try (final KafkaProducer<K, V> producer = new KafkaProducer<>(producerConfigs)) {
             records.forEach(avenger -> producer.send(new ProducerRecord<>(topicName, avenger)));

@@ -1,0 +1,49 @@
+package bbejeck.chapter_3.producer.proto;
+
+import bbejeck.chapter_3.producer.BaseProducer;
+import bbejeck.chapter_3.proto.AvengerProto;
+import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.List;
+
+/**
+ * User: Bill Bejeck
+ * Date: 3/18/21
+ * Time: 4:51 PM
+ */
+public class ProtoProducer extends BaseProducer<String, AvengerProto.Avenger> {
+    static final Logger LOG = LogManager.getLogger(ProtoProducer.class);
+
+    public ProtoProducer() {
+        super(StringSerializer.class, KafkaProtobufSerializer.class);
+    }
+
+    static List<AvengerProto.Avenger> getRecords() {
+        final var blackWidow = AvengerProto.Avenger.newBuilder().setName("Black Widow")
+                .setRealName("Natasha Romanova")
+                .addAllMovies(List.of("Avengers", "Infinity Wars", "End Game")).build();
+
+        final var hulk = AvengerProto.Avenger.newBuilder().setName("Hulk")
+                .setRealName("Dr. Bruce Banner")
+                .addAllMovies(List.of("Avengers", "Ragnarok", "Infinity Wars")).build();
+
+        final var thor = AvengerProto.Avenger.newBuilder().setName("Thor")
+                .setRealName("Thor")
+                .addAllMovies(List.of("Dark Universe", "Ragnarok", "Avengers")).build();
+
+        var avengers = List.of(blackWidow, hulk, thor);
+        LOG.info("Created avengers {}", avengers);
+        return avengers;
+    }
+
+    public static void main(String[] args) {
+        ProtoProducer protoProducer = new ProtoProducer();
+        LOG.info("Sending proto avengers in version one format");
+        protoProducer.send("proto-avengers", getRecords());
+        LOG.info("Done sending avengers, closing down now");
+    }
+
+}

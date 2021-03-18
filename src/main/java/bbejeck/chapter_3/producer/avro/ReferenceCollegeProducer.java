@@ -21,8 +21,7 @@ public class ReferenceCollegeProducer extends BaseProducer<String, CollegeAvro> 
         super(StringSerializer.class, KafkaAvroSerializer.class);
     }
 
-    @Override
-    public List<CollegeAvro> getRecords() {
+    static List<CollegeAvro> getRecords() {
         PersonAvro clopperAlmon = PersonAvro.newBuilder()
                 .setAddress("345 Knox Ave, College Park, MD")
                 .setName("Clopper Almon")
@@ -44,6 +43,6 @@ public class ReferenceCollegeProducer extends BaseProducer<String, CollegeAvro> 
 
     public static void main(String[] args) {
         ReferenceCollegeProducer collegeProducer = new ReferenceCollegeProducer();
-        collegeProducer.send("college");
+        collegeProducer.send("college", getRecords());
     }
 }

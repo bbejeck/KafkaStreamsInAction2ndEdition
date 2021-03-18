@@ -39,7 +39,7 @@ public class AvroConsumer extends BaseConsumer {
 
         Consumer<ConsumerRecords<String, AvengerAvro>> specificRecordsConsumer = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
-            AvengerAvro consumedAvenger = cr.value();
+            var consumedAvenger = cr.value();
             LOG.info("Found specific Avro avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
         }));
 

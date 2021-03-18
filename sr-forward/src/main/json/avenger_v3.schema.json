@@ -8,19 +8,18 @@
     "name": {
       "type": "string"
     },
-    "movies": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "default": []
-    },
     "powers": {
       "type": "array",
       "items": {
         "type": "string"
       },
       "default": []
+    },
+    "nemeses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

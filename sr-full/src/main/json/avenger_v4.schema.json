@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Avenger",
+  "description": "A JSON schema of Avenger object",
+  "type": "object",
+  "javaType": "bbejeck.chapter_3.json.AvengerJson",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "nemeses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "year_published": {
+      "type": "integer",
+      "default": 0
+    },
+    "real_name" : {
+      "type": "string",
+      "default": "unknown"
+    },
+    "partners": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

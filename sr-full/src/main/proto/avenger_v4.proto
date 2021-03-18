@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package bbejeck.chapter_3.proto;
+
+option java_outer_classname = "AvengerProto";
+
+message Avenger {
+    string name = 1;
+    repeated string nemeses = 2;
+    int32 year_published = 3;
+    string real_name = 4;
+    repeated string partners = 5;
+
+}

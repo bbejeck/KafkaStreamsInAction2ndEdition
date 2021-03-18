@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Avenger",
+  "description": "A JSON schema of Avenger object",
+  "type": "object",
+  "javaType": "bbejeck.chapter_3.json.SimpleAvengerJson",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "movies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "powers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

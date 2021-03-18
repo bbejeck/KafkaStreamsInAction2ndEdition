@@ -1,6 +1,6 @@
 package bbejeck.chapter_3;
 
-import bbejeck.chapter_3.proto.AvengerSimpleProtos;
+import bbejeck.chapter_3.proto.AvengerProto;
 import bbejeck.utils.Topics;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
@@ -39,27 +39,27 @@ public class ProtobufProduceConsumeExample {
         Topics.create(topicName);
         //Admin client create topic
 
-        final AvengerSimpleProtos.AvengerSimple avenger = AvengerSimpleProtos.AvengerSimple.newBuilder()
+        final AvengerProto.Avenger avenger = AvengerProto.Avenger.newBuilder()
                 .setName("Black Widow")
                 .setRealName("Natasha Romanova")
                 .addMovies("Avengers")
                 .addMovies("Infinity Wars")
                 .addMovies("End Game").build();
 
-        final ProducerRecord<String, AvengerSimpleProtos.AvengerSimple> avengerRecord = new ProducerRecord<>(topicName, avenger);
+        final ProducerRecord<String, AvengerProto.Avenger> avengerRecord = new ProducerRecord<>(topicName, avenger);
 
-        try (final KafkaProducer<String, AvengerSimpleProtos.AvengerSimple> producer = new KafkaProducer<>(producerProps)) {
+        try (final KafkaProducer<String, AvengerProto.Avenger> producer = new KafkaProducer<>(producerProps)) {
             producer.send(avengerRecord);
         }
 
         final Properties specificProperties = getConsumerProps("specific-group", true);
 
-        final KafkaConsumer<String, AvengerSimpleProtos.AvengerSimple> specificConsumer = new KafkaConsumer<>(specificProperties);
+        final KafkaConsumer<String, AvengerProto.Avenger> specificConsumer = new KafkaConsumer<>(specificProperties);
         specificConsumer.subscribe(Collections.singletonList(topicName));
 
-        ConsumerRecords<String, AvengerSimpleProtos.AvengerSimple> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
+        ConsumerRecords<String, AvengerProto.Avenger> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
         specificConsumerRecords.forEach(cr -> {
-            AvengerSimpleProtos.AvengerSimple consumedAvenger = cr.value();
+            AvengerProto.Avenger consumedAvenger = cr.value();
             System.out.println("Specific: found avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
         });
         specificConsumer.close();
@@ -91,7 +91,7 @@ public class ProtobufProduceConsumeExample {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);
         if (protoSpecific) {
-            props.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, AvengerSimpleProtos.AvengerSimple.class);
+            props.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, AvengerProto.Avenger.class);
         }
 
         return props;

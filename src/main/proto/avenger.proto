@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package bbejeck.chapter_3.proto;
 
-option java_outer_classname = "AvengerSimpleProtos";
+option java_outer_classname = "AvengerProto";
 
-message AvengerSimple {
+message Avenger {
     string name = 1;
     string real_name = 2;
     repeated string movies = 3;

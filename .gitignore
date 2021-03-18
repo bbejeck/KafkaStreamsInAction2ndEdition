@@ -24,10 +24,6 @@ hs_err_pid*
 
 # Ignore Gradle project-specific cache directory
 .gradle
-gradle-wrapper.properties
-.gitattributes
-gradlew
-gradlew.bat
 
 # Ignore Gradle build output directory
 build
@@ -36,10 +32,10 @@ build
 *.iml
 *.ipr
 *.iws
-/settings.gradle
 .idea/
 
 
 scratch.txt
 
-/groupControllerLogs.out
+*.out
+!/gradle/wrapper/gradle-wrapper.jar

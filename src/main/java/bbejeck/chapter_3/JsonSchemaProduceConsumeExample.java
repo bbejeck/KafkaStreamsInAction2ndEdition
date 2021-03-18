@@ -1,12 +1,9 @@
 package bbejeck.chapter_3;
 
-import bbejeck.chapter_3.json.SimpleAvengerJson;
+import bbejeck.chapter_3.json.AvengerJson;
 import bbejeck.utils.Topics;
-import com.fasterxml.jackson.databind.JsonNode;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
-import io.confluent.kafka.serializers.KafkaJsonDeserializer;
 import io.confluent.kafka.serializers.KafkaJsonDeserializerConfig;
-import io.confluent.kafka.serializers.KafkaJsonSerializer;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializer;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -42,47 +39,47 @@ public class JsonSchemaProduceConsumeExample {
         Topics.create(topicName);
 
 
-        SimpleAvengerJson avenger = new SimpleAvengerJson()
+        AvengerJson avenger = new AvengerJson()
                 .withName("Black Widow")
                 .withRealName("Natasha Romanova")
                 .withMovies(Arrays.asList("Avengers", "Infinity Wars", "End Game"));
 
 
-        final ProducerRecord<String, SimpleAvengerJson> avengerRecord = new ProducerRecord<>(topicName, avenger);
+        final ProducerRecord<String, AvengerJson> avengerRecord = new ProducerRecord<>(topicName, avenger);
 
-        try (final KafkaProducer<String, SimpleAvengerJson> producer = new KafkaProducer<>(producerProps)) {
+        try (final KafkaProducer<String, AvengerJson> producer = new KafkaProducer<>(producerProps)) {
             producer.send(avengerRecord);
         }
 
         final Properties specificProperties = getConsumerProps("specific-group", true);
 
-        final KafkaConsumer<String, SimpleAvengerJson> specificConsumer = new KafkaConsumer<>(specificProperties);
-        specificConsumer.subscribe(Collections.singletonList(topicName));
+       try( final KafkaConsumer<String, AvengerJson> specificConsumer = new KafkaConsumer<>(specificProperties)) {
+           specificConsumer.subscribe(Collections.singletonList(topicName));
 
-        ConsumerRecords<String, SimpleAvengerJson> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
-        specificConsumerRecords.forEach(cr -> {
-            SimpleAvengerJson consumedAvenger = cr.value();
-            System.out.println("Found Json schema specific avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
-        });
-        specificConsumer.close();
+           ConsumerRecords<String, AvengerJson> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
+           specificConsumerRecords.forEach(cr -> {
+               AvengerJson consumedAvenger = cr.value();
+               System.out.println("Found Json schema specific avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
+           });
+       }
 
         final Properties genericProperties = getConsumerProps("generic-group", false);
-        final KafkaConsumer<String, Map> genericConsumer = new KafkaConsumer<>(genericProperties);
-        genericConsumer.subscribe(Collections.singletonList(topicName));
+        try (final KafkaConsumer<String, Map> genericConsumer = new KafkaConsumer<>(genericProperties)) {
+            genericConsumer.subscribe(Collections.singletonList(topicName));
 
-        ConsumerRecords<String, Map> jsonNodeConsumerRecords = genericConsumer.poll(Duration.ofSeconds(5));
-        jsonNodeConsumerRecords.forEach(jnr -> {
-            Map jsonMap = jnr.value();
+            ConsumerRecords<String, Map> jsonNodeConsumerRecords = genericConsumer.poll(Duration.ofSeconds(5));
+            jsonNodeConsumerRecords.forEach(jnr -> {
+                Map jsonMap = jnr.value();
 
-            if (jsonMap.get("name") != null) {
-                System.out.print("Found Json schema generic avenger " + jsonMap.get("name"));
-            }
+                if (jsonMap.get("name") != null) {
+                    System.out.print("Found Json schema generic avenger " + jsonMap.get("name"));
+                }
 
-            if (jsonMap.get("realName") != null) {
-                System.out.println(" with real name " + jsonMap.get("realName"));
-            }
-        });
-        genericConsumer.close();
+                if (jsonMap.get("realName") != null) {
+                    System.out.println(" with real name " + jsonMap.get("realName"));
+                }
+            });
+        }
     }
 
     static Properties getConsumerProps(final String groupId, final boolean jsonSpecific) {
@@ -94,7 +91,7 @@ public class JsonSchemaProduceConsumeExample {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaJsonSchemaDeserializer.class);
         if (jsonSpecific) {
-            props.put(KafkaJsonDeserializerConfig.JSON_VALUE_TYPE, SimpleAvengerJson.class);
+            props.put(KafkaJsonDeserializerConfig.JSON_VALUE_TYPE, AvengerJson.class);
         }
 
         return props;

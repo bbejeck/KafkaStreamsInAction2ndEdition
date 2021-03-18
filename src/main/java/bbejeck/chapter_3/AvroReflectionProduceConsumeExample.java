@@ -40,15 +40,15 @@ public class AvroReflectionProduceConsumeExample {
 
         final Properties specificProperties = getConsumerProps("specific-group");
 
-        final KafkaConsumer<String, User> specificConsumer = new KafkaConsumer<>(specificProperties);
-        specificConsumer.subscribe(Collections.singletonList(topicName));
+       try(final KafkaConsumer<String, User> specificConsumer = new KafkaConsumer<>(specificProperties)) {
+           specificConsumer.subscribe(Collections.singletonList(topicName));
 
-        ConsumerRecords<String, User> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
-        specificConsumerRecords.forEach(cr -> {
-            User consumedUser = cr.value();
-            System.out.println("Found user " + consumedUser.getName() + " with favorite color " + consumedUser.getFavoriteColor());
-        });
-        specificConsumer.close();
+           ConsumerRecords<String, User> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
+           specificConsumerRecords.forEach(cr -> {
+               User consumedUser = cr.value();
+               System.out.println("Found user " + consumedUser.getName() + " with favorite color " + consumedUser.getFavoriteColor());
+           });
+       }
 
     }
 

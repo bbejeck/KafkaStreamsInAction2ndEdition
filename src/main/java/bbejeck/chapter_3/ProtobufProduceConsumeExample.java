@@ -54,32 +54,32 @@ public class ProtobufProduceConsumeExample {
 
         final Properties specificProperties = getConsumerProps("specific-group", true);
 
-        final KafkaConsumer<String, AvengerProto.Avenger> specificConsumer = new KafkaConsumer<>(specificProperties);
-        specificConsumer.subscribe(Collections.singletonList(topicName));
+        try(final KafkaConsumer<String, AvengerProto.Avenger> specificConsumer = new KafkaConsumer<>(specificProperties)) {
+            specificConsumer.subscribe(Collections.singletonList(topicName));
 
-        ConsumerRecords<String, AvengerProto.Avenger> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
-        specificConsumerRecords.forEach(cr -> {
-            AvengerProto.Avenger consumedAvenger = cr.value();
-            System.out.println("Specific: found avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
-        });
-        specificConsumer.close();
+            ConsumerRecords<String, AvengerProto.Avenger> specificConsumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
+            specificConsumerRecords.forEach(cr -> {
+                AvengerProto.Avenger consumedAvenger = cr.value();
+                System.out.println("Specific: found avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
+            });
+        }
 
         final Properties genericProperties = getConsumerProps("generic-group", false);
-        final KafkaConsumer<String, DynamicMessage> dynamicMessageConsumer = new KafkaConsumer<>(genericProperties);
-        dynamicMessageConsumer.subscribe(Collections.singletonList(topicName));
+        try(final KafkaConsumer<String, DynamicMessage> dynamicMessageConsumer = new KafkaConsumer<>(genericProperties)) {
+            dynamicMessageConsumer.subscribe(Collections.singletonList(topicName));
 
-        ConsumerRecords<String, DynamicMessage> dynamicConsumerRecords = dynamicMessageConsumer.poll(Duration.ofSeconds(5));
-        dynamicConsumerRecords.forEach(dm -> {
-            DynamicMessage dynamicMessage = dm.value();
-            Descriptors.FieldDescriptor realNameDescriptor = dynamicMessage.getDescriptorForType().findFieldByName("real_name");
-            Descriptors.FieldDescriptor nameDescriptor = dynamicMessage.getDescriptorForType().findFieldByName("name");
-            System.out.println("Dynamic: found avenger "
-                    + dynamicMessage.getField(nameDescriptor)
-                    + " with real name " + dynamicMessage.getField(realNameDescriptor));
+            ConsumerRecords<String, DynamicMessage> dynamicConsumerRecords = dynamicMessageConsumer.poll(Duration.ofSeconds(5));
+            dynamicConsumerRecords.forEach(dm -> {
+                DynamicMessage dynamicMessage = dm.value();
+                Descriptors.FieldDescriptor realNameDescriptor = dynamicMessage.getDescriptorForType().findFieldByName("real_name");
+                Descriptors.FieldDescriptor nameDescriptor = dynamicMessage.getDescriptorForType().findFieldByName("name");
+                System.out.println("Dynamic: found avenger "
+                        + dynamicMessage.getField(nameDescriptor)
+                        + " with real name " + dynamicMessage.getField(realNameDescriptor));
 
 
-        });
-        dynamicMessageConsumer.close();
+            });
+        }
     }
 
     static Properties getConsumerProps(final String groupId, final boolean protoSpecific) {

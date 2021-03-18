@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven {
             url = uri("https://packages.confluent.io/maven/")
         }
@@ -11,10 +11,6 @@ buildscript {
             url = uri("https://jitpack.io")
         }
     }
-
-    dependencies {
-        classpath "com.commercehub.gradle.plugin:gradle-avro-plugin:0.21.0"
-    }
 }
 
 plugins {
@@ -23,13 +19,14 @@ plugins {
     id 'com.github.eirnym.js2p'
     id "com.google.protobuf"
     id "com.github.imflog.kafka-schema-registry-gradle-plugin"
+    id "com.github.davidmc24.gradle.plugin.avro" 
 }
 
-sourceCompatibility = "14"
-targetCompatibility = "14"
+sourceCompatibility = JavaVersion.VERSION_14
+targetCompatibility = JavaVersion.VERSION_14
 
 repositories {
-    jcenter()
+    mavenCentral()
     maven {
         url = uri("https://packages.confluent.io/maven/")
     }
@@ -38,8 +35,6 @@ repositories {
         url = uri("https://jitpack.io")
     }
 }
-
-apply plugin: "com.commercehub.gradle.plugin.avro"
 
 dependencies {
     

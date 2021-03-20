@@ -2,6 +2,7 @@ package bbejeck.chapter_3.producer.proto;
 
 import bbejeck.chapter_3.producer.BaseProducer;
 import bbejeck.chapter_3.proto.AvengerProto;
+import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.logging.log4j.LogManager;
@@ -42,6 +43,7 @@ public class ProtoProducer extends BaseProducer<String, AvengerProto.Avenger> {
     public static void main(String[] args) {
         ProtoProducer protoProducer = new ProtoProducer();
         LOG.info("Sending proto avengers in version one format");
+        Topics.create("proto-avengers");
         protoProducer.send("proto-avengers", getRecords());
         LOG.info("Done sending avengers, closing down now");
     }

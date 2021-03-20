@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Exchange",
+  "description": "A JSON schema of a College using Person refs",
+  "javaType": "bbejeck.chapter_3.json.CollegeJson",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "professors": {
+      "type": "array",
+      "items": {
+        "$ref": "person.json"
+      }
+    }
+  }
+}
+

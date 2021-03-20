@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Exchange",
+  "description": "A JSON schema of a Person object for reference",
+  "javaType": "bbejeck.chapter_3.json.PersonJson",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "age": {
+      "type": "integer"
+    }
+  }
+}
+

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bbejeck.chapter_3.proto;
+
+import "person.proto";
+
+option java_outer_classname = "CollegeProto";
+
+message College {
+  string name = 1;
+  repeated Person professors = 2;
+}

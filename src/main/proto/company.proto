@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bbejeck.chapter_3.proto;
+
+import "person.proto";
+
+option java_outer_classname = "CompanyProto";
+
+message Company {
+  string name = 1;
+  repeated Person executives = 2;
+}

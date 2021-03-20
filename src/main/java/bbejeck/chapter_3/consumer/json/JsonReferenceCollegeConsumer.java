@@ -1,18 +1,17 @@
 package bbejeck.chapter_3.consumer.json;
 
+import bbejeck.ConsumerRecordsHandler;
 import bbejeck.chapter_3.consumer.BaseConsumer;
-import bbejeck.chapter_3.proto.CollegeProto;
+import bbejeck.chapter_3.json.CollegeJson;
+import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializerConfig;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
-import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * User: Bill Bejeck
@@ -29,15 +28,15 @@ public class JsonReferenceCollegeConsumer extends BaseConsumer {
     public static void main(String[] args) {
         JsonReferenceCollegeConsumer collegeConsumer = new JsonReferenceCollegeConsumer();
         Map<String, Object> overrideConfigs = new HashMap<>();
-        overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-college-ref-group");
-        overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, CollegeProto.College.class);
+        overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"json-schema-college-ref-group");
+        overrideConfigs.put(KafkaJsonSchemaDeserializerConfig.JSON_VALUE_TYPE, CollegeJson.class);
 
-        Consumer<ConsumerRecords<String, CollegeProto.College>> processFunction = (consumerRecords ->
+        ConsumerRecordsHandler<String, CollegeJson> processFunction = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
-                    CollegeProto.College collegeRecord = cr.value();
-                    LOG.info("Found Protobuf college record {}", collegeRecord);
+                    CollegeJson collegeRecord = cr.value();
+                    LOG.info("Found JSON Schema college record {}", collegeRecord);
                 }));
 
-        collegeConsumer.runConsumer(overrideConfigs,"proto-college", processFunction);
+        collegeConsumer.runConsumer(overrideConfigs,"json-schema-college", processFunction);
     }
 }

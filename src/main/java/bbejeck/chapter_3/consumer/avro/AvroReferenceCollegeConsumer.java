@@ -1,18 +1,17 @@
 package bbejeck.chapter_3.consumer.avro;
 
+import bbejeck.ConsumerRecordsHandler;
 import bbejeck.chapter_3.avro.CollegeAvro;
 import bbejeck.chapter_3.consumer.BaseConsumer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * User: Bill Bejeck
@@ -32,7 +31,7 @@ public class AvroReferenceCollegeConsumer extends BaseConsumer {
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"college-ref-group");
         overrideConfigs.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
 
-        Consumer<ConsumerRecords<String, CollegeAvro>> processFunction = (consumerRecords ->
+        ConsumerRecordsHandler<String, CollegeAvro> processFunction = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
                     CollegeAvro collegeRecord = cr.value();
                     LOG.info("Found college record {}", collegeRecord);

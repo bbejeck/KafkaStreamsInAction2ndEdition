@@ -1,5 +1,6 @@
 package bbejeck.chapter_3.consumer.proto;
 
+import bbejeck.ConsumerRecordsHandler;
 import bbejeck.chapter_3.consumer.BaseConsumer;
 import bbejeck.chapter_3.proto.AvengerProto;
 import com.google.protobuf.Descriptors;
@@ -7,14 +8,12 @@ import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * User: Bill Bejeck
@@ -38,7 +37,7 @@ public class ProtoConsumer extends BaseConsumer {
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-specific-group");
         overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, AvengerProto.Avenger.class);
 
-        Consumer<ConsumerRecords<String, AvengerProto.Avenger>> specificRecordsConsumer = (consumerRecords ->
+        ConsumerRecordsHandler<String, AvengerProto.Avenger> specificRecordsConsumer = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
             var consumedAvenger = cr.value();
             LOG.info("Found specific Proto avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
@@ -51,7 +50,7 @@ public class ProtoConsumer extends BaseConsumer {
 
         final StringBuilder consumerRecordBuilder = new StringBuilder();
 
-        Consumer<ConsumerRecords<String, DynamicMessage>> genericRecordsHandler = consumerRecords -> consumerRecords.forEach(cr -> {
+        ConsumerRecordsHandler<String, DynamicMessage> genericRecordsHandler = consumerRecords -> consumerRecords.forEach(cr -> {
             final DynamicMessage dynamicMessage = cr.value();
             Descriptors.FieldDescriptor realNameDescriptor = dynamicMessage.getDescriptorForType().findFieldByName("real_name");
             Descriptors.FieldDescriptor nameDescriptor = dynamicMessage.getDescriptorForType().findFieldByName("name");

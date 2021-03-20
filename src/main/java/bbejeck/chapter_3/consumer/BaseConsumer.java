@@ -1,5 +1,6 @@
 package bbejeck.chapter_3.consumer;
 
+import bbejeck.ConsumerRecordsHandler;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -11,7 +12,6 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * User: Bill Bejeck
@@ -32,7 +32,7 @@ public abstract class BaseConsumer {
 
     public <K, V> void runConsumer(final Map<String, Object> configs,
                                    final String topic,
-                                   final Consumer<ConsumerRecords<K, V>> recordsHandler) {
+                                   final ConsumerRecordsHandler<K, V> recordsHandler) {
 
         Map<String, Object> genericConfigs = overrideConfigs(configs);
         LOG.info("Getting ready to consume records");

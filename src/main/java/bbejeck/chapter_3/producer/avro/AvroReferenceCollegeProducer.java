@@ -15,20 +15,20 @@ import java.util.List;
  * Date: 10/11/20
  * Time: 4:40 PM
  */
-public class ReferenceCollegeProducer extends BaseProducer<String, CollegeAvro> {
+public class AvroReferenceCollegeProducer extends BaseProducer<String, CollegeAvro> {
 
-    public ReferenceCollegeProducer() {
+    public AvroReferenceCollegeProducer() {
         super(StringSerializer.class, KafkaAvroSerializer.class);
     }
 
     static List<CollegeAvro> getRecords() {
-        PersonAvro clopperAlmon = PersonAvro.newBuilder()
+        PersonAvro hopperCalmon = PersonAvro.newBuilder()
                 .setAddress("345 Knox Ave, College Park, MD")
                 .setName("Hopper Calmon")
                 .setAge(60)
                 .build();
 
-        PersonAvro maureenCropper = PersonAvro.newBuilder()
+        PersonAvro reenieMopper = PersonAvro.newBuilder()
                 .setAddress("123 Tydings Hall,College Park, MD")
                 .setName("Reenie Mopper")
                 .setAge(30)
@@ -36,13 +36,13 @@ public class ReferenceCollegeProducer extends BaseProducer<String, CollegeAvro> 
 
         CollegeAvro companyAvro = CollegeAvro.newBuilder()
                 .setName("University of Maryland, Dept. of Economics")
-                .setProfessors(Arrays.asList(clopperAlmon, maureenCropper))
+                .setProfessors(Arrays.asList(hopperCalmon, reenieMopper))
                 .build();
         return Collections.singletonList(companyAvro);
     }
 
     public static void main(String[] args) {
-        ReferenceCollegeProducer collegeProducer = new ReferenceCollegeProducer();
+        AvroReferenceCollegeProducer collegeProducer = new AvroReferenceCollegeProducer();
         collegeProducer.send("college", getRecords());
     }
 }

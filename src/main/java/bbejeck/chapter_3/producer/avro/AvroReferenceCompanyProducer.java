@@ -15,9 +15,9 @@ import java.util.List;
  * Date: 10/11/20
  * Time: 4:40 PM
  */
-public class ReferenceCompanyProducer extends BaseProducer<String, CompanyAvro> {
+public class AvroReferenceCompanyProducer extends BaseProducer<String, CompanyAvro> {
 
-    public ReferenceCompanyProducer() {
+    public AvroReferenceCompanyProducer() {
         super(StringSerializer.class, KafkaAvroSerializer.class);
     }
 
@@ -42,7 +42,7 @@ public class ReferenceCompanyProducer extends BaseProducer<String, CompanyAvro> 
     }
 
     public static void main(String[] args) {
-        ReferenceCompanyProducer companyProducer = new ReferenceCompanyProducer();
+        AvroReferenceCompanyProducer companyProducer = new AvroReferenceCompanyProducer();
         companyProducer.send("company", getRecords());
     }
 }

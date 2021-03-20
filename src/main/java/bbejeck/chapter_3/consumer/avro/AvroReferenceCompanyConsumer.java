@@ -1,6 +1,6 @@
 package bbejeck.chapter_3.consumer.avro;
 
-import bbejeck.chapter_3.avro.CollegeAvro;
+import bbejeck.chapter_3.avro.CompanyAvro;
 import bbejeck.chapter_3.consumer.BaseConsumer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
@@ -19,25 +19,25 @@ import java.util.function.Consumer;
  * Date: 10/11/20
  * Time: 6:35 PM
  */
-public class ReferenceCollegeConsumer extends BaseConsumer {
-    private static final Logger LOG = LogManager.getLogger(ReferenceCollegeConsumer.class);
+public class AvroReferenceCompanyConsumer extends BaseConsumer {
+    private static final Logger LOG = LogManager.getLogger(AvroReferenceCompanyConsumer.class);
 
-    public ReferenceCollegeConsumer() {
+    public AvroReferenceCompanyConsumer() {
         super(StringDeserializer.class, KafkaAvroDeserializer.class);
     }
 
     public static void main(String[] args) {
-        ReferenceCollegeConsumer collegeConsumer = new ReferenceCollegeConsumer();
+        AvroReferenceCompanyConsumer collegeConsumer = new AvroReferenceCompanyConsumer();
         Map<String, Object> overrideConfigs = new HashMap<>();
-        overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"college-ref-group");
+        overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"company-ref-group");
         overrideConfigs.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
 
-        Consumer<ConsumerRecords<String, CollegeAvro>> processFunction = (consumerRecords ->
+        Consumer<ConsumerRecords<String, CompanyAvro>> processFunction = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
-                    CollegeAvro collegeRecord = cr.value();
-                    LOG.info("Found college record {}", collegeRecord);
+                    CompanyAvro companyRecord = cr.value();
+                    LOG.info("Found company record {}", companyRecord);
                 }));
 
-        collegeConsumer.runConsumer(overrideConfigs,"college", processFunction);
+        collegeConsumer.runConsumer(overrideConfigs,"company", processFunction);
     }
 }

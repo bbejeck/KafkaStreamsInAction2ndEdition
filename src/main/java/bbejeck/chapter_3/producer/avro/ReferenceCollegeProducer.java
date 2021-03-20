@@ -24,13 +24,13 @@ public class ReferenceCollegeProducer extends BaseProducer<String, CollegeAvro> 
     static List<CollegeAvro> getRecords() {
         PersonAvro clopperAlmon = PersonAvro.newBuilder()
                 .setAddress("345 Knox Ave, College Park, MD")
-                .setName("Clopper Almon")
+                .setName("Hopper Calmon")
                 .setAge(60)
                 .build();
 
         PersonAvro maureenCropper = PersonAvro.newBuilder()
                 .setAddress("123 Tydings Hall,College Park, MD")
-                .setName("Maureen Cropper")
+                .setName("Reenie Mopper")
                 .setAge(30)
                 .build();
 

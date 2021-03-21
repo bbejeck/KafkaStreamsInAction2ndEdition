@@ -1,8 +1,8 @@
 package bbejeck.chapter_3.consumer.json;
 
-import bbejeck.ConsumerRecordsHandler;
 import bbejeck.chapter_3.consumer.BaseConsumer;
 import bbejeck.chapter_3.json.AvengerJson;
+import bbejeck.clients.ConsumerRecordsHandler;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializer;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

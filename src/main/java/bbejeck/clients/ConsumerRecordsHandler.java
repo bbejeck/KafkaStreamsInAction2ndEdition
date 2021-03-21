@@ -1,4 +1,4 @@
-package bbejeck;
+package bbejeck.clients;
 
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 

@@ -1,8 +1,8 @@
 package bbejeck.chapter_3.consumer.proto;
 
-import bbejeck.ConsumerRecordsHandler;
 import bbejeck.chapter_3.consumer.BaseConsumer;
 import bbejeck.chapter_3.proto.AvengerProto;
+import bbejeck.clients.ConsumerRecordsHandler;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;

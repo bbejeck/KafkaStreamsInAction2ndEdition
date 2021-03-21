@@ -1,6 +1,6 @@
 package bbejeck.chapter_3.consumer;
 
-import bbejeck.ConsumerRecordsHandler;
+import bbejeck.clients.ConsumerRecordsHandler;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;

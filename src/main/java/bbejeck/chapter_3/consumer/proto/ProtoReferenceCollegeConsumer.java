@@ -1,8 +1,8 @@
 package bbejeck.chapter_3.consumer.proto;
 
-import bbejeck.ConsumerRecordsHandler;
 import bbejeck.chapter_3.consumer.BaseConsumer;
 import bbejeck.chapter_3.proto.CollegeProto;
+import bbejeck.clients.ConsumerRecordsHandler;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

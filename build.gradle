@@ -117,7 +117,8 @@ schemaRegistry {
     compatibility {
         subject('avro-avengers-value', 'src/main/avro/avenger.avsc', 'AVRO')
     }
-    
+
+    // Possible types are ["JSON", "PROTOBUF", "AVRO"]
     register {
         subject('avro-avengers-value','src/main/avro/avenger.avsc', 'AVRO')
         subject('person','src/main/avro/person.avsc', 'AVRO')

@@ -1,9 +1,9 @@
 package bbejeck.chapter_3.consumer.json;
 
-import bbejeck.ConsumerRecordsHandler;
 import bbejeck.chapter_3.consumer.BaseConsumer;
 import bbejeck.chapter_3.json.CompanyJson;
 import bbejeck.chapter_3.proto.CompanyProto;
+import bbejeck.clients.ConsumerRecordsHandler;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializerConfig;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

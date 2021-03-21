@@ -1,8 +1,8 @@
 package bbejeck.chapter_3.consumer.avro;
 
-import bbejeck.ConsumerRecordsHandler;
 import bbejeck.chapter_3.avro.AvengerAvro;
 import bbejeck.chapter_3.consumer.BaseConsumer;
+import bbejeck.clients.ConsumerRecordsHandler;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import org.apache.avro.generic.GenericRecord;

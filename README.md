@@ -80,7 +80,7 @@ serializers for the given format indicated by the package name.
 ### A guided tour to the chapter 3 code
 It's a good idea for me to describe the contents of the directories and the function of
 each class:
-  * chapter_3.producer
+* chapter_3.producer
     * avro
         * `AvroProducer` Initial producer example for working with Avro schemas
         * `AvroReferenceCollegeProducer` Example producer for working with schema references in Avro

@@ -25,11 +25,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
 
-/**
- * User: Bill Bejeck
- * Date: 9/22/20
- * Time: 8:43 PM
- */
 public class ProtobufMultipleEventTopicExample {
 
     static final Logger LOG = LogManager.getLogger();

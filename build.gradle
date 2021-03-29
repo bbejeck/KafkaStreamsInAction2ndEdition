@@ -49,22 +49,22 @@ dependencies {
         exclude group:'org.apache.kafka', module: 'kafka-clients'
     }
     implementation('org.apache.kafka:kafka-clients:2.7.0!!')
-    implementation('io.confluent:kafka-streams-avro-serde:5.5.1') {
+    implementation('io.confluent:kafka-streams-avro-serde:6.1.1') {
         exclude group:'org.apache.kafka', module: 'kafka-clients'
         exclude group:'org.apache.kafka', module: 'kafka-streams'
     }
-    implementation('io.confluent:kafka-streams-protobuf-serde:5.5.1') {
+    implementation('io.confluent:kafka-streams-protobuf-serde:6.1.1') {
         exclude group:'org.apache.kafka', module: 'kafka-clients'
         exclude group:'org.apache.kafka', module: 'kafka-streams'
     }
 
-    implementation "io.confluent:kafka-avro-serializer:5.5.1"
-    implementation "io.confluent:kafka-protobuf-serializer:5.5.1"
-    implementation "io.confluent:kafka-json-serializer:5.5.1"
-    implementation "io.confluent:kafka-json-schema-serializer:5.5.1"
-    implementation "io.confluent:kafka-schema-registry-client:5.5.1"
-    implementation "io.confluent:kafka-json-schema-provider:5.5.1"
-    implementation "io.confluent:kafka-protobuf-provider:5.5.1"
+    implementation "io.confluent:kafka-avro-serializer:6.1.1"
+    implementation "io.confluent:kafka-protobuf-serializer:6.1.1"
+    implementation "io.confluent:kafka-json-serializer:6.1.1"
+    implementation "io.confluent:kafka-json-schema-serializer:6.1.1"
+    implementation "io.confluent:kafka-schema-registry-client:6.1.1"
+    implementation "io.confluent:kafka-json-schema-provider:6.1.1"
+    implementation "io.confluent:kafka-protobuf-provider:6.1.1"
 
     implementation "org.apache.logging.log4j:log4j-api:2.7"
     implementation "org.apache.logging.log4j:log4j-core:2.7"
@@ -126,14 +126,7 @@ schemaRegistry {
                 .addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
         subject('company-value','src/main/avro/company.avsc', 'AVRO')
                 .addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
-
-        subject('exchange','src/main/avro/exchange.avsc', 'AVRO')
-        subject('return','src/main/avro/return.avsc', 'AVRO')
-        subject('purchase','src/main/avro/purchase.avsc', 'AVRO')
-        subject('transaction-value', 'src/main/avro/transaction-union-refs.avsc','AVRO')
-                .addReference("bbejeck.chapter_3.avro.Return", "return", 1)
-                .addReference("bbejeck.chapter_3.avro.Exchange", "exchange", 1)
-                .addReference("bbejeck.chapter_3.avro.Purchase", "purchase", 1)
+        
 
         subject('truck_event','src/main/avro/truck_event.avsc', 'AVRO')
         subject('plane_event','src/main/avro/plane_event.avsc', 'AVRO')
@@ -180,9 +173,5 @@ schemaRegistry {
         main = "bbejeck.chapter_3.consumer.avro.ReferenceCollegeConsumer"
     }
 
-    task runSalesProduceConsumeApp(type: JavaExec) {
-        classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_4.SalesProduceConsumeApplication"
-    }
 
 }

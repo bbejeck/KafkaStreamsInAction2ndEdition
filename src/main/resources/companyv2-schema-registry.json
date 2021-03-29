@@ -1,4 +1,0 @@
-{
-  "schemaType": "AVRO",
-  "schema": "{ \"namespace\": \"bbejeck.chapter_3.avro\", \"type\": \"record\", \"name\": \"CompanyAvro\", \"fields\": [ {\"name\": \"name\", \"type\": \"string\"}, {\"name\": \"id\", \"type\": [\"string\", \"int\"]}, {\"name\": \"slogan\", \"type\": \"string\", \"default\": \"We are the best[default]\"}, {\"name\": \"locations\", \"type\": {\"type\": \"array\", \"items\": \"string\"}, \"default\": [] } ]}"
-}

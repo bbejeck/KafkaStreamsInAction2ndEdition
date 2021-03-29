@@ -1,1 +1,0 @@
-{"schema": "syntax = \"proto3\";\n\npackage bbejeck.chapter_3.proto;\n\noption java_outer_classname = \"AvengerSimpleProtos\";\n\nmessage AvengerSimple {\n string name = 1;\n string real_name = 2;\n repeated string movies = 3;\n}", "schemaType": "PROTOBUF"}

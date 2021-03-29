@@ -10,11 +10,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * User: Bill Bejeck
- * Date: 10/11/20
- * Time: 4:40 PM
- */
 public class JsonSchemaReferenceCollegeProducer extends BaseProducer<String, CollegeJson> {
 
     public JsonSchemaReferenceCollegeProducer() {

@@ -3,8 +3,8 @@ package bbejeck.chapter_3.consumer.json;
 import bbejeck.chapter_3.consumer.BaseConsumer;
 import bbejeck.chapter_3.json.CollegeJson;
 import bbejeck.clients.ConsumerRecordsHandler;
+import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializer;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializerConfig;
-import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.logging.log4j.LogManager;
@@ -18,15 +18,15 @@ import java.util.Map;
  * Date: 10/11/20
  * Time: 6:35 PM
  */
-public class JsonReferenceCollegeConsumer extends BaseConsumer {
-    private static final Logger LOG = LogManager.getLogger(JsonReferenceCollegeConsumer.class);
+public class JsonSchemaReferenceCollegeConsumer extends BaseConsumer {
+    private static final Logger LOG = LogManager.getLogger(JsonSchemaReferenceCollegeConsumer.class);
 
-    public JsonReferenceCollegeConsumer() {
-        super(StringDeserializer.class, KafkaProtobufDeserializer.class);
+    public JsonSchemaReferenceCollegeConsumer() {
+        super(StringDeserializer.class, KafkaJsonSchemaDeserializer.class);
     }
 
     public static void main(String[] args) {
-        JsonReferenceCollegeConsumer collegeConsumer = new JsonReferenceCollegeConsumer();
+        JsonSchemaReferenceCollegeConsumer collegeConsumer = new JsonSchemaReferenceCollegeConsumer();
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"json-schema-college-ref-group");
         overrideConfigs.put(KafkaJsonSchemaDeserializerConfig.JSON_VALUE_TYPE, CollegeJson.class);

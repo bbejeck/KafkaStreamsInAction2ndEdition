@@ -1,5 +1,0 @@
-{
-  "schema": "syntax = \"proto3\";\npackage proto_files;\n\nimport \"purchase.proto\";\nimport \"return.proto\";\nimport \"exchange.proto\";\n\noption java_package = \"bbejeck.chapter_3.proto\";\noption java_outer_classname = \"TransactionTypeProtos\";\n\nmessage TransactionType {\n  oneof txt_type {\n Purchase purchase = 1;\nReturn return = 2;\n Exchange exchange = 3;\n  }\n}\n",
-  "schemaType": "PROTOBUF",
-  "references": [ { "name": "purchase.proto", "subject": "purchase.proto", "version": 1 }, { "name": "return.proto", "subject": "return.proto", "version": 1 }, { "name": "exchange.proto", "subject": "exchange.proto", "version": 1 } ]
-  }

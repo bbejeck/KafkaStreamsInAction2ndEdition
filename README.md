@@ -7,12 +7,12 @@ Table of Contents
     * [Getting started](#getting-started)
     * [Troubleshooting issues](#troubleshooting-issues)
     * [Command line helper](#command-line-helper)
+    * [Project Modules](#project-modules)
     * [Chapter 2](#chapter-2)
     * [Chapter 3](#chapter-3)
         * [A guided tour to the chapter 3 code](#a-guided-tour-to-the-chapter-3-code)
         * [Running the examples](#running-the-examples)
         * [Schema Registry configs in the build file](#schema-registry-configs-in-the-build-file)
-        * [Project Modules](#project-modules)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -62,6 +62,46 @@ In the root of the project there is a file `project-commands.sh` that contains s
 wrapping some commands you'll find yourself executing during the course of reading this book.
 To expose the commands `cd` into the base directory of the project and run `source project-commands.sh`, then
 you'll have shortcuts for some command-line commands you'll encounter.
+
+## Project Modules
+
+You'll notice the project contains four modules
+
+1. streams
+2. sr-backward
+3. sr-forward
+4. sr-full
+
+The `streams` module is the main module and contains all the source code for the book.  You'll spend the majority of
+your time working with the code here.
+
+In the appendix-B of the book, there is a tutorial walking you through migrating schemas and the permitted changes for each
+compatibility mode.  Each module contains an updated schema and updated producer and consumer clients to
+support the schema changes.  I've named the modules to match compatibility mode it supports.
+
+The appendix walks you through a series of steps including the schema changes and explains what happens and why at each step,
+so I won't go into that level of detail here. So please consult appendix-B for the full explanation.
+
+At a high-level, you'll work through a series of changes and compatibility modes proceeding in this order of compatibility
+`backward`, `forward` and finally `full`.
+
+For each step of the tutorial you'll take the following steps
+
+1. Set the compatibility mode: run the `configSubjectsTask` to set the compatibility mode
+2. Test the updated schema: execute the `testSchemasTask` to test the schema changes are compatible
+3. Register the updated schema: run the `registerSchemasTask` and register the new schema
+
+Then after these steps of updating, testing and registering the schema you'll run a couple of commands for
+the producer and consumer clients in a specific order and observe the output.
+
+**_It's very important to follow the specific order of the commands
+as well as execute them exactly as shown._**
+
+Note that there is a high level of overlap between the submodule code and `build.gradle` files.  **_This is intentional!!_**
+I wanted to isolate each module in the spirit of independent changes.  The purpose of tutorial is to highlight
+how you handle schema changes within different compatibility modes. Not how you set up sub-modules within a main gradle
+project
+
 
 ## Chapter 2 
 
@@ -147,40 +187,6 @@ describes the different commands, but here's a cheat-sheet
 *  Download schemas `./gradlew downloadSchemasTask`
 *  Register schemas `./gradlew registerSchemasTask`
 *  Test compatibility for a proposed update `./gradlew testSchemasTask`
-
-### Project Modules
-
-You'll notice the project contains three modules
-1. sr-backward
-2. sr-forward
-3. sr-full
-
-In the appendix-B of the book, there is a tutorial walking you through migrating schemas and the permitted changes for each
-compatibility mode.  Each module contains an updated schema and updated producer and consumer clients to 
-support the schema changes.  I've named the modules to match compatibility mode it supports.
-
-The appendix walks you through a series of steps including the schema changes and explains what happens and why at each step,
-so I won't go into that level of detail here. So please consult appendix-B for the full explanation.
-
-At a high-level, you'll work through a series of changes and compatibility modes proceeding in this order of compatibility
-`backward`, `forward` and finally `full`.
-
-For each step of the tutorial you'll take the following steps
-
-1. Set the compatibility mode: run the `configSubjectsTask` to set the compatibility mode
-2. Test the updated schema: execute the `testSchemasTask` to test the schema changes are compatible
-3. Register the updated schema: run the `registerSchemasTask` and register the new schema
-
-Then after these steps of updating, testing and registering the schema you'll run a couple of commands for
-the producer and consumer clients in a specific order and observe the output. 
-
-**_It's very important to follow the specific order of the commands
-as well as execute them exactly as shown._**
-
-Note that there is a high level of overlap between the submodule code and `build.gradle` files.  **_This is intentional!!_**
-I wanted to isolate each module in the spirit of independent changes.  The purpose of tutorial is to highlight
-how you handle schema changes within different compatibility modes. Not how you set up sub-modules within a main gradle
-project
 
 
 

@@ -1,7 +1,5 @@
 package bbejeck.chapter_3.model;
 
-import org.apache.avro.reflect.AvroName;
-
 /**
  * User: Bill Bejeck
  * Date: 9/23/20

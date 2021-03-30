@@ -71,7 +71,7 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.7"
 
     testImplementation(platform('org.junit:junit-bom:5.7.0'))
-    testImplementation('org.junit.jupiter:junit-jupiter')   
+    testImplementation('org.junit.jupiter:junit-jupiter')
     testImplementation "org.apache.kafka:kafka-streams-test-utils:2.7.0"
     testImplementation "org.testcontainers:junit-jupiter:1.15.1"
     testImplementation "org.testcontainers:kafka:1.15.1"
@@ -115,23 +115,23 @@ schemaRegistry {
 //    }
 
     compatibility {
-        subject('avro-avengers-value', 'src/main/avro/avenger.avsc', 'AVRO')
+        subject('avro-avengers-value', 'streams/src/main/avro/avenger.avsc', 'AVRO')
     }
 
     // Possible types are ["JSON", "PROTOBUF", "AVRO"]
     register {
-        subject('avro-avengers-value','src/main/avro/avenger.avsc', 'AVRO')
-        subject('person','src/main/avro/person.avsc', 'AVRO')
-        subject('college-value','src/main/avro/college.avsc', 'AVRO')
+        subject('avro-avengers-value','streams/src/main/avro/avenger.avsc', 'AVRO')
+        subject('person','streams/src/main/avro/person.avsc', 'AVRO')
+        subject('college-value','streams/src/main/avro/college.avsc', 'AVRO')
                 .addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
-        subject('company-value','src/main/avro/company.avsc', 'AVRO')
+        subject('company-value','streams/src/main/avro/company.avsc', 'AVRO')
                 .addReference("bbejeck.chapter_3.avro.PersonAvro", "person", 1)
-        
 
-        subject('truck_event','src/main/avro/truck_event.avsc', 'AVRO')
-        subject('plane_event','src/main/avro/plane_event.avsc', 'AVRO')
-        subject('delivery_event','src/main/avro/delivery_event.avsc', 'AVRO')
-        subject('inventory-events-value', 'src/main/avro/all_events.avsc','AVRO')
+
+        subject('truck_event','streams/src/main/avro/truck_event.avsc', 'AVRO')
+        subject('plane_event','streams/src/main/avro/plane_event.avsc', 'AVRO')
+        subject('delivery_event','streams/src/main/avro/delivery_event.avsc', 'AVRO')
+        subject('inventory-events-value', 'streams/src/main/avro/all_events.avsc','AVRO')
                 .addReference("bbejeck.chapter_3.avro.TruckEvent", "truck_event", 1)
                 .addReference("bbejeck.chapter_3.avro.PlaneEvent", "plane_event", 1)
                 .addReference("bbejeck.chapter_3.avro.DeliveryEvent", "delivery_event", 1)

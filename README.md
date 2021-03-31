@@ -24,9 +24,9 @@ Source code repository for the 2nd Edition of Kafka Streams in Action
 The source code for [Event Streaming with Kafka Streams and ksqlDB](https://www.manning.com/books/event-streaming-with-kafka-streams-and-ksqldb) has a few 
 prerequisites you'll need to make sure you have installed to get everything working smoothly.
 
-1. Java version 14 - Although once Gradle supports Java 16 I'll update to using
-   16 for this project.  Specifically this project uses [AdoptOpenJDK](https://adoptopenjdk.net/)
-2. [Gradle](https://gradle.org/) version 6.8.3
+1. Java, the project uses version 14 from [AdoptOpenJDK](https://adoptopenjdk.net/).
+2. [Gradle](https://gradle.org/) version 6.8.3.  Although you don't need to install Gradle if you don't have it.
+   the included Gradle "wrapper" script will install it if needed.  Use `./gradlew` for mac OS/'nix and `gradlew.bat` on Windows.
 3. [Docker Desktop](https://www.docker.com/products/docker-desktop) version 3.2.2
 4. [Git](https://git-scm.com/) version 2.31.1
 
@@ -73,7 +73,10 @@ You'll notice the project contains four modules
 4. sr-full
 
 The `streams` module is the main module and contains all the source code for the book.  You'll spend the majority of
-your time working with the code here.
+your time working with the code here.  
+
+Note that when running any commands other than `clean` or `build` it's best important
+to always prefix the command with the module name which is the target of the command.
 
 In the appendix-B of the book, there is a tutorial walking you through migrating schemas and the permitted changes for each
 compatibility mode.  Each module contains an updated schema and updated producer and consumer clients to
@@ -87,9 +90,9 @@ At a high-level, you'll work through a series of changes and compatibility modes
 
 For each step of the tutorial you'll take the following steps
 
-1. Set the compatibility mode: run the `configSubjectsTask` to set the compatibility mode
-2. Test the updated schema: execute the `testSchemasTask` to test the schema changes are compatible
-3. Register the updated schema: run the `registerSchemasTask` and register the new schema
+1. Set the compatibility mode: run the `<module name>:configSubjectsTask` to set the compatibility mode
+2. Test the updated schema: execute the `<module name>:testSchemasTask` to test the schema changes are compatible
+3. Register the updated schema: run the `<module name>:registerSchemasTask` and register the new schema
 
 Then after these steps of updating, testing and registering the schema you'll run a couple of commands for
 the producer and consumer clients in a specific order and observe the output.
@@ -183,10 +186,16 @@ This plugin make working with Schema Registry very simple. The configuration for
 commands are located within the `schemaRegistry` block in the `build.gradle` file. The book text
 describes the different commands, but here's a cheat-sheet
 
-*  Set subject compatibility `./gradlew configSubjectsTask`
-*  Download schemas `./gradlew downloadSchemasTask`
-*  Register schemas `./gradlew registerSchemasTask`
-*  Test compatibility for a proposed update `./gradlew testSchemasTask`
+*  Set subject compatibility `./gradlew <module name>:configSubjectsTask`
+*  Download schemas `./gradlew <module name>:downloadSchemasTask`
+*  Register schemas `./gradlew <module name>:registerSchemasTask`
+*  Test compatibility for a proposed update `./gradlew <module name>:testSchemasTask`
+
+Where the `<module name>` is one of `streams`, `sr-backward`, `sr-forward`, or `sr-full`.  It's important
+to specify the module in any of the commands, otherwise Gradle will execute the command across all
+modules, and the different Schema Registry modules will clash resulting a failure.
+
+Also, if you are running on Windows use `gradlew.bat` instead.
 
 
 

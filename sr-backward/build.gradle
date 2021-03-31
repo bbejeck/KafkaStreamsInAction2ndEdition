@@ -64,6 +64,10 @@ dependencies {
 
 protobuf {
     generatedFilesBaseDir = "${project.buildDir}/generated-main-proto-java"
+
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.15.3'
+    }
 }
 
 jsonSchema2Pojo {

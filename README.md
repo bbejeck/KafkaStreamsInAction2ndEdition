@@ -41,14 +41,13 @@ All other dependencies should be installed via the `build.gradle` file.
 
 ## Getting started
  
-Before you get started, there's a couple of small steps you need to take.
-First you'll want to get the [Gradle wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).  The 
-wrapper helps you to get up and running quickly with a Gradle project.  
-After that, you'll want to generate the Java
-code from the Avro, Protobuf and JSON Schema schemas so the project will compile.
+Before you get started, you'll need to generate the Java code from 
+the Avro, Protobuf and JSON Schema schemas so the project will compile.
 
-1. First get the Gradle wrapper with this command - `gradle wrapper`
-2. Then generate the needed Java code by running `./gradlew build`
+Run `./gradlew build`  or if you are on Windows `gradlew.bat build`. 
+
+Note that if you don't have Gradle installed, running the `gradlew` script installs Gradle the first
+time you run it.
 
 ## Troubleshooting issues
 

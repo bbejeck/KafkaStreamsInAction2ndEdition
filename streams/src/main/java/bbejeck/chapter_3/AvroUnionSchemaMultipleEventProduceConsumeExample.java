@@ -28,6 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *    Before running this example make sure you have run the gradle task
+ *    streams:registerSchemasTask. Since this example uses an Avro schema
+ *    with a union a the top element, you can't rely on auto-registration
+ *    of schemas
+ */
 
 public class AvroUnionSchemaMultipleEventProduceConsumeExample {
 
@@ -41,6 +47,7 @@ public class AvroUnionSchemaMultipleEventProduceConsumeExample {
             PlaneEvent planeEvent = PlaneEvent.newBuilder().setId("customer-1").setPackageId("1234XRTY").setAirportCode("DCI").setTime(time).build();
             DeliveryEvent deliveryEvent = DeliveryEvent.newBuilder().setId("customer-1").setPackageId("1234XRTY").setCustomerId("Vandley034").setTime(time).build();
             List<SpecificRecord> events = List.of(truckEvent, planeEvent,deliveryEvent);
+            System.out.printf("Producing these events %s %n", events);
             events.forEach(event -> producer.send(new ProducerRecord<>(topic, event), ((metadata, exception) -> {
                 if (exception != null) {
                     System.err.printf("Producing resulted in error %s", exception);

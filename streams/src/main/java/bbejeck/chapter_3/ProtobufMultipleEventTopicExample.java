@@ -60,7 +60,6 @@ public class ProtobufMultipleEventTopicExample {
                 .build();
 
 
-        LOG.info("Sending requests now!!!!!!!!");
         try (final KafkaProducer<String,TransactionTypeProtos.TransactionType> producer = new KafkaProducer<>(producerProps)) {
             var transactions = new ArrayList<TransactionTypeProtos.TransactionType>();
             var purchaseTxn = transactionType.newBuilderForType().setPurchase(purchase).build();
@@ -72,6 +71,7 @@ public class ProtobufMultipleEventTopicExample {
             var exchangeTxn = transactionType.newBuilderForType().setExchange(exchange).build();
             transactions.add(exchangeTxn);
 
+            LOG.info("Sending multiple Protobuf events {}", transactions);
             transactions.forEach(txn -> {
                 var producerRecord = new ProducerRecord<String, TransactionTypeProtos.TransactionType>(topicName, txn);
                 producer.send(producerRecord, (meta, exception) -> {

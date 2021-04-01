@@ -155,22 +155,22 @@ schemaRegistry {
 
     task runCompanyProducer(type: JavaExec) {
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.producer.avro.ReferenceCompanyProducer"
+        main = "bbejeck.chapter_3.producer.avro.AvroReferenceCompanyProducer"
     }
 
     task runCompanyConsumer(type: JavaExec) {
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.consumer.avro.ReferenceCompanyConsumer"
+        main = "bbejeck.chapter_3.consumer.avro.AvroReferenceCompanyConsumer"
     }
 
     task runCollegeProducer(type: JavaExec) {
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.producer.avro.ReferenceCollegeProducer"
+        main = "bbejeck.chapter_3.producer.avro.AvroReferenceCollegeProducer"
     }
 
     task runCollegeConsumer(type: JavaExec) {
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.consumer.avro.ReferenceCollegeConsumer"
+        main = "bbejeck.chapter_3.consumer.avro.AvroReferenceCollegeConsumer"
     }
 
 

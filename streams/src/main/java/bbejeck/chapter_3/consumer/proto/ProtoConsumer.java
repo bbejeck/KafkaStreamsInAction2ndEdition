@@ -16,9 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 10/3/20
- * Time: 3:03 PM
+ * First example of using Protobuf with Schema Registry.  This example
+ * demonstrates consuming with specific and dynamic record types
  */
 public class ProtoConsumer extends BaseConsumer {
 

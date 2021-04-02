@@ -14,9 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 10/11/20
- * Time: 6:35 PM
+ * Example of using Schema Registry and Json Schema with references
  */
 public class JsonSchemaReferenceCollegeConsumer extends BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(JsonSchemaReferenceCollegeConsumer.class);

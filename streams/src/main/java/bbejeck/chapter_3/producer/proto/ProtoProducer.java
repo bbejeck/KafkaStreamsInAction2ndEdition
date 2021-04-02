@@ -11,9 +11,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 /**
- * User: Bill Bejeck
- * Date: 3/18/21
- * Time: 4:51 PM
+ * Basic example of using Protobuf Serializer with Schema Registry
  */
 public class ProtoProducer extends BaseProducer<String, AvengerProto.Avenger> {
     static final Logger LOG = LogManager.getLogger(ProtoProducer.class);

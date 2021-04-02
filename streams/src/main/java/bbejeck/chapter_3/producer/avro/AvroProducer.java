@@ -11,9 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * User: Bill Bejeck
- * Date: 10/3/20
- * Time: 3:21 PM
+ * Example of using Avro with Schema Registry
  */
 public class AvroProducer extends BaseProducer<String, AvengerAvro> {
 

@@ -14,9 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 10/3/20
- * Time: 3:03 PM
+ * Example of using Json Schema deserializers with Schema Registry
+ * This example uses both the specific and the generic type
  */
 public class JsonSchemaConsumer extends BaseConsumer {
 

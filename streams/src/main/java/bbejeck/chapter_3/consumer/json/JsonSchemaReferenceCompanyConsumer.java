@@ -13,7 +13,9 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Example of using Schema Registry and Json Schema with references
+ */
 public class JsonSchemaReferenceCompanyConsumer extends BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(JsonSchemaReferenceCompanyConsumer.class);
 

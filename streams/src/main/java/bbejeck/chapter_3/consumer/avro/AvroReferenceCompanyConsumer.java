@@ -14,9 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 10/11/20
- * Time: 6:35 PM
+ * Another example of Avro schema references
  */
 public class AvroReferenceCompanyConsumer extends BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(AvroReferenceCompanyConsumer.class);

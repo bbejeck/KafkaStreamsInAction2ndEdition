@@ -25,9 +25,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
 
+/**
+ * Before running this example, make sure you have started the Kafka Broker and Schema Registry
+ * via docker-compose up -d.  You don't need to run streams:registerSchemasTask
+ * as Protobuf can recursively register referenced schemas
+ */
+
 public class ProtobufMultipleEventTopicExample {
 
-    static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger(ProtobufMultipleEventTopicExample.class);
 
     public static void main(String[] args) throws Exception {
         final Properties producerProps = new Properties();
@@ -60,7 +66,6 @@ public class ProtobufMultipleEventTopicExample {
                 .build();
 
 
-        LOG.info("Sending requests now!!!!!!!!");
         try (final KafkaProducer<String,TransactionTypeProtos.TransactionType> producer = new KafkaProducer<>(producerProps)) {
             var transactions = new ArrayList<TransactionTypeProtos.TransactionType>();
             var purchaseTxn = transactionType.newBuilderForType().setPurchase(purchase).build();
@@ -72,6 +77,7 @@ public class ProtobufMultipleEventTopicExample {
             var exchangeTxn = transactionType.newBuilderForType().setExchange(exchange).build();
             transactions.add(exchangeTxn);
 
+            LOG.info("Sending Protobuf transactions now {}", transactions);
             transactions.forEach(txn -> {
                 var producerRecord = new ProducerRecord<String, TransactionTypeProtos.TransactionType>(topicName, txn);
                 producer.send(producerRecord, (meta, exception) -> {
@@ -84,32 +90,28 @@ public class ProtobufMultipleEventTopicExample {
 
 
         
-        final Properties specificProperties = getConsumerProps("specific-group");
-
+        final Properties specificProperties = getConsumerProps();
         try(final KafkaConsumer<String, TransactionTypeProtos.TransactionType> specificConsumer = new KafkaConsumer<>(specificProperties)) {
             specificConsumer.subscribe(Collections.singletonList(topicName));
-            int counter = 10;
-            while (counter-- > 0) {
-                ConsumerRecords<String, TransactionTypeProtos.TransactionType> consumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
-                consumerRecords.forEach(cr -> {
-                    TransactionTypeProtos.TransactionType transaction = cr.value();
-                    if (transaction.hasExchange()) {
-                        LOG.info("Processed an exchange " + transaction.getExchange());
-                    } else if (transaction.hasPurchase()) {
-                        LOG.info("Processed a purchase " + transaction.getPurchase());
-                    } else {
-                        LOG.info("Processed a return " + transaction.getReturn());
-                    }
-                });
-            }
+            ConsumerRecords<String, TransactionTypeProtos.TransactionType> consumerRecords = specificConsumer.poll(Duration.ofSeconds(5));
+            consumerRecords.forEach(cr -> {
+                TransactionTypeProtos.TransactionType transaction = cr.value();
+                if (transaction.hasExchange()) {
+                    LOG.info("Processed an exchange " + transaction.getExchange());
+                } else if (transaction.hasPurchase()) {
+                    LOG.info("Processed a purchase " + transaction.getPurchase());
+                } else {
+                    LOG.info("Processed a return " + transaction.getReturn());
+                }
+            });
         }
     }
 
-    static Properties getConsumerProps(final String groupId) {
+    static Properties getConsumerProps() {
         final Properties props = new Properties();
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "protobuf-multi-event-group");
         props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);

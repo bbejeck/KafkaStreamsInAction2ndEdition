@@ -15,9 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 10/3/20
- * Time: 3:03 PM
+ * Example of using Avro with Schema Registry. This example
+ * demonstrates both the specific type and the GenericRecord type
  */
 public class AvroConsumer extends BaseConsumer {
 
@@ -26,8 +25,6 @@ public class AvroConsumer extends BaseConsumer {
     public AvroConsumer() {
         super(StringDeserializer.class, KafkaAvroDeserializer.class);
     }
-
-
     public static void main(String[] args) {
         final String topicName = "avro-avengers";
         AvroConsumer avroConsumer = new AvroConsumer();

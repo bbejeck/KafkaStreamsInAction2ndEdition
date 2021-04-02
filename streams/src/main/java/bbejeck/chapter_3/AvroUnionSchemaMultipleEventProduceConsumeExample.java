@@ -20,6 +20,8 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -28,8 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *    Before running this example make sure you have run the gradle task
+ *    streams:registerSchemasTask. Since this example uses an Avro schema
+ *    with a union a the top element, you can't rely on auto-registration
+ *    of schemas
+ */
 
 public class AvroUnionSchemaMultipleEventProduceConsumeExample {
+
+    private static final Logger LOG = LogManager.getLogger(AvroUnionSchemaMultipleEventProduceConsumeExample.class);
 
     public static void main(String[] args) {
         String topic = "inventory-events";
@@ -41,9 +51,10 @@ public class AvroUnionSchemaMultipleEventProduceConsumeExample {
             PlaneEvent planeEvent = PlaneEvent.newBuilder().setId("customer-1").setPackageId("1234XRTY").setAirportCode("DCI").setTime(time).build();
             DeliveryEvent deliveryEvent = DeliveryEvent.newBuilder().setId("customer-1").setPackageId("1234XRTY").setCustomerId("Vandley034").setTime(time).build();
             List<SpecificRecord> events = List.of(truckEvent, planeEvent,deliveryEvent);
+            LOG.debug("Sending events {}", events);
             events.forEach(event -> producer.send(new ProducerRecord<>(topic, event), ((metadata, exception) -> {
                 if (exception != null) {
-                    System.err.printf("Producing resulted in error %s", exception);
+                    LOG.error("Producing resulted in error", exception);
                 }
             })));
         }
@@ -55,13 +66,13 @@ public class AvroUnionSchemaMultipleEventProduceConsumeExample {
                 SpecificRecord avroRecord = record.value();
                 if (avroRecord instanceof PlaneEvent) {
                     PlaneEvent planeEvent = (PlaneEvent) avroRecord;
-                    System.out.printf("Found a PlaneEvent %s %n", planeEvent);
+                    LOG.debug("Found a PlaneEvent {}", planeEvent);
                 } else if (avroRecord instanceof TruckEvent) {
                     TruckEvent truckEvent = (TruckEvent) avroRecord;
-                    System.out.printf("Found a TruckEvent %s %n", truckEvent);
+                    LOG.debug("Found a TruckEvent {}", truckEvent);
                 } else if (avroRecord instanceof DeliveryEvent) {
                     DeliveryEvent deliveryEvent = (DeliveryEvent) avroRecord;
-                    System.out.printf("Found a DeliveryEvent %s %n", deliveryEvent);
+                    LOG.debug("Found a DeliveryEvent {}", deliveryEvent);
                 }
             });
         }

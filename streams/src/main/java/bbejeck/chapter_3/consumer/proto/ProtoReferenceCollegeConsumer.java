@@ -14,9 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 10/11/20
- * Time: 6:35 PM
+ * Example of consuming records in Protobuf format and a
+ * schema reference.  The College schema has a reference to the Person schema
  */
 public class ProtoReferenceCollegeConsumer extends BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(ProtoReferenceCollegeConsumer.class);

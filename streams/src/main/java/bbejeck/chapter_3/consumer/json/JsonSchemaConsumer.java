@@ -41,7 +41,7 @@ public class JsonSchemaConsumer extends BaseConsumer {
             LOG.info("Found specific JSON Schema avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
         }));
 
-        jsonSchemaConsumer.runConsumer(overrideConfigs,topicName, specificRecordsConsumer);
+        jsonSchemaConsumer.consume(topicName, specificRecordsConsumer);
 
         overrideConfigs.clear();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"json-schema-generic-group");
@@ -63,6 +63,6 @@ public class JsonSchemaConsumer extends BaseConsumer {
             consumerRecordBuilder.setLength(0);
         });
         
-        jsonSchemaConsumer.runConsumer(overrideConfigs, topicName, genericRecordsHandler);
+        jsonSchemaConsumer.consume(topicName, genericRecordsHandler);
     }
 }

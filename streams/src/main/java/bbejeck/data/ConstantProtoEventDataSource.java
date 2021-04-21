@@ -13,7 +13,7 @@ import java.util.Collection;
  * Date: 1/26/21
  * Time: 7:38 PM
  */
-public class ConstantEventDataSource implements DataSource<EventsProto.Events> {
+public class ConstantProtoEventDataSource implements DataSource<EventsProto.Events> {
 
     @Override
     public Collection<EventsProto.Events> fetch() {

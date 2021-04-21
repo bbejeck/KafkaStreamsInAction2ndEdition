@@ -43,7 +43,7 @@ public class ProtoConsumer extends BaseConsumer {
             LOG.info("Found specific Proto avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
         }));
 
-        protoConsumer.runConsumer(overrideConfigs,topicName, specificRecordsConsumer);
+        protoConsumer.consume(topicName, specificRecordsConsumer);
 
         overrideConfigs.clear();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-generic-group");
@@ -65,6 +65,6 @@ public class ProtoConsumer extends BaseConsumer {
             consumerRecordBuilder.setLength(0);
         });
         
-        protoConsumer.runConsumer(overrideConfigs, topicName, genericRecordsHandler);
+        protoConsumer.consume(topicName, genericRecordsHandler);
     }
 }

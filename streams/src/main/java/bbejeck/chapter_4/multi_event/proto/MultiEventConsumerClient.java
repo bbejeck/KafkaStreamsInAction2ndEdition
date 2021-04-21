@@ -1,4 +1,4 @@
-package bbejeck.chapter_4.multi_event;
+package bbejeck.chapter_4.multi_event.proto;
 
 import bbejeck.chapter_4.proto.EventsProto;
 import bbejeck.chapter_4.proto.LoginEventProto;
@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +38,7 @@ public class MultiEventConsumerClient {
 
     public void runConsumer() {
         LOG.info("Starting runConsumer method using properties {}", consumerConfigs);
-        List<String> topicNames = Arrays.asList(((String)consumerConfigs.get("topic.names")).split(","));
+        var topicNames = List.of(((String)consumerConfigs.get("topic.names")).split(","));
         try (final Consumer<String, EventsProto.Events> consumer = new KafkaConsumer<>(consumerConfigs)) {
             LOG.info("Subscribing to {}", topicNames);
             consumer.subscribe(topicNames);

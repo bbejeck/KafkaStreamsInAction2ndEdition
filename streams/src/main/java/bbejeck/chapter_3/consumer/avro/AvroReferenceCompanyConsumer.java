@@ -37,6 +37,6 @@ public class AvroReferenceCompanyConsumer extends BaseConsumer {
                     LOG.info("Found company record {}", companyRecord);
                 }));
 
-        collegeConsumer.runConsumer(overrideConfigs,"company", processFunction);
+        collegeConsumer.consume("company", processFunction);
     }
 }

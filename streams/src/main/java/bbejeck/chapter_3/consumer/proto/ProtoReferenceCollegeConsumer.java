@@ -37,6 +37,6 @@ public class ProtoReferenceCollegeConsumer extends BaseConsumer {
                     LOG.info("Found Protobuf college record {}", collegeRecord);
                 });
 
-        collegeConsumer.runConsumer(overrideConfigs,"proto-college", processFunction);
+        collegeConsumer.consume("proto-college", processFunction);
     }
 }

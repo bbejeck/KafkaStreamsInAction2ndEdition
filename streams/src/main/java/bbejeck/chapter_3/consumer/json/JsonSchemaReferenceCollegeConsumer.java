@@ -37,6 +37,6 @@ public class JsonSchemaReferenceCollegeConsumer extends BaseConsumer {
                     LOG.info("Found JSON Schema college record {}", collegeRecord);
                 }));
 
-        collegeConsumer.runConsumer(overrideConfigs,"json-schema-college", processFunction);
+        collegeConsumer.consume("json-schema-college", processFunction);
     }
 }

@@ -37,6 +37,6 @@ public class ProtoReferenceCompanyConsumer extends BaseConsumer {
                     LOG.info("Found Protobuf company record {}", companyRecord);
                 }));
 
-        companyConsumer.runConsumer(overrideConfigs,"proto-company", processFunction);
+        companyConsumer.consume("proto-company", processFunction);
     }
 }

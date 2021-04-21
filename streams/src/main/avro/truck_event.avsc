@@ -1,6 +1,6 @@
 {
   "type":"record",
-  "namespace": "bbejeck.chapter_3.avro",
+  "namespace": "bbejeck.chapter_4.avro",
   "name":"TruckEvent",
   "fields": [
     {"name": "id", "type":"string"},

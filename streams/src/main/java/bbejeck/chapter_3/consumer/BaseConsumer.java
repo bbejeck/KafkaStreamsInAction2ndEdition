@@ -23,6 +23,7 @@ public abstract class BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(BaseConsumer.class);
     private final Class<?> keyDeserializer;
     private final Class<?> valueDeserializer;
+    private Map<String, Object> overrideConfigs = new HashMap<>();
 
 
     public BaseConsumer(Class<?> keyDeserializer, Class<?> valueDeserializer) {
@@ -30,16 +31,15 @@ public abstract class BaseConsumer {
         this.valueDeserializer = valueDeserializer;
     }
 
-    public <K, V> void runConsumer(final Map<String, Object> configs,
-                                   final String topic,
-                                   final ConsumerRecordsHandler<K, V> recordsHandler) {
 
-        Map<String, Object> genericConfigs = overrideConfigs(configs);
+    public <K, V> void consume(final String topic,
+                               final ConsumerRecordsHandler<K, V> recordsHandler) {
+
         LOG.info("Getting ready to consume records");
         boolean notDoneConsuming = true;
         int noRecordsCount = 0;
 
-        try (final KafkaConsumer<K, V> consumer = new KafkaConsumer<>(genericConfigs)) {
+        try (final KafkaConsumer<K, V> consumer = new KafkaConsumer<>(consumerConfig(overrideConfigs))) {
             consumer.subscribe(Collections.singletonList(topic));
             while (notDoneConsuming) {
                 ConsumerRecords<K, V> consumerRecords = consumer.poll(Duration.ofSeconds(5));
@@ -57,8 +57,8 @@ public abstract class BaseConsumer {
         }
     }
 
-    public Map<String, Object> overrideConfigs(final Map<String, Object> overrideConfigs) {
-          return consumerConfig(overrideConfigs);
+    public void overrideConfigs(final Map<String, Object> overrideConfigs) {
+          this.overrideConfigs = overrideConfigs;
     }
 
     private Map<String, Object> consumerConfig(final Map<String, Object> overrides) {

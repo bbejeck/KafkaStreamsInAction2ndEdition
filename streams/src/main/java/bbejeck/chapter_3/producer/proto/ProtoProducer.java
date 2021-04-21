@@ -22,7 +22,7 @@ public class ProtoProducer extends BaseProducer<String, AvengerProto.Avenger> {
         super(StringSerializer.class, KafkaProtobufSerializer.class);
     }
 
-    static List<AvengerProto.Avenger> getRecords() {
+    public static List<AvengerProto.Avenger> getRecords() {
         final var blackWidow = AvengerProto.Avenger.newBuilder().setName("Black Widow")
                 .setRealName("Natasha Romanova")
                 .addAllMovies(List.of("Avengers", "Infinity Wars", "End Game")).build();

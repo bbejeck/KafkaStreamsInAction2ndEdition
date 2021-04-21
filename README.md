@@ -115,14 +115,14 @@ from the console.  See `project-commands.sh` , as some commands have functions w
 The code in chapter 3 is used for demonstrating how to interacting with Schema
 Registry and not with an emphasis on the producer and consumer code.
 
-I've broken up the examples across two main packages: `chapter_3.producer` and `chapter_3.consumer`
+I've broken up the examples across two main packages: `bbejeck.chapter_3.producer` and `bbejeck.chapter_3.consumer`
 Within those two, there are additional packages of `avro`, `proto`, and `json` containing 
 example code used to drive serializing and deserializing examples using the 
 serializers for the given format indicated by the package name.
 ### A guided tour to the chapter 3 code
 It's a good idea for me to describe the contents of the directories and the function of
 each class:
-* chapter_3.producer
+* bbejeck.chapter_3.producer
     * avro
         * `AvroProducer` Initial producer example for working with Avro schemas
         * `AvroReferenceCollegeProducer` Example producer for working with schema references in Avro
@@ -136,7 +136,7 @@ each class:
         * `ProtoReferenceCollegeProducer` Example producer for working with schema references in Protobuf
         * `ProtoReferenceCompanyProducer` Example producer for working with schema references in Protobuf
 
-* chapter_3.consumer
+* bbejeck.chapter_3.consumer
     * avro
         * `AvroConsumer` Initial consumer example for working with Avro schemas
         * `AvroReferenceCollegeConsumer` Example consumer for working with schema references in Avro
@@ -150,7 +150,7 @@ each class:
         * `ProtoReferenceCollegeConsumer` Example consumer for working with schema references in Protobuf
         * `ProtoReferenceCompanyConsumer` Example consumer for working with schema references in Protobuf
     
-* chapter_3
+* bbejeck.chapter_3
     *  `AvroReflectionProduceConsumeExample` A simple example using the AvroReflection serializer and deserializer.  I will update
     chapter 3 in another MEAP release to cover using this part of the Avro API
        
@@ -172,7 +172,7 @@ For the examples nested under the `producer` or `consumer` packages, you need ru
 2. Run the consumer - the consumer starts up and displays some information on the console then it shuts down
 after two consecutive `poll` calls without retrieving any records it shuts down.
    
-The examples that are directly under the `chapter_3` package have a producer and consumer in them and you only need to run
+The examples that are directly under the `bbejeck.chapter_3` package have a producer and consumer in them and you only need to run
 these directly. For this release of the MEAP, I'm assuming that you'll run these examples from within the IDE.  
 In a future MEAP release(chapter 4?) I'm going to unit tests covering all code.  You can still run the examples as stand-alone
 programs if you wish, but should you choose to experiment you'll be able to run tests to ensure everything still works as

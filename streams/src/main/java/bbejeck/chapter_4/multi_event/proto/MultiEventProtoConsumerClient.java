@@ -20,9 +20,9 @@ import java.util.Map;
  * Date: 1/18/21
  * Time: 6:53 PM
  */
-public class MultiEventConsumerClient {
+public class MultiEventProtoConsumerClient {
 
-    private static final Logger LOG = LogManager.getLogger(MultiEventConsumerClient.class);
+    private static final Logger LOG = LogManager.getLogger(MultiEventProtoConsumerClient.class);
     private boolean runOnce = false;
     final Map<String,Object> consumerConfigs;
     volatile boolean keepConsuming = true;
@@ -32,7 +32,7 @@ public class MultiEventConsumerClient {
     List<SearchEventProto.SearchEvent> searches = new ArrayList<>();
     List<EventsProto.Events> eventsList = new ArrayList<>();
 
-    public MultiEventConsumerClient(final Map<String,Object> consumerConfigs) {
+    public MultiEventProtoConsumerClient(final Map<String,Object> consumerConfigs) {
         this.consumerConfigs = consumerConfigs;
     }
 

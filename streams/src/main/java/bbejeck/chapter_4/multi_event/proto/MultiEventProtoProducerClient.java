@@ -16,16 +16,16 @@ import java.util.Map;
  * Date: 1/18/21
  * Time: 7:44 PM
  */
-public class MultiEventProducerClient {
-    private static final Logger LOG = LogManager.getLogger(MultiEventProducerClient.class);
+public class MultiEventProtoProducerClient {
+    private static final Logger LOG = LogManager.getLogger(MultiEventProtoProducerClient.class);
     final Map<String,Object> producerConfigs;
     final DataSource<EventsProto.Events> dataSource;
     volatile boolean keepProducing = true;
     private boolean runOnce;
 
 
-    public MultiEventProducerClient(final Map<String, Object> producerConfigs,
-                                    final DataSource<EventsProto.Events> dataSource) {
+    public MultiEventProtoProducerClient(final Map<String, Object> producerConfigs,
+                                         final DataSource<EventsProto.Events> dataSource) {
         this.producerConfigs = producerConfigs;
         this.dataSource = dataSource;
     }

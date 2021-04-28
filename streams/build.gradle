@@ -17,7 +17,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'com.github.eirnym.js2p' version '1.0'
-    id "com.google.protobuf" version "0.8.15"
+    id "com.google.protobuf" version "0.8.16"
     id "com.github.imflog.kafka-schema-registry-gradle-plugin" version "1.1.1"
     id "com.github.davidmc24.gradle.plugin.avro" version "1.0.0"
 }
@@ -42,13 +42,12 @@ dependencies {
     implementation "com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39"
     implementation 'javax.validation:validation-api:1.1.0.CR2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
-    implementation "com.google.protobuf:protobuf-java:3.11.4"
     implementation 'com.github.javafaker:javafaker:1.0.2'
 
-    implementation('org.apache.kafka:kafka-streams:2.7.0') {
+    implementation('org.apache.kafka:kafka-streams:2.8.0') {
         exclude group:'org.apache.kafka', module: 'kafka-clients'
     }
-    implementation('org.apache.kafka:kafka-clients:2.7.0!!')
+    implementation('org.apache.kafka:kafka-clients:2.8.0!!')
     implementation('io.confluent:kafka-streams-avro-serde:6.1.1') {
         exclude group:'org.apache.kafka', module: 'kafka-clients'
         exclude group:'org.apache.kafka', module: 'kafka-streams'
@@ -98,9 +97,17 @@ jsonSchema2Pojo {
 
 test {
     // Use junit platform for unit tests
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'long', 'skip'
+    }
     testLogging {
         events "passed", "skipped", "failed"
+    }
+}
+
+task longTests(type: Test) {
+    useJUnitPlatform {
+        includeTags 'long'
     }
 }
 
@@ -132,9 +139,9 @@ schemaRegistry {
         subject('plane_event','streams/src/main/avro/plane_event.avsc', 'AVRO')
         subject('delivery_event','streams/src/main/avro/delivery_event.avsc', 'AVRO')
         subject('inventory-events-value', 'streams/src/main/avro/all_events.avsc','AVRO')
-                .addReference("bbejeck.chapter_3.avro.TruckEvent", "truck_event", 1)
-                .addReference("bbejeck.chapter_3.avro.PlaneEvent", "plane_event", 1)
-                .addReference("bbejeck.chapter_3.avro.DeliveryEvent", "delivery_event", 1)
+                .addReference("bbejeck.chapter_4.avro.TruckEvent", "truck_event", 1)
+                .addReference("bbejeck.chapter_4.avro.PlaneEvent", "plane_event", 1)
+                .addReference("bbejeck.chapter_4.avro.DeliveryEvent", "delivery_event", 1)
     }
 
     config {

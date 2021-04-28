@@ -18,6 +18,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -44,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Time: 8:20 PM
  */
 
+@Tag("long")
 @Testcontainers
 public class TransactionalProducerConsumerTest {
 

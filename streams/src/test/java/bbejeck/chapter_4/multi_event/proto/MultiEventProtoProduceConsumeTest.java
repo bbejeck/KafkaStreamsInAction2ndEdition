@@ -37,11 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Time: 8:27 PM
  */
 @Testcontainers
-public class MultiEventProduceConsumeTest {
+public class MultiEventProtoProduceConsumeTest {
 
 
     private final String outputTopic = "multi-events-topic";
-    private static final Logger LOG = LogManager.getLogger(MultiEventProduceConsumeTest.class);
+    private static final Logger LOG = LogManager.getLogger(MultiEventProtoProduceConsumeTest.class);
     final DataSource<EventsProto.Events> eventsDataSource = new ConstantProtoEventDataSource();
 
 
@@ -66,10 +66,10 @@ public class MultiEventProduceConsumeTest {
     @Test
     @DisplayName("should produce and consume multiple events per topic")
     public void produceConsumeMultipleEventsFromSameTopic() throws Exception {
-        MultiEventProducerClient producerClient = new MultiEventProducerClient(getProducerProps(), eventsDataSource);
+        MultiEventProtoProducerClient producerClient = new MultiEventProtoProducerClient(getProducerProps(), eventsDataSource);
         producerClient.runProducerOnce();
 
-        MultiEventConsumerClient consumerClient = new MultiEventConsumerClient(getConsumerProps());
+        MultiEventProtoConsumerClient consumerClient = new MultiEventProtoConsumerClient(getConsumerProps());
         consumerClient.runConsumerOnce();
 
         List<EventsProto.Events> expectedEvents = new ArrayList<>(eventsDataSource.fetch());

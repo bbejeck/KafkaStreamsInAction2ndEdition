@@ -12,9 +12,9 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 1/18/21
- * Time: 7:44 PM
+ * Producer client for the {@link ProducePipeliningConsumeApplication}
+ * It has some built in pause time between batches to make sure the demo
+ * does not run too fast.
  */
 public class PipeliningProducerClient {
     private static final Logger LOG = LogManager.getLogger(PipeliningProducerClient.class);

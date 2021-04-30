@@ -13,11 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * User: Bill Bejeck
- * Date: 10/11/20
- * Time: 6:35 PM
- */
+
 public class AvroReferenceCompanyConsumer extends BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(AvroReferenceCompanyConsumer.class);
 

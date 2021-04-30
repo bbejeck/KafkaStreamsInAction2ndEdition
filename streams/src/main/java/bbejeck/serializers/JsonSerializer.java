@@ -6,9 +6,7 @@ import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
 /**
- * User: Bill Bejeck
- * Date: 3/13/21
- * Time: 9:02 PM
+ * Simple implementation of a stand alone {@link Serializer}
  */
 public class JsonSerializer<T> implements Serializer<T> {
 

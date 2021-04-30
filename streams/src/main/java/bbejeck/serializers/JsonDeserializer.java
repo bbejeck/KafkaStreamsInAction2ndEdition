@@ -9,9 +9,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 3/13/21
- * Time: 9:16 PM
+ * Simple implementation of a stand alone {@link Deserializer}
  */
 public class JsonDeserializer<T> implements Deserializer<T> {
 

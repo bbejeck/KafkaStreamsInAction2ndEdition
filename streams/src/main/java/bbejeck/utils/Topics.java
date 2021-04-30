@@ -13,9 +13,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * User: Bill Bejeck
- * Date: 9/23/20
- * Time: 9:16 PM
+ * Utility class using the {@link org.apache.kafka.clients.admin.KafkaAdminClient}
+ * for working with topics
  */
 public class Topics {
 

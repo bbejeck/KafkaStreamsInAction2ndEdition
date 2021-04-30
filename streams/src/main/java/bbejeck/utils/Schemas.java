@@ -1,9 +1,9 @@
 package bbejeck.utils;
 
 /**
- * User: Bill Bejeck
- * Date: 10/2/20
- * Time: 2:25 PM
+ * Utility class for working with schemas using
+ * the {@link io.confluent.kafka.schemaregistry.client.SchemaRegistryClient} but
+ * is still under development.
  */
 public class Schemas {
     //final String schemaRegistryUrl;

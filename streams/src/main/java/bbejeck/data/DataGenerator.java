@@ -2,7 +2,6 @@ package bbejeck.data;
 
 import bbejeck.chapter_4.avro.ProductTransaction;
 import bbejeck.chapter_4.avro.StockTransaction;
-import bbejeck.chapter_4.proto.EventsProto;
 import com.github.javafaker.Commerce;
 import com.github.javafaker.Company;
 import com.github.javafaker.Faker;
@@ -19,42 +18,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * User: Bill Bejeck
- * Date: 1/16/21
- * Time: 3:48 PM
+ * Utility class that provides various methods for generating data
+ * used in examples throughout the book
  */
 public class DataGenerator {
 
 
     private DataGenerator() {
-    }
-
-    public static Collection<EventsProto.Events> generateEvents(int numberEvents) {
-        //TODO this needs to be completed in the meantime data will be hardcoded for events
-        Faker faker = new Faker();
-        int counter = 0;
-        Instant instant = Instant.now();
-        Commerce commerce = faker.commerce();
-        List<String> users = getLordOfTheRingsCharacters(5);
-        final List<EventsProto.Events> events = new ArrayList<>();
-        EventsProto.Events.Builder builder = EventsProto.Events.newBuilder();
-        int whichEvent = 0;
-        while (counter++ < numberEvents) {
-             if (whichEvent == 0) {
-                 //Login even
-                 
-             } else if (whichEvent == 1 || whichEvent == 2) {
-                 // Search
-             } else {
-                 // Purchase
-             }
-
-           whichEvent +=1;
-           if (whichEvent > 2) {
-               whichEvent = 0;
-           }
-        }
-        return events;
     }
 
     public static Collection<ProductTransaction> generateProductTransactions(int numberRecords) {

@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * User: Bill Bejeck
- * Date: 1/26/21
- * Time: 7:38 PM
+ * An implementation of the {@link DataSource} interface that
+ * returns the same 3 Protobuf events with each call to {@link DataSource#fetch()}
+ * useful for testing scenarios
  */
 public class ConstantProtoEventDataSource implements DataSource<EventsProto.Events> {
 

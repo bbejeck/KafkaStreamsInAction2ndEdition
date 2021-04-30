@@ -10,11 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * User: Bill Bejeck
- * Date: 10/3/20
- * Time: 3:21 PM
- */
+
 public class AvroProducer extends BaseProducer<String, AvengerAvro> {
 
     static final Logger LOG = LogManager.getLogger(AvroProducer.class);

@@ -46,9 +46,16 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * User: Bill Bejeck
- * Date: 1/19/21
- * Time: 8:20 PM
+ * Test showing how the {@link KafkaProducer} in idempotent mode works.
+ * The test class makes use of the {@link ToxiproxyContainer} to simulate network
+ * partitions that will cause the producer to retry sending records.  The class runs two tests
+ * (parameterized, one actual test method) one with the producer
+ * in non-idempotent mode which will have duplicate records and the other uses
+ * idempotent mode and will have no duplicates.
+ *
+ * This class has a {@link Tag} with the label of "long" as this test
+ * simulates a network partition of over a minute to force the producer to
+ * resend records
  */
 
 @Tag("long")
@@ -106,7 +113,7 @@ public class IdempotentProducerTest {
     @DisplayName("Idempotent Producer")
     @ParameterizedTest(name = "Contains no duplicates should be {0}")
     @MethodSource("testParameters")
-    public void testDuplicatesWithoutIdempotence(boolean enableIdempotence, String groupId) throws Exception {
+    public void parameterizedIdempotentProducerTest(boolean enableIdempotence, String groupId) throws Exception {
         var result = runTest(enableIdempotence, groupId);
         assertEquals(NUMBER_RECORDS_TO_PRODUCE, result.totalSent);
         LOG.info("Duplicate records {}", result.duplicates);

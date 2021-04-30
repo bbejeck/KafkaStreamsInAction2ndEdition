@@ -11,11 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * User: Bill Bejeck
- * Date: 10/4/20
- * Time: 6:16 PM
- */
 public abstract class BaseProducer<K, V> {
 
     private final Class<?> keySerializer;

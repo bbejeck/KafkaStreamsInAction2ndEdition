@@ -15,11 +15,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * User: Bill Bejeck
- * Date: 10/3/20
- * Time: 3:03 PM
- */
+
 public class ProtoConsumer extends BaseConsumer {
 
     private static final Logger LOG = LogManager.getLogger(ProtoConsumer.class);

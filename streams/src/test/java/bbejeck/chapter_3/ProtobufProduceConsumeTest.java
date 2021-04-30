@@ -54,6 +54,9 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+/**
+ * Test for demo of using producer and consumer with Protobuf schemas
+ */
 
 @Testcontainers
 public class ProtobufProduceConsumeTest {

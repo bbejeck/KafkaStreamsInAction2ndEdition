@@ -13,11 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * User: Bill Bejeck
- * Date: 10/5/20
- * Time: 8:57 AM
- */
+
 public abstract class BaseConsumer {
 
     private static final Logger LOG = LogManager.getLogger(BaseConsumer.class);

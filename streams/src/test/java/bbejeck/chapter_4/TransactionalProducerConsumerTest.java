@@ -40,9 +40,12 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * User: Bill Bejeck
- * Date: 1/19/21
- * Time: 8:20 PM
+ * Tests demonstrating using the {@link KafkaProducer} in transactional mode and the
+ * {@link KafkaConsumer} in read-committed mode and in regular mode consuming transactional
+ * records.
+ *
+ * This class has a {@link Tag} with the label of "long" so that it doesn't
+ * run with the shorter tests in gradle builds.
  */
 
 @Tag("long")

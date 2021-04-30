@@ -32,9 +32,8 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * User: Bill Bejeck
- * Date: 1/26/21
- * Time: 8:27 PM
+ * Test to see the MultiEventProtoProducerClient and  MultiEventProtoConsumerClient
+ * in action
  */
 @Testcontainers
 public class MultiEventProtoProduceConsumeTest {
@@ -65,7 +64,8 @@ public class MultiEventProtoProduceConsumeTest {
 
     @Test
     @DisplayName("should produce and consume multiple events per topic")
-    public void produceConsumeMultipleEventsFromSameTopic() throws Exception {
+    public void produceConsumeMultipleEventsFromSameTopic() {
+        LOG.info("Starting test for proto multi events");
         MultiEventProtoProducerClient producerClient = new MultiEventProtoProducerClient(getProducerProps(), eventsDataSource);
         producerClient.runProducerOnce();
 

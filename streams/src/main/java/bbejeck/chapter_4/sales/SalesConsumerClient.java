@@ -13,9 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 1/18/21
- * Time: 6:53 PM
+ * Consumer client for the first example in the book.
+ * Runs in the {@link SalesProduceConsumeApplication}
  */
 public class SalesConsumerClient {
 

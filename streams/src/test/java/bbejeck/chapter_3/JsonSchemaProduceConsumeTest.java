@@ -40,6 +40,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Test for demo of using producer and consumer with JSONSchema schemas
+ */
 
 @Testcontainers
 public class JsonSchemaProduceConsumeTest {

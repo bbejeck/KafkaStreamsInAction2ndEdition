@@ -13,9 +13,18 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 4/20/21
- * Time: 9:11 PM
+ * Producer client for multiple events in one topic using Avro
+ *   Individual Schemas used for this class are
+ *   <ol>
+ *       <li>delivery_event.avsc</li>
+ *       <li>plane_event.avsc</li>
+ *       <li>truck_event.avsc</li>
+ *   </ol>
+ *  And the schema containing the union is all_events.avsc
+ *
+ *  All Avro schemas are located in src/main/avro
+ *
+ *  To run this class execute MultiEventAvroProduceConsumeTest
  */
 public class MultiEventAvroProducerClient {
     private static final Logger LOG = LogManager.getLogger(MultiEventAvroConsumerClient.class);

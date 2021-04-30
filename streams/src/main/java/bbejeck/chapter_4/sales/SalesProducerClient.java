@@ -12,9 +12,10 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 1/18/21
- * Time: 7:44 PM
+ * First example producer client used as part of the
+ * {@link SalesProduceConsumeApplication} includes a pause after
+ * each batch to keep the example application easier to observe
+ * what's going on in the log files.
  */
 public class SalesProducerClient {
     private static final Logger LOG = LogManager.getLogger(SalesProducerClient.class);

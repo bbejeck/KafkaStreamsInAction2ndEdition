@@ -1,9 +1,10 @@
 package bbejeck.chapter_3.model;
 
+import java.util.Objects;
+
 /**
- * User: Bill Bejeck
- * Date: 9/23/20
- * Time: 8:47 PM
+ * Simple model object for use with {@link bbejeck.chapter_3.AvroReflectionProduceConsumeExample}
+ * Also used in the JsonSerializerDeserializerTest.
  */
 public class User { 
     private String name;
@@ -41,5 +42,18 @@ public class User {
 
     public void setFavoriteColor(String favoriteColor) {
         this.favoriteColor = favoriteColor;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return favoriteNumber == user.favoriteNumber && Objects.equals(name, user.name) && Objects.equals(favoriteColor, user.favoriteColor);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, favoriteNumber, favoriteColor);
     }
 }

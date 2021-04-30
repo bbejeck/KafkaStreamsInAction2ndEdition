@@ -45,6 +45,16 @@ import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Since this test uses Avro with a union schema it the Producer must run with
+ * auto.register.schemas = false.  You must start docker wait for a minute or two
+ * and then run the the gradle task "./gradlew streams:registerSchemasTask"
+ * before running this test.  Then you can run this test from Intellij or the command
+ * line with gradle test  bbejeck.chapter_4.multi_event.avro.MultiEventAvroProduceConsumeTest
+ *
+ * The skip tag is required to keep this test from running with gradle builds
+ * since it doesn't use testcontainers for an embedded broker.
+ */
 
 @Tag("skip")
 public class MultiEventAvroProduceConsumeTest {

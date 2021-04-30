@@ -24,9 +24,8 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * User: Bill Bejeck
- * Date: 1/24/21
- * Time: 8:55 PM
+ * Basic test for demonstration of working with
+ * the {@link org.apache.kafka.clients.admin.KafkaAdminClient}
  */
 
 @Testcontainers

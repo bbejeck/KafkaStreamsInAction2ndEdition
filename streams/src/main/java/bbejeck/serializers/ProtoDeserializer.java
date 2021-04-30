@@ -10,9 +10,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 9/24/20
- * Time: 9:27 PM
+ * Simple implementation of a stand alone {@link Deserializer}
+ * for Protobuf generated objects
  */
 public class ProtoDeserializer<T extends Message> implements Deserializer<T> {
 

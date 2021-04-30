@@ -13,6 +13,7 @@ Table of Contents
         * [A guided tour to the chapter 3 code](#a-guided-tour-to-the-chapter-3-code)
         * [Running the examples](#running-the-examples)
         * [Schema Registry configs in the build file](#schema-registry-configs-in-the-build-file)
+    * [Chapter 4](#chapter-4)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -25,9 +26,9 @@ The source code for [Event Streaming with Kafka Streams and ksqlDB](https://www.
 prerequisites you'll need to make sure you have installed to get everything working smoothly.
 
 1. Java, the project uses version 14 from [AdoptOpenJDK](https://adoptopenjdk.net/).
-2. [Gradle](https://gradle.org/) version 6.8.3.  Although you don't need to install Gradle if you don't have it.
+2. [Gradle](https://gradle.org/) version 7.0  Although you don't need to install Gradle if you don't have it.
    the included Gradle "wrapper" script will install it if needed.  Use `./gradlew` for mac OS/'nix and `gradlew.bat` on Windows.
-3. [Docker Desktop](https://www.docker.com/products/docker-desktop) version 3.2.2
+3. [Docker Desktop](https://www.docker.com/products/docker-desktop) version 3.3.1
 4. [Git](https://git-scm.com/) version 2.31.1
 
 I've tried to make everything platform neutral, but just for context here's the environment
@@ -112,7 +113,7 @@ from the console.  See `project-commands.sh` , as some commands have functions w
 
 ## Chapter 3
 
-The code in chapter 3 is used for demonstrating how to interacting with Schema
+The code in chapter 3 is used for demonstrating how to interact with Schema
 Registry and not with an emphasis on the producer and consumer code.
 
 I've broken up the examples across two main packages: `bbejeck.chapter_3.producer` and `bbejeck.chapter_3.consumer`
@@ -153,12 +154,6 @@ each class:
 * bbejeck.chapter_3
     *  `AvroReflectionProduceConsumeExample` A simple example using the AvroReflection serializer and deserializer.  I will update
     chapter 3 in another MEAP release to cover using this part of the Avro API
-       
-    *  `ProtobufMultipleEventTopicExample`  This example demonstrates using schema references with Protobuf.  I don't cover
-    working with possible different types with producers and consumers until chapter 4 when we cover
-       clients.
-    *  `AvroUnionSchemaMultipleEventProduceConsumeExample` Also, an example of using schema references, but with Avro this time.  Again
-    we'll cover working with multiple types with Kafka clients in chapter 4
     
 ### Running the examples
 
@@ -172,9 +167,10 @@ For the examples nested under the `producer` or `consumer` packages, you need ru
 2. Run the consumer - the consumer starts up and displays some information on the console then it shuts down
 after two consecutive `poll` calls without retrieving any records it shuts down.
    
-The examples that are directly under the `bbejeck.chapter_3` package have a producer and consumer in them and you only need to run
-these directly. For this release of the MEAP, I'm assuming that you'll run these examples from within the IDE.  
-In a future MEAP release(chapter 4?) I'm going to unit tests covering all code.  You can still run the examples as stand-alone
+In this MEAP release I've added tests that your can run instead of the producer-consumer steps. In the 
+`src/test/java/bbejeck/chapter_3` package there are three tests for the Avro, Protobuf and JsonSchema
+producer-consumer interaction with SchemaRegistry.  As time goes on I'll add tests for all examples in 
+chapter 3. You can still run the examples as stand-alone
 programs if you wish, but should you choose to experiment you'll be able to run tests to ensure everything still works as
 expected.
 
@@ -195,6 +191,8 @@ to specify the module in any of the commands, otherwise Gradle will execute the 
 modules, and the different Schema Registry modules will clash resulting a failure.
 
 Also, if you are running on Windows use `gradlew.bat` instead.
+
+## Chapter 4
 
 
 

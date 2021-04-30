@@ -16,9 +16,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 1/18/21
- * Time: 6:53 PM
+ * Producer client for multiple events in one topic using Protobuf
+ *    Individual Schemas used for this class are
+ *    <ol>
+ *        <li>login_event.proto</li>
+ *        <li>search_event.proto</li>
+ *        <li>purchase_event.proto</li>
+ *    </ol>
+ *    And the schema containing the oneof field is events.proto
+ *
+ *   All Proto schemas are located in src/main/proto
+ *
+ *   To run this class execute MultiEventProtoProduceConsumeTest
  */
 public class MultiEventProtoConsumerClient {
 

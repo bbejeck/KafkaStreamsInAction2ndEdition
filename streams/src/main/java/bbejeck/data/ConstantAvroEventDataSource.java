@@ -9,9 +9,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * User: Bill Bejeck
- * Date: 4/21/21
- * Time: 9:08 PM
+ * A implementation of the {@link DataSource} interface that
+ * supplies the same three Avro events with each call to {@link  DataSource#fetch()}
+ * useful for testing purposes
  */
 public class ConstantAvroEventDataSource implements DataSource<SpecificRecord> {
 

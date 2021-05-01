@@ -54,8 +54,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * idempotent mode and will have no duplicates.
  *
  * This class has a {@link Tag} with the label of "long" as this test
- * simulates a network partition of over a minute to force the producer to
- * resend records
+ * simulates a network partition to force the producer to
+ * resend records and
  */
 
 @Tag("long")
@@ -64,7 +64,7 @@ public class IdempotentProducerTest {
 
     private static final Logger LOG = LogManager.getLogger(IdempotentProducerTest.class);
     private static final String TOXIPROXY_NETWORK_ALIAS = "toxiproxy";
-    private static final int NUMBER_RECORDS_TO_PRODUCE = 100000;
+    private static final int NUMBER_RECORDS_TO_PRODUCE = 100_000;
     private static final KafkaContainer KAFKA;
     private static final ToxiproxyContainer TOXIPROXY;
     private static final DockerImageName TOXIPROXY_IMAGE = DockerImageName.parse("shopify/toxiproxy:2.1.0");
@@ -72,7 +72,7 @@ public class IdempotentProducerTest {
     private static ToxiproxyContainer.ContainerProxy proxy;
 
 
-    private final String topicName = "test-topic";
+    private final String topicName = "idempotent-producer-test-topic";
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     static {

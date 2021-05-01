@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
  * First producer and consumer application.
  * Uses the {@link SalesProducerClient} and {@link SalesConsumerClient}
  * The application will continue to run until explicitly stopped with
- * a CNTL+C command
+ * a CTRL+C command
  */
 public class SalesProduceConsumeApplication {
 

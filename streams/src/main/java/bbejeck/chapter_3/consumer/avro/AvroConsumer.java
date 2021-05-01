@@ -14,10 +14,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Example of using Avro with Schema Registry. This example
- * demonstrates both the specific type and the GenericRecord type
- */
+
 public class AvroConsumer extends BaseConsumer {
 
     private static final Logger LOG = LogManager.getLogger(AvroConsumer.class);
@@ -25,6 +22,8 @@ public class AvroConsumer extends BaseConsumer {
     public AvroConsumer() {
         super(StringDeserializer.class, KafkaAvroDeserializer.class);
     }
+
+
     public static void main(String[] args) {
         final String topicName = "avro-avengers";
         AvroConsumer avroConsumer = new AvroConsumer();
@@ -33,22 +32,24 @@ public class AvroConsumer extends BaseConsumer {
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"specific-group");
         overrideConfigs.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
 
+        avroConsumer.overrideConfigs(overrideConfigs);
+
         ConsumerRecordsHandler<String, AvengerAvro> specificRecordsConsumer = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
             var consumedAvenger = cr.value();
             LOG.info("Found specific Avro avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
         }));
 
-        avroConsumer.runConsumer(overrideConfigs,topicName, specificRecordsConsumer);
+        avroConsumer.consume(topicName, specificRecordsConsumer);
 
         overrideConfigs.clear();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"generic-group");
         overrideConfigs.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, false);
+        avroConsumer.overrideConfigs(overrideConfigs);
         final StringBuilder consumerRecordBuilder = new StringBuilder();
 
         ConsumerRecordsHandler<String, GenericRecord> genericRecordsHandler = consumerRecords -> consumerRecords.forEach(cr -> {
             final GenericRecord genericRecord = cr.value();
-            genericRecord.getSchema().getFullName();
             if (genericRecord.hasField("name")) {
                 consumerRecordBuilder.append("Found generic Avro avenger ").append(genericRecord.get("name"));
             }
@@ -60,6 +61,6 @@ public class AvroConsumer extends BaseConsumer {
             consumerRecordBuilder.setLength(0);
         });
         
-        avroConsumer.runConsumer(overrideConfigs, topicName, genericRecordsHandler);
+        avroConsumer.consume(topicName, genericRecordsHandler);
     }
 }

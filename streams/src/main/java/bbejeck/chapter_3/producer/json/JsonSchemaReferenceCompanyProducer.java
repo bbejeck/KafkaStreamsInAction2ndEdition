@@ -6,18 +6,13 @@ import bbejeck.chapter_3.producer.BaseProducer;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Example of producing Json Schema objects with Schema Registry
- * and using schema references
- */
+
 public class JsonSchemaReferenceCompanyProducer extends BaseProducer<String, CompanyJson> {
-    static final Logger LOG = LogManager.getLogger(JsonSchemaReferenceCompanyProducer.class);
+
     public JsonSchemaReferenceCompanyProducer() {
         super(StringSerializer.class, KafkaJsonSchemaSerializer.class);
     }
@@ -44,7 +39,6 @@ public class JsonSchemaReferenceCompanyProducer extends BaseProducer<String, Com
     public static void main(String[] args) {
         JsonSchemaReferenceCompanyProducer companyProducer = new JsonSchemaReferenceCompanyProducer();
         Topics.create("json-schema-company");
-        LOG.debug("Sending records {}", getRecords());
         companyProducer.send("json-schema-company", getRecords());
     }
 }

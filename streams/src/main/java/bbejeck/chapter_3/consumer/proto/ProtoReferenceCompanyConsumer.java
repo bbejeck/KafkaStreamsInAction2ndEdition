@@ -13,10 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Example of consuming records in Protobuf format and a
- *  * schema reference.  The Company schema has a reference to the Person schema
- */
+
 public class ProtoReferenceCompanyConsumer extends BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(ProtoReferenceCompanyConsumer.class);
 
@@ -33,9 +30,9 @@ public class ProtoReferenceCompanyConsumer extends BaseConsumer {
         ConsumerRecordsHandler<String, CompanyProto.Company> processFunction = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
                     CompanyProto.Company companyRecord = cr.value();
-                    LOG.debug("Found Protobuf company record {}", companyRecord);
+                    LOG.info("Found Protobuf company record {}", companyRecord);
                 }));
 
-        companyConsumer.runConsumer(overrideConfigs,"proto-company", processFunction);
+        companyConsumer.consume("proto-company", processFunction);
     }
 }

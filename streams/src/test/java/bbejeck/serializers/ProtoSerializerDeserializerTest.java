@@ -1,8 +1,7 @@
-package bbejeck.serializers.proto;
+package bbejeck.serializers;
 
 import bbejeck.chapter_3.proto.AvengerProto;
-import bbejeck.serializers.ProtoDeserializer;
-import bbejeck.serializers.SerializationConfig;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -10,15 +9,17 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ProtoDeserializerTest {
+class ProtoSerializerDeserializerTest {
 
     @Test
-    void testDeserialize() {
+    @DisplayName("Should Round trip a Proto object")
+    void shouldSerializeThenDeserialize() {
+        ProtoSerializer<AvengerProto.Avenger> serializer = new ProtoSerializer<>();
         AvengerProto.Avenger avenger = AvengerProto.Avenger.newBuilder()
                 .setName("Hulk")
                 .setRealName("Bruce Banner")
                 .addMovies("Endgame").build();
-        byte[] avengerBytes = avenger.toByteArray();
+        byte[] avengerBytes = serializer.serialize("topic", avenger);
 
         Map<String, Object> configs = new HashMap<>();
         configs.put(SerializationConfig.VALUE_CLASS_NAME, AvengerProto.Avenger.class);

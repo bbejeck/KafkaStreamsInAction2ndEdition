@@ -13,10 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Example of consuming records in Protobuf format and a
- * schema reference.  The College schema has a reference to the Person schema
- */
+
 public class ProtoReferenceCollegeConsumer extends BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(ProtoReferenceCollegeConsumer.class);
 
@@ -30,12 +27,12 @@ public class ProtoReferenceCollegeConsumer extends BaseConsumer {
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-college-ref-group");
         overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, CollegeProto.College.class);
 
-        ConsumerRecordsHandler<String, CollegeProto.College> processFunction = (consumerRecords ->
+        ConsumerRecordsHandler<String, CollegeProto.College> processFunction = consumerRecords ->
                 consumerRecords.forEach(cr -> {
                     CollegeProto.College collegeRecord = cr.value();
                     LOG.info("Found Protobuf college record {}", collegeRecord);
-                }));
+                });
 
-        collegeConsumer.runConsumer(overrideConfigs,"proto-college", processFunction);
+        collegeConsumer.consume("proto-college", processFunction);
     }
 }

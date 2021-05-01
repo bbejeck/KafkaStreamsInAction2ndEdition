@@ -25,9 +25,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * User: Bill Bejeck
- * Date: 1/18/21
- * Time: 12:02 PM
+ * Application that ties together the
+ * {@link PipeliningConsumerClient} and the {@link PipeliningProducerClient} for the
+ * demonstration of handing commits with async processing
  */
 public class ProducePipeliningConsumeApplication {
 

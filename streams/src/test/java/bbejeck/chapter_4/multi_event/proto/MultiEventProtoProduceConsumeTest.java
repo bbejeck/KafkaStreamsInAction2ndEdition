@@ -1,7 +1,7 @@
-package bbejeck.chapter_4.multi_event;
+package bbejeck.chapter_4.multi_event.proto;
 
 import bbejeck.chapter_4.proto.EventsProto;
-import bbejeck.data.ConstantEventDataSource;
+import bbejeck.data.ConstantProtoEventDataSource;
 import bbejeck.data.DataSource;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
@@ -32,17 +32,16 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * User: Bill Bejeck
- * Date: 1/26/21
- * Time: 8:27 PM
+ * Test to see the MultiEventProtoProducerClient and  MultiEventProtoConsumerClient
+ * in action
  */
 @Testcontainers
-public class MultiEventProduceConsumeTest {
+public class MultiEventProtoProduceConsumeTest {
 
 
     private final String outputTopic = "multi-events-topic";
-    private static final Logger LOG = LogManager.getLogger(MultiEventProduceConsumeTest.class);
-    final DataSource<EventsProto.Events> eventsDataSource = new ConstantEventDataSource();
+    private static final Logger LOG = LogManager.getLogger(MultiEventProtoProduceConsumeTest.class);
+    final DataSource<EventsProto.Events> eventsDataSource = new ConstantProtoEventDataSource();
 
 
     @Container
@@ -65,11 +64,12 @@ public class MultiEventProduceConsumeTest {
 
     @Test
     @DisplayName("should produce and consume multiple events per topic")
-    public void produceConsumeMultipleEventsFromSameTopic() throws Exception {
-        MultiEventProducerClient producerClient = new MultiEventProducerClient(getProducerProps(), eventsDataSource);
+    public void produceConsumeMultipleEventsFromSameTopic() {
+        LOG.info("Starting test for proto multi events");
+        MultiEventProtoProducerClient producerClient = new MultiEventProtoProducerClient(getProducerProps(), eventsDataSource);
         producerClient.runProducerOnce();
 
-        MultiEventConsumerClient consumerClient = new MultiEventConsumerClient(getConsumerProps());
+        MultiEventProtoConsumerClient consumerClient = new MultiEventProtoConsumerClient(getConsumerProps());
         consumerClient.runConsumerOnce();
 
         List<EventsProto.Events> expectedEvents = new ArrayList<>(eventsDataSource.fetch());

@@ -16,9 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 1/18/21
- * Time: 6:53 PM
+ * The consumer client for the pipelining example.
+ * It hands consumed records over to  {@link ConcurrentRecordProcessor#processRecords(ConsumerRecords)} and
+ * retrieves offsets for committing from {@link ConcurrentRecordProcessor#getOffsets()}
+ * the idea being that only fully processed record offsets get committed.
  */
 public class PipeliningConsumerClient {
 

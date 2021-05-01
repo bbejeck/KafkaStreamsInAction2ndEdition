@@ -4,9 +4,8 @@ import com.google.protobuf.Message;
 import org.apache.kafka.common.serialization.Serializer;
 
 /**
- * User: Bill Bejeck
- * Date: 9/24/20
- * Time: 9:25 PM
+ * Simple implementation of a stand alone {@link Serializer}
+ * for Protobuf generated objects
  */
 public class ProtoSerializer<T extends Message> implements Serializer<T> {
 

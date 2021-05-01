@@ -4,21 +4,19 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * User: Bill Bejeck
- * Date: 10/4/20
- * Time: 6:16 PM
- */
 public abstract class BaseProducer<K, V> {
 
     private final Class<?> keySerializer;
     private final Class<?> valueSerializer;
     private Map<String, Object> overrideConfigs = new HashMap<>();
+    private static final Logger LOG = LogManager.getLogger(BaseProducer.class);
 
     public BaseProducer(final Class<?> keySerializer,
                         final Class<?> valueSerializer) {
@@ -31,6 +29,7 @@ public abstract class BaseProducer<K, V> {
     }
 
     public void send(final String topicName, List<V> records) {
+        LOG.debug("Producing records {}", records);
         Map<String, Object> producerConfigs = producerConfig(overrideConfigs);
         try (final KafkaProducer<K, V> producer = new KafkaProducer<>(producerConfigs)) {
             records.forEach(avenger -> producer.send(new ProducerRecord<>(topicName, avenger)));

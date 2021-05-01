@@ -10,9 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-/**
- * Basic example of using Protobuf Serializer with Schema Registry
- */
+
 public class ProtoProducer extends BaseProducer<String, AvengerProto.Avenger> {
     static final Logger LOG = LogManager.getLogger(ProtoProducer.class);
 
@@ -20,7 +18,7 @@ public class ProtoProducer extends BaseProducer<String, AvengerProto.Avenger> {
         super(StringSerializer.class, KafkaProtobufSerializer.class);
     }
 
-    static List<AvengerProto.Avenger> getRecords() {
+    public static List<AvengerProto.Avenger> getRecords() {
         final var blackWidow = AvengerProto.Avenger.newBuilder().setName("Black Widow")
                 .setRealName("Natasha Romanova")
                 .addAllMovies(List.of("Avengers", "Infinity Wars", "End Game")).build();

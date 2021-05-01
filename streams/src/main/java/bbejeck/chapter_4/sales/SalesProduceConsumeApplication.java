@@ -21,9 +21,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * User: Bill Bejeck
- * Date: 1/18/21
- * Time: 12:02 PM
+ * First producer and consumer application.
+ * Uses the {@link SalesProducerClient} and {@link SalesConsumerClient}
+ * The application will continue to run until explicitly stopped with
+ * a CTRL+C command
  */
 public class SalesProduceConsumeApplication {
 

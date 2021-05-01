@@ -35,6 +35,6 @@ public class JsonSchemaReferenceCompanyConsumer extends BaseConsumer {
                     LOG.info("Found JSON Schema company record {}", companyRecord);
                 }));
 
-        companyConsumer.runConsumer(overrideConfigs,"json-schema-company", processFunction);
+        companyConsumer.consume("json-schema-company", processFunction);
     }
 }

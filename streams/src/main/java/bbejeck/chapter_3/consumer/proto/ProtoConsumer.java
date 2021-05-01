@@ -15,10 +15,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * First example of using Protobuf with Schema Registry.  This example
- * demonstrates consuming with specific and dynamic record types
- */
+
 public class ProtoConsumer extends BaseConsumer {
 
     private static final Logger LOG = LogManager.getLogger(ProtoConsumer.class);
@@ -42,7 +39,7 @@ public class ProtoConsumer extends BaseConsumer {
             LOG.info("Found specific Proto avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
         }));
 
-        protoConsumer.runConsumer(overrideConfigs,topicName, specificRecordsConsumer);
+        protoConsumer.consume(topicName, specificRecordsConsumer);
 
         overrideConfigs.clear();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-generic-group");
@@ -64,6 +61,6 @@ public class ProtoConsumer extends BaseConsumer {
             consumerRecordBuilder.setLength(0);
         });
         
-        protoConsumer.runConsumer(overrideConfigs, topicName, genericRecordsHandler);
+        protoConsumer.consume(topicName, genericRecordsHandler);
     }
 }

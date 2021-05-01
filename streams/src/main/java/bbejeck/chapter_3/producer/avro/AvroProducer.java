@@ -10,9 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Example of using Avro with Schema Registry
- */
+
 public class AvroProducer extends BaseProducer<String, AvengerAvro> {
 
     static final Logger LOG = LogManager.getLogger(AvroProducer.class);
@@ -21,7 +19,7 @@ public class AvroProducer extends BaseProducer<String, AvengerAvro> {
         super(StringSerializer.class, KafkaAvroSerializer.class);
     }
 
-    static List<AvengerAvro> getRecords() {
+    public static List<AvengerAvro> getRecords() {
         final var blackWidow = AvengerAvro.newBuilder().setName("Black Widow")
                 .setRealName("Natasha Romanova")
                 .setMovies(List.of("Avengers", "Infinity Wars", "End Game")).build();

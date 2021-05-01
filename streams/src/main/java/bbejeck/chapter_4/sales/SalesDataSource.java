@@ -7,22 +7,21 @@ import bbejeck.data.DataSource;
 import java.util.Collection;
 
 /**
- * User: Bill Bejeck
- * Date: 1/27/21
- * Time: 8:04 PM
+ * Class used for data generation in {@link SalesProduceConsumeApplication}
  */
 public class SalesDataSource implements DataSource<ProductTransaction> {
-    private int numberRecords = 10;
+    private final int numberRecords;
 
     public SalesDataSource(int numberRecords) {
         this.numberRecords = numberRecords;
     }
 
     public SalesDataSource() {
+        this(10);
     }
 
     @Override
     public Collection<ProductTransaction> fetch() {
-        return  DataGenerator.generateProductTransactions(10);
+        return  DataGenerator.generateProductTransactions(numberRecords);
     }
 }

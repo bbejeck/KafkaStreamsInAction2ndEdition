@@ -20,6 +20,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -45,17 +46,25 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * User: Bill Bejeck
- * Date: 1/19/21
- * Time: 8:20 PM
+ * Test showing how the {@link KafkaProducer} in idempotent mode works.
+ * The test class makes use of the {@link ToxiproxyContainer} to simulate network
+ * partitions that will cause the producer to retry sending records.  The class runs two tests
+ * (parameterized, one actual test method) one with the producer
+ * in non-idempotent mode which will have duplicate records and the other uses
+ * idempotent mode and will have no duplicates.
+ *
+ * This class has a {@link Tag} with the label of "long" as this test
+ * simulates a network partition to force the producer to
+ * resend records and
  */
 
+@Tag("long")
 @Testcontainers
 public class IdempotentProducerTest {
 
     private static final Logger LOG = LogManager.getLogger(IdempotentProducerTest.class);
     private static final String TOXIPROXY_NETWORK_ALIAS = "toxiproxy";
-    private static final int NUMBER_RECORDS_TO_PRODUCE = 100000;
+    private static final int NUMBER_RECORDS_TO_PRODUCE = 100_000;
     private static final KafkaContainer KAFKA;
     private static final ToxiproxyContainer TOXIPROXY;
     private static final DockerImageName TOXIPROXY_IMAGE = DockerImageName.parse("shopify/toxiproxy:2.1.0");
@@ -63,7 +72,7 @@ public class IdempotentProducerTest {
     private static ToxiproxyContainer.ContainerProxy proxy;
 
 
-    private final String topicName = "test-topic";
+    private final String topicName = "idempotent-producer-test-topic";
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     static {
@@ -104,7 +113,7 @@ public class IdempotentProducerTest {
     @DisplayName("Idempotent Producer")
     @ParameterizedTest(name = "Contains no duplicates should be {0}")
     @MethodSource("testParameters")
-    public void testDuplicatesWithoutIdempotence(boolean enableIdempotence, String groupId) throws Exception {
+    public void parameterizedIdempotentProducerTest(boolean enableIdempotence, String groupId) throws Exception {
         var result = runTest(enableIdempotence, groupId);
         assertEquals(NUMBER_RECORDS_TO_PRODUCE, result.totalSent);
         LOG.info("Duplicate records {}", result.duplicates);

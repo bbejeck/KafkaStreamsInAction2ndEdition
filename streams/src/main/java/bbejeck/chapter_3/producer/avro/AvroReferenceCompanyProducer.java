@@ -5,21 +5,14 @@ import bbejeck.chapter_3.avro.PersonAvro;
 import bbejeck.chapter_3.producer.BaseProducer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Example of schema references with Avro. The company schema has a reference to
- * the person schema.
- *
- * Make sure to run the streams:registerSchemasTask before running this example
- */
+
 public class AvroReferenceCompanyProducer extends BaseProducer<String, CompanyAvro> {
-    static final Logger LOG = LogManager.getLogger(AvroReferenceCompanyProducer.class);
+
     public AvroReferenceCompanyProducer() {
         super(StringSerializer.class, KafkaAvroSerializer.class);
     }
@@ -46,7 +39,6 @@ public class AvroReferenceCompanyProducer extends BaseProducer<String, CompanyAv
 
     public static void main(String[] args) {
         AvroReferenceCompanyProducer companyProducer = new AvroReferenceCompanyProducer();
-        LOG.debug("Sending records {}", getRecords());
         companyProducer.send("company", getRecords());
     }
 }

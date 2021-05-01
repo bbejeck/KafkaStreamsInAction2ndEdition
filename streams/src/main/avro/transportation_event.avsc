@@ -1,13 +1,13 @@
 {
   "type": "record",
-  "namespace": "bbejeck.chapter_3.avro",
+  "namespace": "bbejeck.chapter_4.avro",
   "name": "TransportationEvent",
 
   "fields" : [
     {"name": "txn_type", "type": [
-      "bbejeck.chapter_3.avro.TruckEvent",
-      "bbejeck.chapter_3.avro.PlaneEvent",
-      "bbejeck.chapter_3.avro.DeliveryEvent"
+      "bbejeck.chapter_4.avro.TruckEvent",
+      "bbejeck.chapter_4.avro.PlaneEvent",
+      "bbejeck.chapter_4.avro.DeliveryEvent"
     ]}
   ]
 }

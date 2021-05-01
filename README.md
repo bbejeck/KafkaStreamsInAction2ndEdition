@@ -13,6 +13,9 @@ Table of Contents
         * [A guided tour to the chapter 3 code](#a-guided-tour-to-the-chapter-3-code)
         * [Running the examples](#running-the-examples)
         * [Schema Registry configs in the build file](#schema-registry-configs-in-the-build-file)
+    * [Chapter 4](#chapter-4)
+        * [A tour of the chapter 4 code](#a-tour-of-the-chapter-4-code)
+        * [Test Code](#test-code)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -25,9 +28,9 @@ The source code for [Event Streaming with Kafka Streams and ksqlDB](https://www.
 prerequisites you'll need to make sure you have installed to get everything working smoothly.
 
 1. Java, the project uses version 14 from [AdoptOpenJDK](https://adoptopenjdk.net/).
-2. [Gradle](https://gradle.org/) version 6.8.3.  Although you don't need to install Gradle if you don't have it.
+2. [Gradle](https://gradle.org/) version 7.0  Although you don't need to install Gradle if you don't have it.
    the included Gradle "wrapper" script will install it if needed.  Use `./gradlew` for mac OS/'nix and `gradlew.bat` on Windows.
-3. [Docker Desktop](https://www.docker.com/products/docker-desktop) version 3.2.2
+3. [Docker Desktop](https://www.docker.com/products/docker-desktop) version 3.3.1
 4. [Git](https://git-scm.com/) version 2.31.1
 
 I've tried to make everything platform neutral, but just for context here's the environment
@@ -112,17 +115,17 @@ from the console.  See `project-commands.sh` , as some commands have functions w
 
 ## Chapter 3
 
-The code in chapter 3 is used for demonstrating how to interacting with Schema
+The code in chapter 3 is used for demonstrating how to interact with Schema
 Registry and not with an emphasis on the producer and consumer code.
 
-I've broken up the examples across two main packages: `chapter_3.producer` and `chapter_3.consumer`
+I've broken up the examples across two main packages: `bbejeck.chapter_3.producer` and `bbejeck.chapter_3.consumer`
 Within those two, there are additional packages of `avro`, `proto`, and `json` containing 
 example code used to drive serializing and deserializing examples using the 
 serializers for the given format indicated by the package name.
 ### A guided tour to the chapter 3 code
 It's a good idea for me to describe the contents of the directories and the function of
 each class:
-* chapter_3.producer
+* bbejeck.chapter_3.producer
     * avro
         * `AvroProducer` Initial producer example for working with Avro schemas
         * `AvroReferenceCollegeProducer` Example producer for working with schema references in Avro
@@ -136,7 +139,7 @@ each class:
         * `ProtoReferenceCollegeProducer` Example producer for working with schema references in Protobuf
         * `ProtoReferenceCompanyProducer` Example producer for working with schema references in Protobuf
 
-* chapter_3.consumer
+* bbejeck.chapter_3.consumer
     * avro
         * `AvroConsumer` Initial consumer example for working with Avro schemas
         * `AvroReferenceCollegeConsumer` Example consumer for working with schema references in Avro
@@ -150,15 +153,9 @@ each class:
         * `ProtoReferenceCollegeConsumer` Example consumer for working with schema references in Protobuf
         * `ProtoReferenceCompanyConsumer` Example consumer for working with schema references in Protobuf
     
-* chapter_3
+* bbejeck.chapter_3
     *  `AvroReflectionProduceConsumeExample` A simple example using the AvroReflection serializer and deserializer.  I will update
     chapter 3 in another MEAP release to cover using this part of the Avro API
-       
-    *  `ProtobufMultipleEventTopicExample`  This example demonstrates using schema references with Protobuf.  I don't cover
-    working with possible different types with producers and consumers until chapter 4 when we cover
-       clients.
-    *  `AvroUnionSchemaMultipleEventProduceConsumeExample` Also, an example of using schema references, but with Avro this time.  Again
-    we'll cover working with multiple types with Kafka clients in chapter 4
     
 ### Running the examples
 
@@ -172,9 +169,10 @@ For the examples nested under the `producer` or `consumer` packages, you need ru
 2. Run the consumer - the consumer starts up and displays some information on the console then it shuts down
 after two consecutive `poll` calls without retrieving any records it shuts down.
    
-The examples that are directly under the `chapter_3` package have a producer and consumer in them and you only need to run
-these directly. For this release of the MEAP, I'm assuming that you'll run these examples from within the IDE.  
-In a future MEAP release(chapter 4?) I'm going to unit tests covering all code.  You can still run the examples as stand-alone
+In this MEAP release I've added tests that your can run instead of the producer-consumer steps. In the 
+`src/test/java/bbejeck/chapter_3` package there are three tests for the Avro, Protobuf and JsonSchema
+producer-consumer interaction with SchemaRegistry.  As time goes on I'll add tests for all examples in 
+chapter 3. You can still run the examples as stand-alone
 programs if you wish, but should you choose to experiment you'll be able to run tests to ensure everything still works as
 expected.
 
@@ -195,6 +193,111 @@ to specify the module in any of the commands, otherwise Gradle will execute the 
 modules, and the different Schema Registry modules will clash resulting a failure.
 
 Also, if you are running on Windows use `gradlew.bat` instead.
+
+## Chapter 4
+
+Chapter 4 is all about working with the `KafkaProducer` and `KafkaConsumer` so all the example code are small 
+applications demonstrating this.  I've also tried something new for this chapter and that is use an integration test
+to demonstrate the applications running.  I did this for two reasons 1) For you the reader to be able to experiment
+and see that the applications still work as intended and 2) IMHO having a test makes the example more meaningful than 
+an application that simply prints results to standard out.
+
+However, it's up to you the reader to let me know that having an integration test is a better approach than a
+
+### A tour of the chapter 4 code
+
+In chapter 4, I've structured the code to match up with the main themes from the chapter.  So there are packages that 
+contain a `KafkaProducer` and `KafkaConsumer` for supporting what the text is trying to teach.  Here's a description of
+what's found in each package:
+
+* **bbejeck.chapter_4.multi_event**
+
+     Although we covered producing multiple events to a single topic in chapter 3, that coverage only dealt with the
+     Schema Registry.  In chapter four we covered what needs to be done in you producer and consumer clients for
+     multi-event topics. 
+  
+     * avro
+       
+       Producer and consumer client applications for working with Avro multiple event topics.  These classes
+       run in the `MultiEventAvroProduceConsumeTest` integration test.
+    
+     * proto
+    
+       Producer and consumer client applications for working with Protobuf multiple event topics. These classes
+       run in the `MultiEventProtoProduceConsumeTest` integration test.
+       
+       
+* **bbejeck.chapter_4.pipelining**
+
+     This code in this package corresponds to the async committing portion of the text.  The `PipeliningProducerClient`
+     does not do anything special beyond producing the records.  The `PipeliningConsumerClient` consumes the records and 
+     hands them off to the `ConcurrentRecordProcessor` which processes the records.  The `ConcurrentRecordProcessor` also
+     stores the offsets of records successfully processed in a `ConcurrentLinkedDeque` and retrieves them when queried by the
+     `PipeliningConsumerClient` for committing. 
+     The `ProducePipeliningConsumeApplication` uses a `DataGenerator` and runs indefinitely until you shut it down.
+     with a `CTRL+C` command.
+  
+     _Please note all this example code is meant for demonstration purposes of one way of handling long processing times
+     and committing offset strategies_
+  
+  
+*  **bbejeck.chapter_4.sales**
+   
+      This is the example for the introduction for working with a `KafkaProducer` and `KafkaConsumer`.  It
+      follows the narrative of an application for handing sales data.  The `SalesProduceConsumeApplication` 
+      runs the producer and consumer in separate threads for the convenience of having the producer and consumer
+      clients run in single application, but this is not meant to reflect what would be done in a production setting.
+      The `SalesProduceConsumeApplication` uses a data generator `DataGenerator` and runs indefinitely until
+      you shut it down with a `CTRL +C` command.
+   
+   
+ ### Test Code
+
+  In chapter 4 I started a new approach by using integration tests for some the sample applications.  In some examples 
+  I felt the producer and consumer code were enough to teach the main point.  In other examples I think
+  that instead of having you read log output, it might be better to structure the example as an integration
+  test and assert the main points of example.
+
+  Some tests in the chapter_4 package are long-running, and have a the `Tag("long")` so they won't run in a 
+  a `./gradlew test` command but only individually from the IDE or with a `./gradlew longTests` command.  However,
+  the long-running tests are meant as a teaching tool.
+
+* **AdminClientTest**
+
+    The `AdminClientTest` is a basic demo of working with topics.  As the book progresses I'll add more test
+    cases.
+  
+  
+* **IdempotentProducerTest**
+
+   The `IdempotentProducerTest` is a parameterized test demonstrating how the idempotent producer guarantees exactly-once
+   delivery (per producer session) by simulating a network partition using [Toxiproxy](https://www.testcontainers.org/modules/toxiproxy/) module.
+   The network partition forces the `KafkaProducer` to retry sending records.  The test asserts that in regular mode there
+   are duplicate records and in idempotent mode even with the retries the `KafkaProducer` only delivers records once.  This
+   is a long-running test so it's meant for running individually for observing idempotent behavior.
+    
+
+  
+* **TransactionalConsumeTransformProduceTest**
+
+    The `TransactionalConsumeTransformProduceTest` is a demonstration of the consume-transform-produce process using the
+    Kafka transactional API.  This is also a test tagged `Tag("long)` and is a teaching tool meant to run individually
+    from the IDE.
+  
+  
+* **TransactionalProducerConsumerTest**
+
+    The `TransactionalProducerConsumerTest` demonstrates two use cases.  The first is the simple path of producing records
+    in a transaction and the consumer reading them in `read-committed` mode. The second use case demonstrates how the
+    consumer when in `read-committed` mode only consumes records that have successfully committed, and when in regular mode
+    it will consume all records.  This example is accomplished in the `testConsumeOnlyOnceAfterAbortReadCommitted` which
+    is a parameterized test with a simulated error resulting aborting a transaction.
+  
+  
+* **serializers**
+
+   The tests in the `serializers` package are simple tests of round-trip serialize-deserialize for 
+   stand-alone serializers and deserializers for JSON and Protobuf
 
 
 

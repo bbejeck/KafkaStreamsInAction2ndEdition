@@ -19,9 +19,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * User: Bill Bejeck
- * Date: 1/21/21
- * Time: 8:01 PM
+ * Utility class used for processing records in a separate thread
+ * as part of the pipelining example in chapter 4.  Note that class is meant only to
+ * serve as an example in a demonstration of performing async processing and it's
+ * relation to committing offsets.
  */
 public class ConcurrentRecordProcessor implements RecordProcessor<String, ProductTransaction > {
        private static final Logger LOG = LogManager.getLogger(ConcurrentRecordProcessor.class);

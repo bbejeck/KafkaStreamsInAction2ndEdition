@@ -10,9 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-/**
- * Example of using Json Schema with Schema Registry
- */
+
 public class JsonSchemaProducer extends BaseProducer<String, AvengerJson> {
     static final Logger LOG = LogManager.getLogger(JsonSchemaProducer.class);
 

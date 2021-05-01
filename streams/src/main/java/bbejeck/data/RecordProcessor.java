@@ -7,9 +7,9 @@ import org.apache.kafka.common.TopicPartition;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 1/28/21
- * Time: 9:52 PM
+ * Interface that provides for accepting {@link ConsumerRecords} for processing, possibly
+ * in an asynchronous manner.  Also provides a method for fetching offsets of records
+ * successfully processed.
  */
 public interface RecordProcessor <K,V> {
 

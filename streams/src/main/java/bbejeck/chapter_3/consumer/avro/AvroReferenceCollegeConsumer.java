@@ -13,9 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Example of Avro schema references
- */
+
 public class AvroReferenceCollegeConsumer extends BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(AvroReferenceCollegeConsumer.class);
 
@@ -35,6 +33,6 @@ public class AvroReferenceCollegeConsumer extends BaseConsumer {
                     LOG.info("Found college record {}", collegeRecord);
                 }));
 
-        collegeConsumer.runConsumer(overrideConfigs,"college", processFunction);
+        collegeConsumer.consume("college", processFunction);
     }
 }

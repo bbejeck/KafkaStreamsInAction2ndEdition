@@ -6,18 +6,13 @@ import bbejeck.chapter_3.proto.PersonProto;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Example of using schema references with Protobuf.  This example nests a
- * Person object in the College object
- */
+
 public class ProtoReferenceCollegeProducer extends BaseProducer<String, CollegeProto.College> {
-    static final Logger LOG = LogManager.getLogger(ProtoReferenceCollegeProducer.class);
+
     public ProtoReferenceCollegeProducer() {
         super(StringSerializer.class, KafkaProtobufSerializer.class);
     }
@@ -44,7 +39,6 @@ public class ProtoReferenceCollegeProducer extends BaseProducer<String, CollegeP
 
     public static void main(String[] args) {
         ProtoReferenceCollegeProducer collegeProducer = new ProtoReferenceCollegeProducer();
-        LOG.debug("Sending reference records {}", getRecords());
         Topics.create("proto-college");
         collegeProducer.send("proto-college", getRecords());
     }

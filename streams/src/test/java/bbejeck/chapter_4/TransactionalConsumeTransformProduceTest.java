@@ -46,9 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * User: Bill Bejeck
- * Date: 1/19/21
- * Time: 8:20 PM
+ * Test for demonstration of the consume-transform-produce development
+ * cycle within a transaction
  */
 
 @Testcontainers

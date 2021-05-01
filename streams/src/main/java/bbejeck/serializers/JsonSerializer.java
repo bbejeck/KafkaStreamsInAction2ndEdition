@@ -6,15 +6,13 @@ import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
 /**
- * User: Bill Bejeck
- * Date: 3/13/21
- * Time: 9:02 PM
+ * Simple implementation of a stand alone {@link Serializer}
  */
-public class ObjectSerializer<T> implements Serializer<T> {
+public class JsonSerializer<T> implements Serializer<T> {
 
     final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ObjectSerializer() {
+    public JsonSerializer() {
     }
 
     @Override

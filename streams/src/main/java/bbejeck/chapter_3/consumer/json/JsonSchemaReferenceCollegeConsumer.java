@@ -13,9 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Example of using Schema Registry and Json Schema with references
- */
+
 public class JsonSchemaReferenceCollegeConsumer extends BaseConsumer {
     private static final Logger LOG = LogManager.getLogger(JsonSchemaReferenceCollegeConsumer.class);
 
@@ -35,6 +33,6 @@ public class JsonSchemaReferenceCollegeConsumer extends BaseConsumer {
                     LOG.info("Found JSON Schema college record {}", collegeRecord);
                 }));
 
-        collegeConsumer.runConsumer(overrideConfigs,"json-schema-college", processFunction);
+        collegeConsumer.consume("json-schema-college", processFunction);
     }
 }

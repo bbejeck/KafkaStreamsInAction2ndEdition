@@ -13,10 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Example of using Json Schema deserializers with Schema Registry
- * This example uses both the specific and the generic type
- */
+
 public class JsonSchemaConsumer extends BaseConsumer {
 
     private static final Logger LOG = LogManager.getLogger(JsonSchemaConsumer.class);
@@ -40,7 +37,7 @@ public class JsonSchemaConsumer extends BaseConsumer {
             LOG.info("Found specific JSON Schema avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());
         }));
 
-        jsonSchemaConsumer.runConsumer(overrideConfigs,topicName, specificRecordsConsumer);
+        jsonSchemaConsumer.consume(topicName, specificRecordsConsumer);
 
         overrideConfigs.clear();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"json-schema-generic-group");
@@ -62,6 +59,6 @@ public class JsonSchemaConsumer extends BaseConsumer {
             consumerRecordBuilder.setLength(0);
         });
         
-        jsonSchemaConsumer.runConsumer(overrideConfigs, topicName, genericRecordsHandler);
+        jsonSchemaConsumer.consume(topicName, genericRecordsHandler);
     }
 }

@@ -52,7 +52,7 @@ public class MultiEventProtoConsumerClient {
             LOG.info("Subscribing to {}", topicNames);
             consumer.subscribe(topicNames);
             while (keepConsuming) {
-                ConsumerRecords<String, EventsProto.Events> consumerRecords = consumer.poll(Duration.ofSeconds(5));
+                ConsumerRecords<String, EventsProto.Events> consumerRecords = consumer.poll(Duration.ofSeconds(1));
                 consumerRecords.forEach(record -> LOG.info("Found event {} for user {}", getEventTypeByEnum(record.value()), record.key()));
                 if (runOnce) {
                     close();

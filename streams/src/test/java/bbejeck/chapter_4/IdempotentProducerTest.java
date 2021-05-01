@@ -1,5 +1,6 @@
 package bbejeck.chapter_4;
 
+import bbejeck.testcontainers.BaseProxyInterceptingKafkaContainerTest;
 import bbejeck.utils.Topics;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -15,7 +16,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +24,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.ToxiproxyContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -59,45 +55,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 
 @Tag("long")
-@Testcontainers
-public class IdempotentProducerTest {
+public class IdempotentProducerTest extends BaseProxyInterceptingKafkaContainerTest {
 
     private static final Logger LOG = LogManager.getLogger(IdempotentProducerTest.class);
-    private static final String TOXIPROXY_NETWORK_ALIAS = "toxiproxy";
     private static final int NUMBER_RECORDS_TO_PRODUCE = 100_000;
-    private static final KafkaContainer KAFKA;
-    private static final ToxiproxyContainer TOXIPROXY;
-    private static final DockerImageName TOXIPROXY_IMAGE = DockerImageName.parse("shopify/toxiproxy:2.1.0");
     private static final Properties adminProps = new Properties();
-    private static ToxiproxyContainer.ContainerProxy proxy;
 
 
     private final String topicName = "idempotent-producer-test-topic";
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    static {
-        Network network = Network.newNetwork();
-        KAFKA = new ProxyInterceptingKafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"))
-                .withExposedPorts(9093)
-                .withNetwork(network);
-
-        TOXIPROXY = new ToxiproxyContainer(TOXIPROXY_IMAGE)
-                .withNetwork(network)
-                .withNetworkAliases(TOXIPROXY_NETWORK_ALIAS);
-    }
-
     @BeforeAll
     public static void init() {
-        TOXIPROXY.start();
-        proxy = TOXIPROXY.getProxy(KAFKA, 9093);
-        KAFKA.start();
-        adminProps.put("bootstrap.servers", KAFKA.getBootstrapServers());
-    }
 
-    @AfterAll
-    public static void shutdown() {
-        KAFKA.stop();
-        TOXIPROXY.stop();
+        adminProps.put("bootstrap.servers", KAFKA.getBootstrapServers());
     }
 
     @BeforeEach
@@ -141,9 +112,9 @@ public class IdempotentProducerTest {
             };
             Future<Integer> produceResult = executorService.submit(produceThread);
             Thread.sleep(1000);
-            proxy.setConnectionCut(true);
+            PROXY.setConnectionCut(true);
             Thread.sleep(45_000L);
-            proxy.setConnectionCut(false);
+            PROXY.setConnectionCut(false);
             totalSent = produceResult.get();
             consumer.subscribe(Collections.singletonList(topicName));
             boolean keepConsuming = true;
@@ -189,21 +160,7 @@ public class IdempotentProducerTest {
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
         return new KafkaConsumer<>(consumerProps);
     }
-
-
-    static class ProxyInterceptingKafkaContainer extends KafkaContainer {
-        public ProxyInterceptingKafkaContainer(final DockerImageName dockerImageName) {
-            super(dockerImageName);
-        }
-
-        @Override
-        public String getBootstrapServers() {
-            String bootstrapServers = String.format("PLAINTEXT://%s:%s", proxy.getContainerIpAddress(), proxy.getProxyPort());
-            LOG.info("Bootstrap servers config real={} proxy={} ", super.getBootstrapServers(), bootstrapServers);
-            return bootstrapServers;
-        }
-    }
-
+    
     private static Stream<Arguments> testParameters() {
         return Stream.of(
                 Arguments.of(false, "no-idempotence"),

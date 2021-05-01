@@ -20,6 +20,7 @@ import bbejeck.chapter_3.consumer.proto.ProtoConsumer;
 import bbejeck.chapter_3.producer.proto.ProtoProducer;
 import bbejeck.chapter_3.proto.AvengerProto;
 import bbejeck.clients.ConsumerRecordsHandler;
+import bbejeck.testcontainers.BaseKafkaContainerTest;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
@@ -39,10 +40,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,22 +55,17 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
  * Test for demo of using producer and consumer with Protobuf schemas
  */
 
-@Testcontainers
-public class ProtobufProduceConsumeTest {
+public class ProtobufProduceConsumeTest extends BaseKafkaContainerTest {
     private final String outputTopic = "proto-test-topic";
     private static final Logger LOG = LogManager.getLogger(ProtobufProduceConsumeTest.class);
     private ProtoProducer protoProducer;
     private ProtoConsumer protoConsumer;
     private int counter;
-    
-    @Container
-    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"));
-
 
     @BeforeEach
     public void setUp() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", KAFKA.getBootstrapServers());
         createTopic(props, outputTopic, 1, (short) 1);
         protoProducer = new ProtoProducer();
         protoConsumer = new ProtoConsumer();
@@ -82,7 +74,7 @@ public class ProtobufProduceConsumeTest {
     @AfterEach
     public void tearDown() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", KAFKA.getBootstrapServers());
         deleteTopic(props, outputTopic);
     }
 
@@ -137,7 +129,7 @@ public class ProtobufProduceConsumeTest {
 
     private Map<String, Object> getProducerConfigs() {
         Map<String, Object> producerProps = new HashMap<>();
-        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaProtobufSerializer.class);
         producerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "mock://localhost:8081");
@@ -147,7 +139,7 @@ public class ProtobufProduceConsumeTest {
 
     private Map<String, Object> getConsumerConfigs(final boolean isSpecific) {
         Map<String, Object> consumerProps = new HashMap<>();
-        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "proto-test-group");
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

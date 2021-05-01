@@ -15,6 +15,7 @@
  */
 package bbejeck.chapter_3;
 
+import bbejeck.testcontainers.BaseKafkaContainerTest;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializer;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
@@ -30,10 +31,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,29 +41,24 @@ import java.util.Properties;
  * Test for demo of using producer and consumer with JSONSchema schemas
  */
 
-@Testcontainers
-public class JsonSchemaProduceConsumeTest {
+public class JsonSchemaProduceConsumeTest extends BaseKafkaContainerTest {
 
 
     private final String outputTopic = "json-schema-test-topic";
     private static final Logger LOG = LogManager.getLogger(JsonSchemaProduceConsumeTest.class);
 
 
-    @Container
-    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"));
-
-
     @BeforeEach
     public void setUp() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", KAFKA.getBootstrapServers());
         createTopic(props, outputTopic, 1, (short) 1);
     }
 
     @AfterEach
     public void tearDown() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", KAFKA.getBootstrapServers());
         deleteTopic(props, outputTopic);
     }
 
@@ -80,7 +72,7 @@ public class JsonSchemaProduceConsumeTest {
 
     private Map<String, Object> getProducerConfigs() {
         Map<String, Object> producerProps = new HashMap<>();
-        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class);
         producerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "mock://localhost:8081");
@@ -90,7 +82,7 @@ public class JsonSchemaProduceConsumeTest {
 
     private Map<String, Object> getConsumerConfigs() {
         Map<String, Object> consumerProps = new HashMap<>();
-        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "json-schema-test-group");
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

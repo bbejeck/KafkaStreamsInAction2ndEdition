@@ -49,7 +49,7 @@ public class MultiEventAvroConsumerClient {
             LOG.info("Subscribing to {}", topicNames);
             consumer.subscribe(topicNames);
             while (keepConsuming) {
-                ConsumerRecords<String, SpecificRecord> records = consumer.poll(Duration.ofSeconds(5));
+                ConsumerRecords<String, SpecificRecord> records = consumer.poll(Duration.ofSeconds(1));
                 records.forEach(record -> {
                     SpecificRecord avroRecord = record.value();
                     consumedRecords.add(avroRecord);

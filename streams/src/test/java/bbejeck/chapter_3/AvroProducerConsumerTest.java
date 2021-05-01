@@ -5,6 +5,7 @@ import bbejeck.chapter_3.avro.AvengerAvro;
 import bbejeck.chapter_3.consumer.avro.AvroConsumer;
 import bbejeck.chapter_3.producer.avro.AvroProducer;
 import bbejeck.clients.ConsumerRecordsHandler;
+import bbejeck.testcontainers.BaseKafkaContainerTest;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
@@ -23,10 +24,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,21 +39,18 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
  * Test for demo of using producer and consumer with Avro schemas
  */
 
-@Testcontainers
-public class AvroProducerConsumerTest {
+
+public class AvroProducerConsumerTest extends BaseKafkaContainerTest {
     private final String outputTopic = "avro-test-topic";
     private static final Logger LOG = LogManager.getLogger(AvroProducerConsumerTest.class);
     private AvroProducer avroProducer;
     private AvroConsumer avroConsumer;
     int counter = 0;
 
-    @Container
-    public static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"));
-
     @BeforeEach
     public void setUp() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", KAFKA.getBootstrapServers());
         createTopic(props, outputTopic, 1, (short) 1);
         avroProducer = new AvroProducer();
         avroConsumer = new AvroConsumer();
@@ -65,7 +59,7 @@ public class AvroProducerConsumerTest {
     @AfterEach
     public void tearDown() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", KAFKA.getBootstrapServers());
         deleteTopic(props, outputTopic);
     }
 
@@ -121,7 +115,7 @@ public class AvroProducerConsumerTest {
 
     private Map<String, Object> getProducerConfigs() {
         Map<String, Object> producerProps = new HashMap<>();
-        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
         producerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "mock://localhost:8081");
@@ -130,7 +124,7 @@ public class AvroProducerConsumerTest {
 
     private Map<String, Object> getConsumerConfigs(final boolean specificType) {
         Map<String, Object> consumerProps = new HashMap<>();
-        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "avro-test-group");
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

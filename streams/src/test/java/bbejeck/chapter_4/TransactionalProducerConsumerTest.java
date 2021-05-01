@@ -1,5 +1,6 @@
 package bbejeck.chapter_4;
 
+import bbejeck.testcontainers.BaseTransactionalKafkaContainerTest;
 import bbejeck.utils.Topics;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -23,10 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -49,31 +46,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 
 @Tag("long")
-@Testcontainers
-public class TransactionalProducerConsumerTest {
+public class TransactionalProducerConsumerTest extends BaseTransactionalKafkaContainerTest {
 
     private final String topicName = "transactional-topic";
-
-    @Container
-    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"))
-            // NOTE: These settings are required to run transactions with a single broker container
-            // otherwise you're expected to have a 3 broker minimum for using
-            // transactions in a production environment
-            .withEnv("KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR", "1")
-            .withEnv("KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", "1")
-            .withEnv("KAFKA_TRANSACTION_STATE_LOG_MIN_ISR", "1");
 
     @BeforeEach
     public void setUp() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", TXN_KAFKA.getBootstrapServers());
         Topics.create(props, topicName);
     }
 
     @AfterEach
     public void tearDown() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", TXN_KAFKA.getBootstrapServers());
         Topics.delete(props, topicName);
     }
 
@@ -173,7 +160,7 @@ public class TransactionalProducerConsumerTest {
 
     private KafkaProducer<String, Integer> getProducer() {
         Map<String, Object> producerProps = new HashMap<>();
-        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, TXN_KAFKA.getBootstrapServers());
         producerProps.put(ProducerConfig.ACKS_CONFIG, "all");
         producerProps.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "transactional-producer");
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -183,7 +170,7 @@ public class TransactionalProducerConsumerTest {
 
     private KafkaConsumer<String, Integer> getConsumer(final String isolationLevel) {
         Map<String, Object> consumerProps = new HashMap<>();
-        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, TXN_KAFKA.getBootstrapServers());
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "transactional-test-group-id");
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, isolationLevel);

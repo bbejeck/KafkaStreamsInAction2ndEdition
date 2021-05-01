@@ -38,7 +38,7 @@ public abstract class BaseConsumer {
         try (final KafkaConsumer<K, V> consumer = new KafkaConsumer<>(consumerConfig(overrideConfigs))) {
             consumer.subscribe(Collections.singletonList(topic));
             while (notDoneConsuming) {
-                ConsumerRecords<K, V> consumerRecords = consumer.poll(Duration.ofSeconds(5));
+                ConsumerRecords<K, V> consumerRecords = consumer.poll(Duration.ofSeconds(1));
                 if (consumerRecords.isEmpty()) {
                     noRecordsCount++;
                 }

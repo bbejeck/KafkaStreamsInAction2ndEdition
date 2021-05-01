@@ -3,6 +3,7 @@ package bbejeck.chapter_4;
 import bbejeck.chapter_4.avro.BrokerSummary;
 import bbejeck.chapter_4.avro.StockTransaction;
 import bbejeck.data.DataGenerator;
+import bbejeck.testcontainers.BaseTransactionalKafkaContainerTest;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
@@ -25,11 +26,8 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -50,8 +48,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  * cycle within a transaction
  */
 
-@Testcontainers
-public class TransactionalConsumeTransformProduceTest {
+@Tag("long")
+public class TransactionalConsumeTransformProduceTest extends BaseTransactionalKafkaContainerTest {
 
     private final String sourceTopic = "stock-transactions-topic";
     private final String outputTopic = "broker-summary-topic";
@@ -59,19 +57,10 @@ public class TransactionalConsumeTransformProduceTest {
     private static final int NUM_GENERATED_RECORDS = 25;
     private static final int EXPECTED_NUMBER_TRANSACTIONS = 3;
 
-    @Container
-    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"))
-            // NOTE: These settings are required to run transactions with a single broker container
-            // otherwise you're expected to have a 3 broker minimum for using
-            // transactions in a production environment
-            .withEnv("KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR", "1")
-            .withEnv("KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", "1")
-            .withEnv("KAFKA_TRANSACTION_STATE_LOG_MIN_ISR", "1");
-
     @BeforeEach
     public void setUp() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", TXN_KAFKA.getBootstrapServers());
         Topics.create(props, sourceTopic);
         Topics.create(props, outputTopic);
 
@@ -88,7 +77,7 @@ public class TransactionalConsumeTransformProduceTest {
     @AfterEach
     public void tearDown() {
         final Properties props = new Properties();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", TXN_KAFKA.getBootstrapServers());
         Topics.delete(props, sourceTopic);
         Topics.delete(props, outputTopic);
     }
@@ -171,7 +160,7 @@ public class TransactionalConsumeTransformProduceTest {
 
     private Map<String, Object> getProducerProps() {
         Map<String, Object> producerProps = new HashMap<>();
-        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, TXN_KAFKA.getBootstrapServers());
         producerProps.put(ProducerConfig.ACKS_CONFIG, "all");
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
@@ -181,7 +170,7 @@ public class TransactionalConsumeTransformProduceTest {
 
     private Map<String, Object> getConsumerProps() {
         Map<String, Object> consumerProps = new HashMap<>();
-        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, TXN_KAFKA.getBootstrapServers());
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "consume-transform-produce-id");
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

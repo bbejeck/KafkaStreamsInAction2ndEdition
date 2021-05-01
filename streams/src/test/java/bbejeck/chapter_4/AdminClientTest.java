@@ -1,14 +1,11 @@
 package bbejeck.chapter_4;
 
+import bbejeck.testcontainers.BaseKafkaContainerTest;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,19 +25,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * the {@link org.apache.kafka.clients.admin.KafkaAdminClient}
  */
 
-@Testcontainers
-public class AdminClientTest {
+
+public class AdminClientTest extends BaseKafkaContainerTest {
 
     private final Properties props = new Properties();
     private final int partitions = 1;
     private final short replication = 1;
 
-    @Container
-    public static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"));
-
     @BeforeEach
     public void setUp() {
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
+        props.put("bootstrap.servers", KAFKA.getBootstrapServers());
     }
 
     @Test

@@ -8,6 +8,7 @@ Table of Contents
     * [Troubleshooting issues](#troubleshooting-issues)
     * [Command line helper](#command-line-helper)
     * [Project Modules](#project-modules)
+    * [Testing with containers](#testing-with-containers)  
     * [Chapter 2](#chapter-2)
     * [Chapter 3](#chapter-3)
         * [A guided tour to the chapter 3 code](#a-guided-tour-to-the-chapter-3-code)
@@ -107,6 +108,20 @@ I wanted to isolate each module in the spirit of independent changes.  The purpo
 how you handle schema changes within different compatibility modes. Not how you set up sub-modules within a main gradle
 project
 
+## Testing with containers
+
+Several tests (both unit and integration) use [testcontainers](https://www.testcontainers.org/).  In order to 
+reduce the overhead of the tests use singleton containers.  You get a singleton container by extending one of three
+abstract classes in the `testcontainers` package. The abstract classes all create and start a container in a static block when first
+loaded, and the remaining tests reuse the same container.
+
+As result, running the tests takes some time, with some taking over a minute depending on the point the test is emphasizing.
+To mitigate the time it take to run the tests, the longer running tests are tagged -  `Tag("long")`  and only run with the
+Gradle command `./gradlew longTests`.  Otherwise `./gradlew build` and `./gradlew test` only run the "shorter" tests.
+
+* `BaseKafkaContainerTest` -  Base Kafka container
+* `BaseProxyInterceptingKafkaContainerTest` - Kafka container which includes a Toxiproxy container for simulating network issues
+* `BaseTransactionalKafkaContainerTest` - This Kafka container is configured for transactional API tests and sets correct Kafka configs for using transactions in a single broker
 
 ## Chapter 2 
 

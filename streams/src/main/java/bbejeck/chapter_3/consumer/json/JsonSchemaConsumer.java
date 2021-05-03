@@ -31,6 +31,8 @@ public class JsonSchemaConsumer extends BaseConsumer {
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"json-schema-specific-group");
         overrideConfigs.put(KafkaJsonSchemaDeserializerConfig.JSON_VALUE_TYPE, AvengerJson.class.getName());
 
+        jsonSchemaConsumer.overrideConfigs(overrideConfigs);
+
         ConsumerRecordsHandler<String, AvengerJson> specificRecordsConsumer = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
             var consumedAvenger = cr.value();
@@ -41,6 +43,8 @@ public class JsonSchemaConsumer extends BaseConsumer {
 
         overrideConfigs.clear();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"json-schema-generic-group");
+        jsonSchemaConsumer.overrideConfigs(overrideConfigs);
+
 
         final StringBuilder consumerRecordBuilder = new StringBuilder();
 

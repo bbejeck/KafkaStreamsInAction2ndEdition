@@ -32,6 +32,7 @@ public class ProtoConsumer extends BaseConsumer {
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-specific-group");
         overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, AvengerProto.Avenger.class);
+        protoConsumer.overrideConfigs(overrideConfigs);
 
         ConsumerRecordsHandler<String, AvengerProto.Avenger> specificRecordsConsumer = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
@@ -43,6 +44,7 @@ public class ProtoConsumer extends BaseConsumer {
 
         overrideConfigs.clear();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-generic-group");
+        protoConsumer.overrideConfigs(overrideConfigs);
 
         final StringBuilder consumerRecordBuilder = new StringBuilder();
 

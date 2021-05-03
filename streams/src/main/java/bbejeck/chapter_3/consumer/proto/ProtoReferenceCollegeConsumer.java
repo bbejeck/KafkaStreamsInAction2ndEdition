@@ -26,6 +26,7 @@ public class ProtoReferenceCollegeConsumer extends BaseConsumer {
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-college-ref-group");
         overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, CollegeProto.College.class);
+        collegeConsumer.overrideConfigs(overrideConfigs);
 
         ConsumerRecordsHandler<String, CollegeProto.College> processFunction = consumerRecords ->
                 consumerRecords.forEach(cr -> {

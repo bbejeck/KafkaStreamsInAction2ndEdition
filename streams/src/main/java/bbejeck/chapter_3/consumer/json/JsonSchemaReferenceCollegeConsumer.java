@@ -26,6 +26,7 @@ public class JsonSchemaReferenceCollegeConsumer extends BaseConsumer {
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"json-schema-college-ref-group");
         overrideConfigs.put(KafkaJsonSchemaDeserializerConfig.JSON_VALUE_TYPE, CollegeJson.class);
+        collegeConsumer.overrideConfigs(overrideConfigs);
 
         ConsumerRecordsHandler<String, CollegeJson> processFunction = (consumerRecords ->
                 consumerRecords.forEach(cr -> {

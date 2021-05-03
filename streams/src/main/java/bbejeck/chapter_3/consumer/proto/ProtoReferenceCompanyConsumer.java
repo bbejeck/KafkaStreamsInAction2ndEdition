@@ -26,6 +26,7 @@ public class ProtoReferenceCompanyConsumer extends BaseConsumer {
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-company-ref-group");
         overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, CompanyProto.Company.class);
+        companyConsumer.overrideConfigs(overrideConfigs);
 
         ConsumerRecordsHandler<String, CompanyProto.Company> processFunction = (consumerRecords ->
                 consumerRecords.forEach(cr -> {

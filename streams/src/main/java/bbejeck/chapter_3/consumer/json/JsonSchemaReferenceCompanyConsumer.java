@@ -28,6 +28,7 @@ public class JsonSchemaReferenceCompanyConsumer extends BaseConsumer {
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"json-schema-company-ref-group");
         overrideConfigs.put(KafkaJsonSchemaDeserializerConfig.JSON_VALUE_TYPE, CompanyJson.class.getName());
+        companyConsumer.overrideConfigs(overrideConfigs);
 
         ConsumerRecordsHandler<String, CompanyJson> processFunction = (consumerRecords ->
                 consumerRecords.forEach(cr -> {

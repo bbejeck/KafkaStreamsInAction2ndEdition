@@ -26,6 +26,7 @@ public class AvroReferenceCompanyConsumer extends BaseConsumer {
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"company-ref-group");
         overrideConfigs.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
+        collegeConsumer.overrideConfigs(overrideConfigs);
 
         ConsumerRecordsHandler<String, CompanyAvro> processFunction = (consumerRecords ->
                 consumerRecords.forEach(cr -> {

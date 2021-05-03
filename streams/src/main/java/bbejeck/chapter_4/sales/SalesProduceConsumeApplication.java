@@ -25,6 +25,7 @@ import java.util.concurrent.Executors;
  * Uses the {@link SalesProducerClient} and {@link SalesConsumerClient}
  * The application will continue to run until explicitly stopped with
  * a CTRL+C command
+ * Make sure you have started docker with the docker-compose up -d command
  */
 public class SalesProduceConsumeApplication {
 

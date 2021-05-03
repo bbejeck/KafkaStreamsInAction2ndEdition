@@ -28,6 +28,8 @@ import java.util.concurrent.Executors;
  * Application that ties together the
  * {@link PipeliningConsumerClient} and the {@link PipeliningProducerClient} for the
  * demonstration of handing commits with async processing
+ *
+ * Make sure you have started docker beforehand with the docker-compose up -d command
  */
 public class ProducePipeliningConsumeApplication {
 

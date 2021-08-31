@@ -8,6 +8,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,15 +16,20 @@ import java.util.Map;
 public class ProducerUtil {
 
     public static void main(String[] args) {
-        Topics.create("input");
+        Topics.create("input-one");
+        Topics.create("input-two");
         Topics.create("output");
         System.out.printf("Created the topics %n");
         
         try(Producer<String, String> producer = new KafkaProducer<>(getProducerConfigs())) {
-            ProducerRecord<String, String> recordOne = new ProducerRecord<>("input", "foo", "the dog");
-            ProducerRecord<String, String> recordTwo = new ProducerRecord<>("input", "bar", "jumped over");
-            ProducerRecord<String, String> recordThree = new ProducerRecord<>("input", "foo", "the lazy fox");
-            ProducerRecord<String, String> recordFour = new ProducerRecord<>("input", "bar", "all streams lead to Kafka");
+            Instant now = Instant.now();
+            Instant tenSecondsAgo = now.minusSeconds(10);
+            ProducerRecord<String, String> recordOne = new ProducerRecord<>("input-one", 0, now.toEpochMilli(), "foo", "The quick ");
+            //ProducerRecord<String, String> recordThree = new ProducerRecord<>("input-two", 0, now.plusSeconds(1).toEpochMilli(), "foo", "brown fox");
+            ProducerRecord<String, String> recordThree = new ProducerRecord<>("input-two", 0, now.minusSeconds(1).toEpochMilli(), "foo", "brown fox");
+            ProducerRecord<String, String> recordTwo = new ProducerRecord<>("input-one", 0, now.toEpochMilli(),"bar", "jumps over ");
+            //ProducerRecord<String, String> recordFour = new ProducerRecord<>("input-two", 0, now.plusSeconds(2).toEpochMilli(), "bar", "the lazy dog");
+            ProducerRecord<String, String> recordFour = new ProducerRecord<>("input-two", 0, now.minusSeconds(2).toEpochMilli(), "bar", "the lazy dog");
 
             List<ProducerRecord<String, String>> records = List.of(recordOne, recordTwo, recordThree, recordFour);
             System.out.printf("Sending records now %n");

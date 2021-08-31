@@ -28,7 +28,8 @@ public class StreamsJoins {
 
         KStream<String, String> joinedStream = firstStream
                 .join(secondStream, (value1, value2) -> value1 + value2,
-                JoinWindows.of(Duration.ofSeconds(0)).before(Duration.ofSeconds(3)),
+                JoinWindows.of(Duration.ofSeconds(3)),
+                //JoinWindows.of(Duration.ofSeconds(0)).before(Duration.ofSeconds(3)),
                 //JoinWindows.of(Duration.ofSeconds(0)).after(Duration.ofSeconds(3)),
                 StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String()));
 

@@ -12,12 +12,15 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class ProducerUtil {
 
     public static void main(String[] args) {
         Topics.create("input-one");
-        Topics.create("input-two");
+        Properties properties = new Properties();
+        properties.put("bootstrap.servers", "localhost:9092");
+        Topics.create(properties, "input-two", 3, (short)1);
         Topics.create("output");
         System.out.printf("Created the topics %n");
         

@@ -28,12 +28,11 @@ public class StreamsJoins {
 
         KStream<String, String> joinedStream = firstStream
                 .join(secondStream, (value1, value2) -> value1 + value2,
-                JoinWindows.of(Duration.ofSeconds(3)),
-                //JoinWindows.of(Duration.ofSeconds(0)).before(Duration.ofSeconds(3)),
+                //JoinWindows.of(Duration.ofSeconds(3)),
+                JoinWindows.of(Duration.ofSeconds(0)).before(Duration.ofSeconds(3)),
                 //JoinWindows.of(Duration.ofSeconds(0)).after(Duration.ofSeconds(3)),
-                StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String()));
-
-              //StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String()).withName("phrase-join").withStoreName("phrase-join"));
+                //StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String()));
+              StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String()).withName("phrase-join").withStoreName("phrase-join"));
 
         joinedStream.peek((key, value) -> System.out.printf("Joined Key %d is [%s] value is [%s] %n", counter++, key, value))
                 .to("output", Produced.with(Serdes.String(), Serdes.String()));

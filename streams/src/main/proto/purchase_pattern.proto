@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package bbejeck.chapter_6.proto;
+option java_outer_classname = "PatternProto";
+
+message Pattern {
+   string zipCode = 1;
+   string item = 2;
+   int64 date = 3;
+   double amount = 4;
+}

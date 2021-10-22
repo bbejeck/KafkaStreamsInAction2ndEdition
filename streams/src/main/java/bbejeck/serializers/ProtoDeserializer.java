@@ -1,5 +1,6 @@
 package bbejeck.serializers;
 
+import bbejeck.utils.SerdeUtil;
 import com.google.protobuf.Message;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.SerializationException;
@@ -36,7 +37,7 @@ public class ProtoDeserializer<T extends Message> implements Deserializer<T> {
     @Override
     @SuppressWarnings("unchecked")
     public void configure(Map<String, ?> configs, boolean isKey) {
-        final String protoClassConfig = (isKey) ? SerializationConfig.KEY_CLASS_NAME : SerializationConfig.VALUE_CLASS_NAME;
+        final String protoClassConfig = SerdeUtil.getClassConfig(isKey);
         final Class<T> protoClass = (Class<T>)configs.get(protoClassConfig);
         if (protoClass == null) {
             throw new ConfigException("No class provided for " + protoClassConfig);

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package bbejeck.chapter_7.proto;
+option java_outer_classname = "StockTransactionProto";
+
+message Transaction {
+  string symbol = 1;
+  double share_price = 2;
+  int32 number_shares = 3;
+  bool isPurchase = 4;
+}

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package bbejeck.chapter_6.proto;
+option java_outer_classname = "RewardAccumulatorProto";
+
+message RewardAccumulator {
+   string customerId = 1;
+   double purchaseTotal = 2;
+   int32 totalRewardPoints = 3;
+   int32 currentRewardPoints = 4;
+}

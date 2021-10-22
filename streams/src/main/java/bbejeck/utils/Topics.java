@@ -4,6 +4,7 @@ import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.ListTopicsOptions;
 import org.apache.kafka.clients.admin.NewTopic;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
@@ -54,6 +55,10 @@ public class Topics {
 
     public static void create(final Properties props, final String name) {
         create(props, name, 1, (short) 1);
+    }
+
+    public static void create(final String... names) {
+        Arrays.stream(names).forEach(Topics::create);
     }
 
     public static void create(final String name) {

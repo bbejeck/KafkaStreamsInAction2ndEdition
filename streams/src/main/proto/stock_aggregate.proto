@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package bbejeck.chapter_7.proto;
+option java_outer_classname = "StockAggregateProto";
+
+message Aggregate {
+  string symbol = 1;
+  int64 sales_share_volume = 2;
+  int64 purchase_share_volume = 3;
+  double sales_dollar_amount = 4;
+  double purchase_dollar_amount = 5;
+  double highest_price = 6;
+  double lowest_price = 7;
+}

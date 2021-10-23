@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package bbejeck.chapter_6.proto;
+option java_outer_classname = "SensorProto";
+
+message Sensor {
+  string sensorId = 1;
+  enum Type  {
+    TEMPERATURE = 0;
+    PROXIMITY = 1;
+  }
+  Type sensorType = 2;
+  double reading = 3;
+}

@@ -10,9 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 /**
- * User: Bill Bejeck
- * Date: 6/4/21
- * Time: 8:53 AM
+ * TopicNameExtractor that chooses the topic name at dynamically based
+ * on the value contained in the "routing" header
  */
 public class HeadersTopicNameExtractor implements TopicNameExtractor<String, RetailPurchaseProto.RetailPurchase> {
     private final String defaultTopicName = "purchases";

@@ -34,6 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
+/**
+ * The Yelling Kafka Streams application using the peek operator to display records to the console
+ */
+
 public class KafkaStreamsYellingAppWithPeek extends BaseStreamsApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaStreamsYellingAppWithPeek.class);
@@ -53,27 +57,26 @@ public class KafkaStreamsYellingAppWithPeek extends BaseStreamsApplication {
         KStream<String, String> upperCasedStream = simpleFirstStream
                 .mapValues((key, value) -> value.toUpperCase())
                 .peek(sysout);
-        
+
         upperCasedStream.to("out-topic", Produced.with(stringSerde, stringSerde));
 
         return builder.build(streamProperties);
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Creating topics");
-        Topics.create("src-topic", "out-topic");
-        MockDataProducer.produceRandomTextData();
+        LOG.info("Creating topics");
+        Topics.maybeDeleteThenCreate("src-topic", "out-topic");
         Properties streamProperties = new Properties();
-        streamProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "yelling_app_id");
+        streamProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "yelling_app_with_peek_id");
         streamProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         KafkaStreamsYellingAppWithPeek yellingApp = new KafkaStreamsYellingAppWithPeek();
         Topology topology = yellingApp.topology(streamProperties);
-        try (KafkaStreams kafkaStreams = new KafkaStreams(topology, streamProperties)) {
-            LOG.info("Hello World Yelling App Started");
+        try (KafkaStreams kafkaStreams = new KafkaStreams(topology, streamProperties);
+             MockDataProducer mockDataProducer = new MockDataProducer()) {
+            LOG.info("Hello World Yelling App with peeks Started");
             kafkaStreams.start();
+            mockDataProducer.produceRandomTextData();
             Thread.sleep(35000);
-            LOG.info("Shutting down the Yelling APP now");
-            MockDataProducer.shutdown();
         }
 
     }

@@ -30,11 +30,16 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
+/**
+ * The Kafka Streams Yelling application with named processors
+ * look at the topology description to see how it's more descriptive
+ */
 public class KafkaStreamsYellingNamedProcessorsApp extends BaseStreamsApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaStreamsYellingNamedProcessorsApp.class);
@@ -47,35 +52,40 @@ public class KafkaStreamsYellingNamedProcessorsApp extends BaseStreamsApplicatio
 
         KStream<String, String> simpleFirstStream = builder.stream("src-topic",
                 Consumed.with(stringSerde, stringSerde)
-                        .withName("Application Input"));
+                        .withName("Application-Input"));
 
         KStream<String, String> upperCasedStream = simpleFirstStream.mapValues((key, value) -> value.toUpperCase(),
-                Named.as("Convert to Yelling"));
+                Named.as("Convert_to_Yelling"));
 
-        upperCasedStream.print(Printed.toSysOut());
+        upperCasedStream.print(Printed.<String, String>toSysOut().withName("Console_Printer"));
         upperCasedStream.to("out-topic", Produced.with(stringSerde, stringSerde)
-                .withName("Application Output"));
+                .withName("Application-Output"));
 
         return builder.build(streamProperties);
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Creating topics");
+        LOG.info("Creating topics");
         Topics.create("src-topic", "out-topic");
-        MockDataProducer.produceRandomTextData();
-        Properties streamProperties = new Properties();
-        streamProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "yelling_app_id");
-        streamProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        Properties streamProperties = getProperties();
         KafkaStreamsYellingNamedProcessorsApp yellingApp = new KafkaStreamsYellingNamedProcessorsApp();
         Topology topology = yellingApp.topology(streamProperties);
-        System.out.println(topology.describe().toString());
-        try (KafkaStreams kafkaStreams = new KafkaStreams(topology, streamProperties)) {
+        LOG.info("Topology Description with named processors {}", topology.describe());
+        try (KafkaStreams kafkaStreams = new KafkaStreams(topology, streamProperties);
+             MockDataProducer mockDataProducer = new MockDataProducer()) {
             LOG.info("Hello World Yelling App Started");
             kafkaStreams.start();
+            mockDataProducer.produceRandomTextData();
             Thread.sleep(35000);
-            LOG.info("Shutting down the Yelling APP now");
-            MockDataProducer.shutdown();
         }
 
+    }
+
+    @NotNull
+    private static Properties getProperties() {
+        Properties streamProperties = new Properties();
+        streamProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "yelling_app_named_processors_id");
+        streamProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        return streamProperties;
     }
 }

@@ -5,9 +5,8 @@ import org.apache.kafka.streams.processor.RecordContext;
 import org.apache.kafka.streams.processor.TopicNameExtractor;
 
 /**
- * User: Bill Bejeck
- * Date: 6/4/21
- * Time: 8:53 AM
+ * TopicNameExtractor that chooses the topic name at dynamically based
+ * on the department of the RetailPurchase object
  */
 public class PurchaseTopicNameExtractor implements TopicNameExtractor<String, RetailPurchaseProto.RetailPurchase> {
 

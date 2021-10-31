@@ -29,10 +29,15 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
+
+/**
+ * Initial Kafka Streams application that "yells" at people, it's a great app to run it relieves stress.
+ */
 
 public class KafkaStreamsYellingApp extends BaseStreamsApplication {
 
@@ -55,22 +60,27 @@ public class KafkaStreamsYellingApp extends BaseStreamsApplication {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Creating topics");
-        Topics.create("src-topic", "out-topic");
-        MockDataProducer.produceRandomTextData();
+        LOG.info("Creating topics");
+        Topics.maybeDeleteThenCreate("src-topic", "out-topic");
+        Properties streamProperties = getProperties();
+        KafkaStreamsYellingApp yellingApp = new KafkaStreamsYellingApp();
+        Topology topology = yellingApp.topology(streamProperties);
+        LOG.info("Topology description {}", topology.describe());
+        try (KafkaStreams kafkaStreams = new KafkaStreams(topology, streamProperties);
+             MockDataProducer mockDataProducer = new MockDataProducer()) {
+            LOG.info("Hello World Yelling App Started");
+            kafkaStreams.start();
+            mockDataProducer.produceRandomTextData();
+            Thread.sleep(35000);
+            LOG.info("Shutting down the Yelling APP now");
+        }
+    }
+
+    @NotNull
+    private static Properties getProperties() {
         Properties streamProperties = new Properties();
         streamProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "yelling_app_id");
         streamProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        KafkaStreamsYellingApp yellingApp = new KafkaStreamsYellingApp();
-        Topology topology = yellingApp.topology(streamProperties);
-        System.out.println(topology.describe().toString());
-        try(KafkaStreams kafkaStreams = new KafkaStreams(topology, streamProperties)) {
-            LOG.info("Hello World Yelling App Started");
-            kafkaStreams.start();
-            Thread.sleep(35000);
-            LOG.info("Shutting down the Yelling APP now");
-            MockDataProducer.shutdown();
-        }
-
+        return streamProperties;
     }
 }

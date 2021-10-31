@@ -4,10 +4,13 @@ package bbejeck.chapter_6.proto;
 option java_outer_classname = "SensorProto";
 
 message Sensor {
-  string sensorId = 1;
+  string id = 1;
   enum Type  {
-    TEMPERATURE = 0;
-    PROXIMITY = 1;
+    // This is a dummy value in protobuf 3 0 index considered default so it's not included in the message
+    // As a consequence it doesn't print
+    NONE = 0;
+    TEMPERATURE = 1;
+    PROXIMITY = 2;
   }
   Type sensorType = 2;
   double reading = 3;

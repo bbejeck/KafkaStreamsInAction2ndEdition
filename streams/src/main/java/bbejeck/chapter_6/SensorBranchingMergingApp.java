@@ -5,7 +5,6 @@ import bbejeck.chapter_6.proto.SensorProto;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -26,9 +25,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * User: Bill Bejeck
- * Date: 10/13/21
- * Time: 6:25 PM
+ * Kafka Streams example that uses branching and merging in the same application
+ * based on a fictional IoT example
  */
 public class SensorBranchingMergingApp extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(SensorBranchingMergingApp.class);
@@ -48,9 +46,12 @@ public class SensorBranchingMergingApp extends BaseStreamsApplication {
         StreamsBuilder builder = new StreamsBuilder();
         Consumed<String, SensorProto.Sensor> sensorConsumed = Consumed.with(stringSerde, sensorSerde);
 
-        KStream<String, SensorProto.Sensor> legacySensorStream = builder.stream("combined-sensors", sensorConsumed);
-        KStream<String, SensorProto.Sensor> temperatureSensorStream = builder.stream("temperature-sensors", sensorConsumed);
-        KStream<String, SensorProto.Sensor> proximitySensorStream = builder.stream("proximity-sensors", sensorConsumed);
+        KStream<String, SensorProto.Sensor> legacySensorStream =
+                builder.stream("combined-sensors", sensorConsumed);
+        KStream<String, SensorProto.Sensor> temperatureSensorStream =
+                builder.stream("temperature-sensors", sensorConsumed);
+        KStream<String, SensorProto.Sensor> proximitySensorStream =
+                builder.stream("proximity-sensors", sensorConsumed);
 
 
         Predicate<String, SensorProto.Sensor> isProximitySensor =
@@ -60,15 +61,17 @@ public class SensorBranchingMergingApp extends BaseStreamsApplication {
 
         Map<String, KStream<String, SensorProto.Sensor>> sensorMap =
                 legacySensorStream.split(Named.as("sensor-"))
-                .branch(isTemperatureSensor, Branched.as("temperature"))
-                .branch(isProximitySensor,
-                        Branched.withFunction(
-                                ps -> ps.mapValues(feetToMetersMapper), "proximity"))
-                .noDefaultBranch();
+                        .branch(isTemperatureSensor, Branched.as("temperature"))
+                        .branch(isProximitySensor,
+                                Branched.withFunction(
+                                        ps -> ps.mapValues(feetToMetersMapper), "proximity"))
+                        .noDefaultBranch();
 
         temperatureSensorStream.merge(sensorMap.get("sensor-temperature"))
+                .peek((key, value)-> LOG.info("temperature branch {}", value) )
                 .to("temp-reading", Produced.with(stringSerde, sensorSerde));
         proximitySensorStream.merge(sensorMap.get("sensor-proximity"))
+                .peek((key, value)-> LOG.info("proximity branch {}", value))
                 .to("proximity-reading", Produced.with(stringSerde, sensorSerde));
 
 
@@ -77,25 +80,24 @@ public class SensorBranchingMergingApp extends BaseStreamsApplication {
 
     public static void main(String[] args) throws InterruptedException {
         // used only to produce data for this application, not typical usage
-        Topics.create("transactions", "patterns", "rewards", "purchases", "coffee-topic", "electronics");
-        MockDataProducer.producePurchasedItemsData();
+        Topics.maybeDeleteThenCreate("combined-sensors", "temperature-sensors", "proximity-sensors",
+                "temp-reading", "proximity-reading");
         SensorBranchingMergingApp zMartKafkaStreamsApp = new SensorBranchingMergingApp();
         Properties properties = getProperties();
         Topology topology = zMartKafkaStreamsApp.topology(properties);
-        try (KafkaStreams kafkaStreams = new KafkaStreams(topology, properties)) {
-            LOG.info("ZMart First Kafka Streams Application Started");
+        try (KafkaStreams kafkaStreams = new KafkaStreams(topology, properties);
+             MockDataProducer mockDataProducer = new MockDataProducer()) {
+            LOG.info("IoT Branching and Merging Started");
             kafkaStreams.start();
+            mockDataProducer.produceIotData();
             Thread.sleep(30000);
-            MockDataProducer.shutdown();
         }
     }
 
 
     private static Properties getProperties() {
         Properties props = new Properties();
-        props.put(StreamsConfig.CLIENT_ID_CONFIG, "FirstZmart-Kafka-Streams-Client");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "zmart-purchases");
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "FirstZmart-Kafka-Streams-App");
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "IoT_sample_application");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 1);
         return props;

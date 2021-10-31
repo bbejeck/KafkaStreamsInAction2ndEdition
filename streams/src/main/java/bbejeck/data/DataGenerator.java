@@ -4,8 +4,10 @@ import bbejeck.chapter_4.avro.ProductTransaction;
 import bbejeck.chapter_4.avro.StockTransaction;
 import bbejeck.chapter_6.proto.PurchasedItemProto;
 import bbejeck.chapter_6.proto.RetailPurchaseProto;
+import bbejeck.chapter_6.proto.SensorProto;
 import com.github.javafaker.Address;
 import com.github.javafaker.Business;
+import com.github.javafaker.ChuckNorris;
 import com.github.javafaker.Commerce;
 import com.github.javafaker.Company;
 import com.github.javafaker.Faker;
@@ -20,7 +22,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -29,6 +33,7 @@ import java.util.Random;
  */
 public class DataGenerator {
 
+    private static final Random random = new Random();
 
     private DataGenerator() {
     }
@@ -38,14 +43,16 @@ public class DataGenerator {
         Shakespeare shakespeare = faker.shakespeare();
         Company company = faker.company();
         Number number = faker.number();
+        ChuckNorris chuckNorris = faker.chuckNorris();
         Collection<String> text = new ArrayList<>();
         int randomTextCount = 10;
         for (int i = 0; i < randomTextCount; i++) {
-            int whichFaker = number.numberBetween(1, 4);
+            int whichFaker = number.numberBetween(1, 5);
             switch (whichFaker) {
                 case 1 -> text.add(shakespeare.hamletQuote());
                 case 2 -> text.add(shakespeare.asYouLikeItQuote());
                 case 3 -> text.add(company.bs());
+                case 4 -> text.add(chuckNorris.fact());
             }
         }
         return text;
@@ -72,6 +79,41 @@ public class DataGenerator {
         return transactions;
     }
 
+    public static Map<String, List<SensorProto.Sensor>> generateSensorReadings(int numberRecords) {
+        Faker faker = new Faker();
+        final List<String> idNumbers = new ArrayList<>();
+        IdNumber idNumber = faker.idNumber();
+        for (int i = 0; i < 20; i++) {
+            idNumbers.add(idNumber.invalid());
+        }
+        int numberPerTopic = numberRecords / 3;
+        
+        Number number = faker.number();
+        SensorProto.Sensor.Builder sensorBuilder = SensorProto.Sensor.newBuilder();
+        List<SensorProto.Sensor.Type> types = List.of(SensorProto.Sensor.Type.TEMPERATURE, SensorProto.Sensor.Type.PROXIMITY);
+        Map<String, List<SensorProto.Sensor>> recordsMap = new HashMap<>();
+        List<String> sensorTopics = List.of("combined-sensors", "temperature-sensors", "proximity-sensors");
+        sensorTopics.forEach(sensorTopic -> recordsMap.put(sensorTopic, new ArrayList<>()));
+        sensorTopics.forEach(sensorTopic -> {
+            List<SensorProto.Sensor> sensorList = recordsMap.get(sensorTopic);
+            for (int i = 0; i < numberPerTopic; i++) {
+                sensorBuilder.setReading(number.randomDouble(2, 1, 1000));
+                sensorBuilder.setId(idNumbers.get(random.nextInt(20)));
+                SensorProto.Sensor.Type type = switch (sensorTopic) {
+                    case "combined-sensors" -> types.get(number.numberBetween(0,2));
+                    case "temperature-sensors" -> SensorProto.Sensor.Type.TEMPERATURE;
+                    case "proximity-sensors" -> SensorProto.Sensor.Type.PROXIMITY;
+                    default -> types.get(number.numberBetween(0,2));
+                };
+                sensorBuilder.setSensorType(type);
+                sensorList.add(sensorBuilder.build());
+                sensorBuilder.clear();
+            }
+        });
+
+        return recordsMap;
+    }
+
     public static Collection<RetailPurchaseProto.RetailPurchase> generatePurchasedItems(final int numberRecords) {
         int counter = 0;
         final List<RetailPurchaseProto.RetailPurchase> retailPurchases = new ArrayList<>();
@@ -82,11 +124,12 @@ public class DataGenerator {
         IdNumber idNumber = faker.idNumber();
         Address address = faker.address();
         Instant instant = Instant.now();
-        int numberOfPurchasedItems = number.numberBetween(1, 4);
 
         PurchasedItemProto.PurchasedItem.Builder purchaseItemBuilder = PurchasedItemProto.PurchasedItem.newBuilder();
         RetailPurchaseProto.RetailPurchase.Builder retailBuilder = RetailPurchaseProto.RetailPurchase.newBuilder();
+        List<String> departments = new ArrayList<>(List.of("coffee", "electronics"));
         while (counter++ < numberRecords) {
+            int numberOfPurchasedItems = number.numberBetween(1, 6);
             long purchaseDate = instant.plusSeconds(number.randomNumber()).truncatedTo(ChronoUnit.SECONDS).toEpochMilli();
             String customerId = idNumber.invalid();
             for (int i = 0; i < numberOfPurchasedItems; i++) {
@@ -97,7 +140,12 @@ public class DataGenerator {
                 purchaseItemBuilder.setPurchaseDate(purchaseDate);
                 retailBuilder.addPurchasedItems(purchaseItemBuilder.build());
             }
-            retailBuilder.setDepartment(commerce.department());
+            if (departments.size() == 2) {
+                departments.add(2, commerce.department());
+            } else {
+                departments.set(2, commerce.department());
+            }
+            retailBuilder.setDepartment(departments.get(random.nextInt(3)));
             retailBuilder.setStoreId(commerce.department());
             retailBuilder.setEmployeeId(idNumber.invalid());
             retailBuilder.setCustomerId(customerId);
@@ -120,7 +168,7 @@ public class DataGenerator {
         StockTransaction.Builder builder = StockTransaction.newBuilder();
         Random random = new Random();
         Instant instant = Instant.now();
-        while(counter++ < numberRecords) {
+        while (counter++ < numberRecords) {
             builder.setCustomerName(customers.get(random.nextInt(customers.size())))
                     .setBroker(brokers.get(random.nextInt(brokers.size())))
                     .setSymbol(symbols.get(random.nextInt(symbols.size())))
@@ -128,9 +176,9 @@ public class DataGenerator {
                     .setShares(random.nextInt(25_000))
                     .setSharePrice(random.nextDouble() * 100);
 
-          transactions.add(builder.build());
+            transactions.add(builder.build());
         }
-        
+
         return transactions;
     }
 
@@ -167,5 +215,6 @@ public class DataGenerator {
         DataGenerator.generateStockTransaction(10).forEach(System.out::println);
         DataGenerator.generatePurchasedItems(10).forEach(System.out::println);
         DataGenerator.generateRandomText().forEach(System.out::println);
+        DataGenerator.generateSensorReadings(10).entrySet().forEach(System.out::println);
     }
 }

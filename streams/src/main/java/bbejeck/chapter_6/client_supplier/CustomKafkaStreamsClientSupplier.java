@@ -14,9 +14,8 @@ import org.apache.logging.log4j.Logger;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 6/8/21
- * Time: 10:00 AM
+ * An example of using a KafkaClientSupplier to provide a Kafka Streams application
+ * your own KafkaProducer and KafkaConsumer instances
  */
 public class CustomKafkaStreamsClientSupplier implements KafkaClientSupplier {
 

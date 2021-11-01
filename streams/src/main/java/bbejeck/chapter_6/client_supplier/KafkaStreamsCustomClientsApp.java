@@ -16,6 +16,7 @@
 
 package bbejeck.chapter_6.client_supplier;
 
+import bbejeck.utils.Topics;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -24,6 +25,7 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Produced;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,16 +47,27 @@ public class KafkaStreamsCustomClientsApp {
     }
 
     public static void main(String[] args) throws Exception {
+        Properties properties = getProperties();
+        LOG.info("Creating the required topics");
+        Topics.maybeDeleteThenCreate("src-topic", "out-topic");
+        KafkaStreamsCustomClientsApp streamsApplication = new KafkaStreamsCustomClientsApp();
+        Topology topology = streamsApplication.topology();
+        try(KafkaStreams kafkaStreams = new KafkaStreams(topology,
+                                                     properties,
+                                                     new CustomKafkaStreamsClientSupplier())) {
+            
+           LOG.debug("Starting the Kafka Streams application");
+           kafkaStreams.start();
+           Thread.sleep(30000);
+        }
+
+    }
+
+    @NotNull
+    private static Properties getProperties() {
         Properties properties = new Properties();
         properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "yelling_app_id");
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-
-        KafkaStreamsCustomClientsApp streamsApplication = new KafkaStreamsCustomClientsApp();
-        Topology topology = streamsApplication.topology();
-        KafkaStreams kafkaStreams = new KafkaStreams(topology,
-                                                     properties,
-                                                     new CustomKafkaStreamsClientSupplier());
-        kafkaStreams.start();
-
+        return properties;
     }
 }

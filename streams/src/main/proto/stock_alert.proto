@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package bbejeck.chapter_8.proto;
+option java_outer_classname = "StockAlertProto";
+
+message StockAlert {
+  string symbol = 1;
+  double share_price = 2;
+  int64 share_volume = 3;
+  string market_segment = 4;
+}

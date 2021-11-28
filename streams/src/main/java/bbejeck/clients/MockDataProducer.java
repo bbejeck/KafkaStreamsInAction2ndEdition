@@ -2,6 +2,7 @@ package bbejeck.clients;
 
 import bbejeck.chapter_6.proto.RetailPurchaseProto;
 import bbejeck.chapter_6.proto.SensorProto;
+import bbejeck.chapter_8.proto.StockAlertProto;
 import bbejeck.data.DataGenerator;
 import bbejeck.serializers.ProtoSerializer;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
@@ -20,8 +21,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 
 /**
  * This class produces records for the various Kafka Streams applications.
@@ -36,6 +40,7 @@ public class MockDataProducer implements AutoCloseable {
     private static final String YELLING_APP_TOPIC = "src-topic";
     private static final String NULL_KEY = null;
     private volatile boolean keepRunning = true;
+    private final Random random = new Random();
 
     public MockDataProducer() {
     }
@@ -118,6 +123,55 @@ public class MockDataProducer implements AutoCloseable {
                     }
                 }
             }
+        };
+        LOG.info("Done generating text data");
+        executorService.submit(generateTask);
+    }
+
+    public void produceStockAlerts(final String topic) {
+        Callable<Void> generateStockTask = () -> {
+            final Map<String, Object> configs = producerConfigs();
+            final Callback callback = callback();
+            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProtoSerializer.class);
+            try (Producer<String, StockAlertProto.StockAlert> producer = new KafkaProducer<>(configs)) {
+                while (keepRunning) {
+                    List<StockAlertProto.StockAlert> stockAlerts = (List) DataGenerator.generateStockAlerts(5);
+                    stockAlerts.stream()
+                            .map(alert -> new ProducerRecord<>(topic, alert.getSymbol(), alert))
+                            .forEach(pr -> producer.send(pr, callback));
+
+                    LOG.info("StockAlert batch sent");
+                    Thread.sleep(6000);
+                }
+            }
+            LOG.info("Done generating stock alerts");
+            return null;
+        };
+        executorService.submit(generateStockTask);
+    }
+
+    public void produceRandomTextDataWithKeyFunction(Function<String, String> keyFunction, final String topic) {
+        Callable<Void> generateTask = () -> {
+            final Map<String, Object> configs = producerConfigs();
+            final Callback callback = callback();
+            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+
+            try (Producer<String, String> producer = new KafkaProducer<>(configs)) {
+                while (keepRunning) {
+                    List<String> textValues = (List) DataGenerator.generateRandomText();
+                    textValues.set(random.nextInt(textValues.size()), null);
+                    textValues.set(random.nextInt(textValues.size()), null);
+                    System.out.println("Sending values " + textValues);
+                    textValues.stream()
+                            .map(text -> new ProducerRecord<>(topic, keyFunction.apply(text), text))
+                            .forEach(pr -> producer.send(pr, callback));
+
+                    LOG.info("Text batch sent");
+                        Thread.sleep(6000);
+
+                }
+            }
+            return null;
         };
         LOG.info("Done generating text data");
         executorService.submit(generateTask);

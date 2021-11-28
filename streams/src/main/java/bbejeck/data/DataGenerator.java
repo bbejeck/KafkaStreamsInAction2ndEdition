@@ -5,6 +5,7 @@ import bbejeck.chapter_4.avro.StockTransaction;
 import bbejeck.chapter_6.proto.PurchasedItemProto;
 import bbejeck.chapter_6.proto.RetailPurchaseProto;
 import bbejeck.chapter_6.proto.SensorProto;
+import bbejeck.chapter_8.proto.StockAlertProto;
 import com.github.javafaker.Address;
 import com.github.javafaker.Business;
 import com.github.javafaker.ChuckNorris;
@@ -34,9 +35,19 @@ import java.util.Random;
 public class DataGenerator {
 
     private static final Random random = new Random();
-
-    private DataGenerator() {
+    private static List<String> textileTickers;
+    private static List<String> techTickers;
+    
+    static {
+        Faker faker = new Faker();
+        Stock stock = faker.stock();
+        textileTickers = List.of(stock.nyseSymbol(), stock.nyseSymbol(), stock.nyseSymbol());
+        techTickers = List.of(stock.nsdqSymbol(), stock.nsdqSymbol(), stock.nsdqSymbol());
+        System.out.println(techTickers);
+        System.out.println(textileTickers);
     }
+
+    private DataGenerator() {}
 
     public static Collection<String> generateRandomText() {
         Faker faker = new Faker();
@@ -47,7 +58,7 @@ public class DataGenerator {
         Collection<String> text = new ArrayList<>();
         int randomTextCount = 10;
         for (int i = 0; i < randomTextCount; i++) {
-            int whichFaker = number.numberBetween(1, 5);
+            int whichFaker = number.numberBetween(1, 6);
             switch (whichFaker) {
                 case 1 -> text.add(shakespeare.hamletQuote());
                 case 2 -> text.add(shakespeare.asYouLikeItQuote());
@@ -57,6 +68,31 @@ public class DataGenerator {
         }
         return text;
     }
+
+    public static Collection<StockAlertProto.StockAlert> generateStockAlerts(int numberRecords) {
+        Faker faker = new Faker();
+        int counter = 0;
+        final List<StockAlertProto.StockAlert> stockAlerts = new ArrayList<>();
+        Number number = faker.number();
+        String textiles = "textiles";
+        String technology = "technology";
+        StockAlertProto.StockAlert.Builder stockAlertBuilder = StockAlertProto.StockAlert.newBuilder();
+        while (counter++ < numberRecords) {
+            int tickerIndex = random.nextInt(2);
+            //Add textile stock alert
+            stockAlertBuilder.setSharePrice(number.randomDouble(2, 1, 5))
+                    .setShareVolume(number.numberBetween(1, 100))
+                    .setMarketSegment(textiles)
+                    .setSymbol(textileTickers.get(tickerIndex));
+            stockAlerts.add(stockAlertBuilder.build());
+            // Add tech sector alert
+            stockAlertBuilder.setMarketSegment(technology);
+            stockAlertBuilder.setSymbol(techTickers.get(tickerIndex));
+            stockAlerts.add(stockAlertBuilder.build());
+        }
+        return stockAlerts;
+    }
+
 
     public static Collection<ProductTransaction> generateProductTransactions(int numberRecords) {
         Faker faker = new Faker();
@@ -87,7 +123,7 @@ public class DataGenerator {
             idNumbers.add(idNumber.invalid());
         }
         int numberPerTopic = numberRecords / 3;
-        
+
         Number number = faker.number();
         SensorProto.Sensor.Builder sensorBuilder = SensorProto.Sensor.newBuilder();
         List<SensorProto.Sensor.Type> types = List.of(SensorProto.Sensor.Type.TEMPERATURE, SensorProto.Sensor.Type.PROXIMITY);
@@ -100,10 +136,10 @@ public class DataGenerator {
                 sensorBuilder.setReading(number.randomDouble(2, 1, 1000));
                 sensorBuilder.setId(idNumbers.get(random.nextInt(20)));
                 SensorProto.Sensor.Type type = switch (sensorTopic) {
-                    case "combined-sensors" -> types.get(number.numberBetween(0,2));
+                    case "combined-sensors" -> types.get(number.numberBetween(0, 2));
                     case "temperature-sensors" -> SensorProto.Sensor.Type.TEMPERATURE;
                     case "proximity-sensors" -> SensorProto.Sensor.Type.PROXIMITY;
-                    default -> types.get(number.numberBetween(0,2));
+                    default -> types.get(number.numberBetween(0, 2));
                 };
                 sensorBuilder.setSensorType(type);
                 sensorList.add(sensorBuilder.build());
@@ -166,7 +202,6 @@ public class DataGenerator {
         List<String> brokers = getLordOfTheRingsCharacters(5);
         List<String> customers = getHarryPotterCharacters(10);
         StockTransaction.Builder builder = StockTransaction.newBuilder();
-        Random random = new Random();
         Instant instant = Instant.now();
         while (counter++ < numberRecords) {
             builder.setCustomerName(customers.get(random.nextInt(customers.size())))
@@ -216,5 +251,6 @@ public class DataGenerator {
         DataGenerator.generatePurchasedItems(10).forEach(System.out::println);
         DataGenerator.generateRandomText().forEach(System.out::println);
         DataGenerator.generateSensorReadings(10).entrySet().forEach(System.out::println);
+        DataGenerator.generateStockAlerts(4).forEach(System.out::println);
     }
 }

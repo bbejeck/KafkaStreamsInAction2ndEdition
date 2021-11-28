@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package bbejeck.chapter_8.proto;
+option java_outer_classname = "SegmentAggregateProto";
+
+message SegmentAggregate {
+  double dollar_volume = 1;
+  int64 share_volume = 2;
+  string market_segment = 3;
+}

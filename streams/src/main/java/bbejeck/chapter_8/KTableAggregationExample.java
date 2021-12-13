@@ -43,24 +43,31 @@ public class KTableAggregationExample extends BaseStreamsApplication {
 
         final Aggregator<String, StockAlertProto.StockAlert, SegmentAggregateProto.SegmentAggregate> adderAggregator = (key, newStockAlert, currentAgg) -> {
             SegmentAggregateProto.SegmentAggregate.Builder aggBuilder = SegmentAggregateProto.SegmentAggregate.newBuilder(currentAgg);
+            System.out.printf("Adder     : -> key %s stock alert %s and aggregate %s %n", key, strip(newStockAlert), strip(currentAgg));
             long currentShareVolume = newStockAlert.getShareVolume();
             double currentDollarVolume = newStockAlert.getShareVolume() * newStockAlert.getSharePrice();
             aggBuilder.setShareVolume(currentAgg.getShareVolume() + currentShareVolume);
             aggBuilder.setDollarVolume(currentAgg.getDollarVolume() + currentDollarVolume);
-            return aggBuilder.build();
+            SegmentAggregateProto.SegmentAggregate updatedAggregate = aggBuilder.build();
+            System.out.printf("Adder     : <- updated aggregate %s %n", strip(updatedAggregate));
+            return updatedAggregate;
         };
 
         final Aggregator<String, StockAlertProto.StockAlert, SegmentAggregateProto.SegmentAggregate> subtractorAggregator = (key, prevStockAlert, currentAgg) -> {
             SegmentAggregateProto.SegmentAggregate.Builder aggBuilder = SegmentAggregateProto.SegmentAggregate.newBuilder(currentAgg);
+            System.out.printf("Subtractor: -> key %s stock alert %s and aggregate %s %n", key, strip(prevStockAlert), strip(currentAgg));
             long prevShareVolume = prevStockAlert.getShareVolume();
             double prevDollarVolume = prevStockAlert.getShareVolume() * prevStockAlert.getSharePrice();
             aggBuilder.setShareVolume(currentAgg.getShareVolume() - prevShareVolume);
             aggBuilder.setDollarVolume(currentAgg.getDollarVolume() - prevDollarVolume);
-            return aggBuilder.build();
+            SegmentAggregateProto.SegmentAggregate updatedAggregate = aggBuilder.build();
+            System.out.printf("Subtractor: <- updated aggregate %s %n", strip(updatedAggregate));
+            return updatedAggregate;
         };
 
         KTable<String, StockAlertProto.StockAlert> stockTable =
-                builder.table("stock-alert", Consumed.with(stringSerde, stockAlertSerde));
+                builder.table("stock-alert",
+                        Consumed.with(stringSerde, stockAlertSerde));
 
         stockTable.groupBy((key, value) -> KeyValue.pair(value.getMarketSegment(), value),
                         Grouped.with(stringSerde, stockAlertSerde))
@@ -75,6 +82,10 @@ public class KTableAggregationExample extends BaseStreamsApplication {
         return builder.build();
     }
 
+    private String strip(final Object obj) {
+         return  obj.toString().replace("\n", " ");
+    }
+
     public static void main(String[] args) throws Exception {
         Topics.maybeDeleteThenCreate("stock-alert", "stock-alert-aggregate");
 
@@ -85,7 +96,7 @@ public class KTableAggregationExample extends BaseStreamsApplication {
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             kafkaStreams.cleanUp();
             kafkaStreams.start();
-            mockDataProducer.produceStockAlerts("stock-alert");
+            mockDataProducer.produceStockAlertsForKtableAggregateExample("stock-alert");
             Thread.sleep(45000);
         }
     }
@@ -96,6 +107,7 @@ public class KTableAggregationExample extends BaseStreamsApplication {
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.ByteArray().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.ByteArray().getClass());
+        props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 15000);
         return props;
     }
 }

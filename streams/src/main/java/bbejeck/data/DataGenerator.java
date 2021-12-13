@@ -35,17 +35,10 @@ import java.util.Random;
 public class DataGenerator {
 
     private static final Random random = new Random();
-    private static List<String> textileTickers;
-    private static List<String> techTickers;
-    
-    static {
-        Faker faker = new Faker();
-        Stock stock = faker.stock();
-        textileTickers = List.of(stock.nyseSymbol(), stock.nyseSymbol(), stock.nyseSymbol());
-        techTickers = List.of(stock.nsdqSymbol(), stock.nsdqSymbol(), stock.nsdqSymbol());
-        System.out.println(techTickers);
-        System.out.println(textileTickers);
-    }
+    private static List<String> textileTickers = List.of("PXLW", "CTHR", "WIX");
+    private static List<String> techTickers = List.of("DDR", "TK", "OSK");
+
+    public record StockNums(double sharePrice, int num){}
 
     private DataGenerator() {}
 
@@ -69,7 +62,7 @@ public class DataGenerator {
         return text;
     }
 
-    public static Collection<StockAlertProto.StockAlert> generateStockAlerts(int numberRecords) {
+    public static Collection<StockAlertProto.StockAlert> generateStockAlertsForKTableAggregateExample() {
         Faker faker = new Faker();
         int counter = 0;
         final List<StockAlertProto.StockAlert> stockAlerts = new ArrayList<>();
@@ -77,18 +70,22 @@ public class DataGenerator {
         String textiles = "textiles";
         String technology = "technology";
         StockAlertProto.StockAlert.Builder stockAlertBuilder = StockAlertProto.StockAlert.newBuilder();
-        while (counter++ < numberRecords) {
-            int tickerIndex = random.nextInt(2);
-            //Add textile stock alert
-            stockAlertBuilder.setSharePrice(number.randomDouble(2, 1, 5))
-                    .setShareVolume(number.numberBetween(1, 100))
-                    .setMarketSegment(textiles)
-                    .setSymbol(textileTickers.get(tickerIndex));
-            stockAlerts.add(stockAlertBuilder.build());
-            // Add tech sector alert
-            stockAlertBuilder.setMarketSegment(technology);
-            stockAlertBuilder.setSymbol(techTickers.get(tickerIndex));
-            stockAlerts.add(stockAlertBuilder.build());
+        while (counter++ < 2) {
+
+            List<StockAlertProto.StockAlert> textileStocks = textileTickers.stream()
+                    .map(s -> stockAlertBuilder.setSharePrice(number.randomDouble(2, 1, 5))
+                            .setShareVolume(number.numberBetween(1, 10))
+                            .setMarketSegment(textiles)
+                            .setSymbol(s).build()).toList();
+
+            stockAlerts.addAll(textileStocks);
+            List<StockAlertProto.StockAlert> techStocks = techTickers.stream()
+                    .map(s -> stockAlertBuilder.setSharePrice(number.randomDouble(2, 1, 5))
+                            .setShareVolume(number.numberBetween(1, 10))
+                            .setMarketSegment(technology)
+                            .setSymbol(s).build()).toList();
+
+            stockAlerts.addAll(techStocks);
         }
         return stockAlerts;
     }
@@ -251,6 +248,6 @@ public class DataGenerator {
         DataGenerator.generatePurchasedItems(10).forEach(System.out::println);
         DataGenerator.generateRandomText().forEach(System.out::println);
         DataGenerator.generateSensorReadings(10).entrySet().forEach(System.out::println);
-        DataGenerator.generateStockAlerts(4).forEach(System.out::println);
+        DataGenerator.generateStockAlertsForKTableAggregateExample().forEach(System.out::println);
     }
 }

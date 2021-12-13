@@ -128,14 +128,14 @@ public class MockDataProducer implements AutoCloseable {
         executorService.submit(generateTask);
     }
 
-    public void produceStockAlerts(final String topic) {
+    public void produceStockAlertsForKtableAggregateExample(final String topic) {
         Callable<Void> generateStockTask = () -> {
             final Map<String, Object> configs = producerConfigs();
             final Callback callback = callback();
             configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProtoSerializer.class);
             try (Producer<String, StockAlertProto.StockAlert> producer = new KafkaProducer<>(configs)) {
                 while (keepRunning) {
-                    List<StockAlertProto.StockAlert> stockAlerts = (List) DataGenerator.generateStockAlerts(5);
+                    List<StockAlertProto.StockAlert> stockAlerts = (List) DataGenerator.generateStockAlertsForKTableAggregateExample();
                     stockAlerts.stream()
                             .map(alert -> new ProducerRecord<>(topic, alert.getSymbol(), alert))
                             .forEach(pr -> producer.send(pr, callback));

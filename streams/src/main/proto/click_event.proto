@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bbejeck.chapter_8.proto;
+
+
+option java_outer_classname = "ClickEventProto";
+
+message ClickEvent {
+  string url = 1;
+  int32 user_id = 2;
+  int64 time = 3;
+}

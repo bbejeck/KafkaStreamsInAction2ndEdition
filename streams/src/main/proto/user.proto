@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bbejeck.chapter_8.proto;
+
+option java_outer_classname = "UserProto";
+
+message User {
+  string name = 1;
+  string address = 2;
+  int32 age = 3;
+  int32 id = 4;
+}

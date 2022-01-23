@@ -17,7 +17,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'com.github.eirnym.js2p' version '1.0'
-    id "com.google.protobuf" version "0.8.16"
+    id "com.google.protobuf" version "0.8.18"
     id "com.github.imflog.kafka-schema-registry-gradle-plugin" version "1.1.1"
     id "com.github.davidmc24.gradle.plugin.avro" version "1.0.0"
 }
@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.protobuf:protobuf-java:3.15.3'
+    implementation 'com.google.protobuf:protobuf-java:3.18.0'
     implementation "org.apache.avro:avro:1.10.0"
     implementation "com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39"
     implementation 'javax.validation:validation-api:1.1.0.CR2'
@@ -81,7 +81,7 @@ protobuf {
     generatedFilesBaseDir = "${project.buildDir}/generated-main-proto-java"
 
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.15.3'
+        artifact = 'com.google.protobuf:protoc:3.18.0'
     }
 }
 
@@ -152,32 +152,32 @@ schemaRegistry {
 
     task runAvroProducer(type: JavaExec){
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.producer.avro.AvroProducer"
+        mainClass = "bbejeck.chapter_3.producer.avro.AvroProducer"
     }
 
     task runAvroConsumer(type: JavaExec){
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
+        mainClass = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
     }
 
     task runCompanyProducer(type: JavaExec) {
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.producer.avro.AvroReferenceCompanyProducer"
+        mainClass = "bbejeck.chapter_3.producer.avro.AvroReferenceCompanyProducer"
     }
 
     task runCompanyConsumer(type: JavaExec) {
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.consumer.avro.AvroReferenceCompanyConsumer"
+        mainClass = "bbejeck.chapter_3.consumer.avro.AvroReferenceCompanyConsumer"
     }
 
     task runCollegeProducer(type: JavaExec) {
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.producer.avro.AvroReferenceCollegeProducer"
+        mainClass = "bbejeck.chapter_3.producer.avro.AvroReferenceCollegeProducer"
     }
 
     task runCollegeConsumer(type: JavaExec) {
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.consumer.avro.AvroReferenceCollegeConsumer"
+        mainClass = "bbejeck.chapter_3.consumer.avro.AvroReferenceCollegeConsumer"
     }
 
 

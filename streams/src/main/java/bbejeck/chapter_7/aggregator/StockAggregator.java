@@ -17,6 +17,7 @@ public class StockAggregator implements Aggregator<String, StockTransactionProto
                                                StockAggregateProto.Aggregate aggregate) {
 
         StockAggregateProto.Aggregate.Builder currAggregate = aggregate.toBuilder();
+        currAggregate.setSymbol(key);
         double transactionDollars = transaction.getNumberShares() * transaction.getSharePrice();
 
         if (transaction.getIsPurchase()) {

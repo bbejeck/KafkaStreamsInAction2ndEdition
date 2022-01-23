@@ -17,7 +17,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'com.github.eirnym.js2p' version '1.0'
-    id "com.google.protobuf" version "0.8.16"
+    id "com.google.protobuf" version "0.8.18"
     id "com.github.imflog.kafka-schema-registry-gradle-plugin" version "1.1.1"
     id "com.github.davidmc24.gradle.plugin.avro" version "1.0.0"
 }
@@ -42,7 +42,7 @@ dependencies {
     implementation "com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39"
     implementation 'javax.validation:validation-api:1.1.0.CR2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
-    implementation "com.google.protobuf:protobuf-java:3.11.4"
+    implementation "com.google.protobuf:protobuf-java:3.18.0"
 
     implementation "io.confluent:kafka-streams-avro-serde:5.5.1"
     implementation "io.confluent:kafka-streams-protobuf-serde:5.5.1"
@@ -66,7 +66,7 @@ dependencies {
 protobuf {
     generatedFilesBaseDir = "${project.buildDir}/generated-main-proto-java"
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.15.3'
+        artifact = 'com.google.protobuf:protoc:3.18.0'
     }
 }
 
@@ -110,12 +110,12 @@ schemaRegistry {
 
     task runAvroProducer(type: JavaExec){
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.producer.avro.AvroProducer"
+        mainClass = "bbejeck.chapter_3.producer.avro.AvroProducer"
     }
 
     task runAvroConsumer(type: JavaExec){
         classpath sourceSets.main.runtimeClasspath
-        main = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
+        mainClass = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
         args 'previous'
     }
 

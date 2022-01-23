@@ -23,6 +23,7 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -83,6 +84,7 @@ public class KTableAggregationExample extends BaseStreamsApplication {
     }
 
     private String strip(final Object obj) {
+        Objects.requireNonNull(obj, "Must pass in valid value for newline replacement");
          return  obj.toString().replace("\n", " ");
     }
 

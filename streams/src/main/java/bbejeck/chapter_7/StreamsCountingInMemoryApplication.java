@@ -10,8 +10,6 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KGroupedStream;
-import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.state.Stores;
@@ -22,8 +20,9 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * A basic example of Kafka Streams stateful operations with {@link KStream#groupByKey()} and {@link KGroupedStream#count()}
- * This demo application uses the in-memory store via {@link Stores#inMemoryKeyValueStore(String)}
+ * User: Bill Bejeck
+ * Date: 9/20/21
+ * Time: 5:38 PM
  */
 public class StreamsCountingInMemoryApplication extends BaseStreamsApplication {
       private static final Logger LOG = LoggerFactory.getLogger(StreamsCountingInMemoryApplication.class);

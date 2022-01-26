@@ -4,21 +4,15 @@ import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_7.aggregator.StockAggregator;
 import bbejeck.chapter_7.proto.StockAggregateProto;
 import bbejeck.chapter_7.proto.StockTransactionProto;
-import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
-import bbejeck.utils.Topics;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
-import org.apache.kafka.streams.kstream.Aggregator;
 import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.Grouped;
-import org.apache.kafka.streams.kstream.Initializer;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KeyValueMapper;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.logging.log4j.LogManager;
@@ -28,9 +22,9 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Example demonstrating  {@link KStream#groupBy(KeyValueMapper, Grouped)}
- * and the {@link org.apache.kafka.streams.kstream.KGroupedStream#aggregate(Initializer, Aggregator, Materialized)}
- * methods.
+ * User: Bill Bejeck
+ * Date: 7/24/21
+ * Time: 1:10 PM
  */
 public class StreamsStockTransactionAggregations extends BaseStreamsApplication {
     private static final Logger LOG = LogManager.getLogger(StreamsStockTransactionAggregations.class);
@@ -51,7 +45,8 @@ public class StreamsStockTransactionAggregations extends BaseStreamsApplication 
         KStream<String, StockTransactionProto.Transaction> transactionKStream =
                 builder.stream("stock-transactions", Consumed.with(stringSerde, txnSerde));
 
-        transactionKStream.groupBy((key, value) -> value.getSymbol(), Grouped.with(Serdes.String(), txnSerde))
+        transactionKStream.peek((key, value) -> LOG.info("Incoming transaction {}", value))
+                .groupBy((key, value) -> value.getSymbol())
                 .aggregate(() -> initialAggregate,
                         new StockAggregator(),
                         Materialized.with(stringSerde, aggregateSerde))
@@ -63,17 +58,13 @@ public class StreamsStockTransactionAggregations extends BaseStreamsApplication 
     }
 
     public static void main(String[] args) throws Exception {
-        Topics.maybeDeleteThenCreate("stock-transactions", "stock-aggregations");
         StreamsStockTransactionAggregations streamsStockTransactionAggregations = new StreamsStockTransactionAggregations();
         Properties properties = new Properties();
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "streams-stock-transaction-aggregations");
         Topology topology = streamsStockTransactionAggregations.topology(properties);
-        try (KafkaStreams streams = new KafkaStreams(topology, properties);
-             MockDataProducer mockDataProducer = new MockDataProducer()) {
+        try (KafkaStreams streams = new KafkaStreams(topology, properties)) {
             streams.start();
-            LOG.info("Started the streamsStockTransactionAggregations application");
-            mockDataProducer.produceStockTransactions("stock-transactions");
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await();
         }

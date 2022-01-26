@@ -12,7 +12,6 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
-import org.apache.kafka.streams.kstream.Reducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,10 +19,9 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Another stateful example for Kafka Streams demonstrating the reduce operations
- * Starting by first grouping with {@link KStream#groupByKey()} then using
- * {@link org.apache.kafka.streams.kstream.KGroupedStream#reduce(Reducer, Materialized)}
- * For storage this example uses the default RocksDB for persistent storage
+ * User: Bill Bejeck
+ * Date: 7/17/21
+ * Time: 4:49 PM
  */
 public class StreamsPokerGameReducer extends BaseStreamsApplication {
      private static final Logger LOG = LoggerFactory.getLogger(StreamsPokerGameReducer.class);

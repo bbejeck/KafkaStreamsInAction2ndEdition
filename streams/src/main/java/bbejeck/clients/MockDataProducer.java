@@ -12,6 +12,8 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.DoubleSerializer;
+import org.apache.kafka.common.serialization.Serializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * This class produces records for the various Kafka Streams applications.
@@ -174,6 +177,54 @@ public class MockDataProducer implements AutoCloseable {
             return null;
         };
         LOG.info("Done generating text data");
+        executorService.submit(generateTask);
+    }
+
+    public void produceFixedNamesWithScores(final String topic) {
+        Callable<Void> generateTask = () -> {
+            final Map<String, Object> configs = producerConfigs();
+            final Callback callback = callback();
+            configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, DoubleSerializer.class);
+            try(Producer<String, Double> producer = new KafkaProducer<>(configs)) {
+                while (keepRunning) {
+                    Collection<DataGenerator.NameScore> nameScoreList = DataGenerator.generateFixedNamesWithAScore();
+                    nameScoreList.stream()
+                            .map(nameScore -> new ProducerRecord<>(topic, nameScore.name(), nameScore.score()))
+                            .forEach(pr -> producer.send(pr, callback));
+
+                    LOG.info("Names and Scores  batch sent");
+                    Thread.sleep(6000);
+                }
+            }
+            return null;
+        };
+        executorService.submit(generateTask);
+    }
+
+    public <K, V> void produceWithKeyValueSupplier(Supplier<K> keySupplier,
+                                                   Supplier<V> valueSupplier,
+                                                   Serializer<K> keySerializer,
+                                                   Serializer<V> valueSerializer,
+                                                   final String topic) {
+        Callable<Void> generateTask = () -> {
+            final Map<String, Object> configs = producerConfigs();
+            final Callback callback = callback();
+            configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
+            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+
+            try (Producer<K, V> producer = new KafkaProducer<>(configs)) {
+                while (keepRunning) {
+                    for (int i = 0; i < 15; i++) {
+                      producer.send(new ProducerRecord<>(topic, keySupplier.get(), valueSupplier.get()), callback);
+                    }
+                    LOG.info("Batch sent");
+                    Thread.sleep(6000);
+                }
+            }
+            return null;
+        };
+        LOG.info("Done generating data");
         executorService.submit(generateTask);
     }
 

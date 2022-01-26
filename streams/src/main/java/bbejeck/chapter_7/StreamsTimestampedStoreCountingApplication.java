@@ -24,12 +24,12 @@ public class StreamsTimestampedStoreCountingApplication extends BaseStreamsAppli
         builder.stream("counting-input")
                 .groupByKey()
                 .count(Materialized.as(Stores.persistentTimestampedKeyValueStore("timestamped-count")))
-       .toStream().map((key, value) -> {
-                  byte[] bytes = (byte[]) key;
-                  return null;
+                .toStream().map((key, value) -> {
+                    byte[] bytes = (byte[]) key;
+                    return null;
                 }).peek((key, value) -> System.out.println("key " + key + " value " + value));
-                //.to("counting-output");
-        
+        //.to("counting-output");
+
         return builder.build();
     }
 
@@ -40,9 +40,10 @@ public class StreamsTimestampedStoreCountingApplication extends BaseStreamsAppli
         properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "timestamped-count");
         properties.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, "0");
         Topology topology = application.topology(properties);
-        KafkaStreams streams = new KafkaStreams(topology, properties);
-        streams.start();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        countDownLatch.await();
+        try (KafkaStreams streams = new KafkaStreams(topology, properties)) {
+            streams.start();
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            countDownLatch.await();
+        }
     }
 }

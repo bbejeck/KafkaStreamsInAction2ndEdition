@@ -39,6 +39,7 @@ public class DataGenerator {
     private static List<String> techTickers = List.of("DDR", "TK", "OSK");
 
     public record StockNums(double sharePrice, int num){}
+    public record NameScore(String name, double score){}
 
     private DataGenerator() {}
 
@@ -60,6 +61,15 @@ public class DataGenerator {
             }
         }
         return text;
+    }
+
+    public static Collection<NameScore> generateFixedNamesWithAScore() {
+        final List<String> names = List.of("Anna", "Matthias", "Neil", "Dave", "Rick", "Yeva");
+        Number fakeNumer = new Faker().number();
+       return names.stream().map(name -> {
+            double score = fakeNumer.randomDouble(2, 5, 350);
+            return new NameScore(name, score);
+        }).toList();
     }
 
     public static Collection<StockAlertProto.StockAlert> generateStockAlertsForKTableAggregateExample() {

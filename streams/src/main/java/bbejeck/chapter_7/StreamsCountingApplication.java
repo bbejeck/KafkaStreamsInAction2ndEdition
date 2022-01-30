@@ -9,6 +9,8 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.KGroupedStream;
+import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
@@ -21,9 +23,8 @@ import static org.apache.kafka.streams.StreamsConfig.APPLICATION_ID_CONFIG;
 import static org.apache.kafka.streams.StreamsConfig.BOOTSTRAP_SERVERS_CONFIG;
 
 /**
- * User: Bill Bejeck
- * Date: 9/20/21
- * Time: 5:38 PM
+ * A basic example of Kafka Streams stateful operations with {@link KStream#groupByKey()} and {@link KGroupedStream#count()}
+ * This demo application uses the default of RocksDB state stores (persistent storage)
  */
 public class StreamsCountingApplication  extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(StreamsCountingApplication.class);

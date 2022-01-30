@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bbejeck.chapter_8.proto;
+option java_outer_classname = "PromotionProto";
+
+message Promotion {
+  string customer_id = 1;
+  double points = 2;
+  string drink = 3;
+  int32 items_purchased = 4;
+
+}

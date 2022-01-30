@@ -5,9 +5,7 @@ import bbejeck.chapter_7.proto.StockTransactionProto;
 import org.apache.kafka.streams.kstream.Aggregator;
 
 /**
- * User: Bill Bejeck
- * Date: 7/23/21
- * Time: 7:58 PM
+ * The {@link Aggregator} used for the {@link bbejeck.chapter_7.StreamsStockTransactionAggregations} example
  */
 public class StockAggregator implements Aggregator<String, StockTransactionProto.Transaction, StockAggregateProto.Aggregate> {
 

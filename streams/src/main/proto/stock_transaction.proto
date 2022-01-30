@@ -8,4 +8,5 @@ message Transaction {
   double share_price = 2;
   int32 number_shares = 3;
   bool isPurchase = 4;
+  int64 timestamp = 5;
 }

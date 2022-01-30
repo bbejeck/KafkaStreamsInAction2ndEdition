@@ -5,8 +5,11 @@ import bbejeck.chapter_4.avro.StockTransaction;
 import bbejeck.chapter_6.proto.PurchasedItemProto;
 import bbejeck.chapter_6.proto.RetailPurchaseProto;
 import bbejeck.chapter_6.proto.SensorProto;
+import bbejeck.chapter_7.proto.CoffeePurchaseProto;
+import bbejeck.chapter_7.proto.StockTransactionProto;
 import bbejeck.chapter_8.proto.StockAlertProto;
 import com.github.javafaker.Address;
+import com.github.javafaker.Bool;
 import com.github.javafaker.Business;
 import com.github.javafaker.ChuckNorris;
 import com.github.javafaker.Commerce;
@@ -18,6 +21,7 @@ import com.github.javafaker.LordOfTheRings;
 import com.github.javafaker.Number;
 import com.github.javafaker.Shakespeare;
 import com.github.javafaker.Stock;
+import com.google.protobuf.AbstractMessage;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -122,6 +126,28 @@ public class DataGenerator {
         return transactions;
     }
 
+    public static Collection<StockTransactionProto.Transaction> generateStockTransactions(int numberRecords) {
+        Faker faker = new Faker();
+        int counter = 0;
+        final List<StockTransactionProto.Transaction> transactions = new ArrayList<>();
+        Commerce commerce = faker.commerce();
+        Stock stock = faker.stock();
+        Number number = faker.number();
+        Bool bool = faker.bool();
+        StockTransactionProto.Transaction.Builder builder = StockTransactionProto.Transaction.newBuilder();
+        Instant instant = Instant.now();
+
+        while (counter++ < numberRecords) {
+            builder.setSymbol(stock.nsdqSymbol())
+                    .setSharePrice(Double.parseDouble(commerce.price()))
+                    .setNumberShares(number.numberBetween(100, 5000))
+                    .setTimestamp(instant.plusSeconds(5L * counter).truncatedTo(ChronoUnit.SECONDS).toEpochMilli())
+                    .setIsPurchase(bool.bool());
+            transactions.add(builder.build());
+        }
+        return transactions;
+    }
+
     public static Map<String, List<SensorProto.Sensor>> generateSensorReadings(int numberRecords) {
         Faker faker = new Faker();
         final List<String> idNumbers = new ArrayList<>();
@@ -155,6 +181,25 @@ public class DataGenerator {
         });
 
         return recordsMap;
+    }
+
+    public static Map<String, Collection<? extends AbstractMessage>> generateJoinExampleData(final int numberRecords){
+        final Collection<RetailPurchaseProto.RetailPurchase> purchases = generatePurchasedItems(numberRecords);
+        Faker faker = new Faker();
+        Number numberFaker = faker.number();
+        Instant instant = Instant.now();
+        final List<String> drinks = List.of("mocha", "iced-mocha", "brewed coffee", "americano", "espresso");
+        final List<String> sizes = List.of("small", "medium", "large", "I need to wake up");
+        List<String> customerIds = purchases.stream().map(RetailPurchaseProto.RetailPurchase::getCustomerId).toList();
+        CoffeePurchaseProto.CoffeePurchase.Builder builder = CoffeePurchaseProto.CoffeePurchase.newBuilder();
+        final List<CoffeePurchaseProto.CoffeePurchase> coffeePurchases = customerIds.stream().map(cid -> builder.setCustomerId(cid)
+                 .setPrice(numberFaker.randomDouble(2, 3, 7))
+                 .setPurchaseDate(instant.plusSeconds(numberFaker.randomNumber()).truncatedTo(ChronoUnit.SECONDS).toEpochMilli())
+                 .setDrink(drinks.get(numberFaker.numberBetween(0, drinks.size())))
+                 .setSize((sizes.get(numberFaker.numberBetween(0, sizes.size())))).build()).toList();
+
+
+        return Map.of("coffee", coffeePurchases, "retail", purchases);
     }
 
     public static Collection<RetailPurchaseProto.RetailPurchase> generatePurchasedItems(final int numberRecords) {

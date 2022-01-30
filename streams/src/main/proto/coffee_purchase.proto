@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bbejeck.chapter_7.proto;
+option java_outer_classname = "CoffeePurchaseProto";
+
+message CoffeePurchase {
+  string drink = 1;
+  string size = 2;
+  double price = 3;
+  int64 purchaseDate = 4;
+  string customerId = 5;
+}

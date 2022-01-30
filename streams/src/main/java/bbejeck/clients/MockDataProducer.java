@@ -2,9 +2,12 @@ package bbejeck.clients;
 
 import bbejeck.chapter_6.proto.RetailPurchaseProto;
 import bbejeck.chapter_6.proto.SensorProto;
+import bbejeck.chapter_7.proto.CoffeePurchaseProto;
+import bbejeck.chapter_7.proto.StockTransactionProto;
 import bbejeck.chapter_8.proto.StockAlertProto;
 import bbejeck.data.DataGenerator;
 import bbejeck.serializers.ProtoSerializer;
+import com.google.protobuf.AbstractMessage;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer;
 import org.apache.kafka.clients.producer.Callback;
@@ -148,6 +151,52 @@ public class MockDataProducer implements AutoCloseable {
                 }
             }
             LOG.info("Done generating stock alerts");
+            return null;
+        };
+        executorService.submit(generateStockTask);
+    }
+
+    public void produceJoinExampleRecords(final String purchaseTopic, final String coffeeTopic) {
+        Callable<Void> generateJoinDataTask = () -> {
+            final Map<String, Object> configs = producerConfigs();
+            final Callback callback = callback();
+            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProtoSerializer.class);
+            try (Producer<String, ? extends AbstractMessage> producer = new KafkaProducer<>(configs)) {
+                while (keepRunning) {
+                  Map<String, Collection<? extends AbstractMessage>> records = DataGenerator.generateJoinExampleData(25);
+                  records.get("retail").stream().map(p -> new ProducerRecord(purchaseTopic,((RetailPurchaseProto.RetailPurchase)p).getCustomerId(), p))
+                          .forEach(pr -> producer.send(pr, callback));
+                  LOG.info("Join example store purchases sent");
+                  records.get("coffee").stream().map(p -> new ProducerRecord(coffeeTopic, ((CoffeePurchaseProto.CoffeePurchase)p).getCustomerId(), p))
+                          .forEach(pr -> producer.send(pr, callback));
+                  LOG.info("Join example coffee purchases sent");
+                  Thread.sleep(6000);
+                }
+            }
+            LOG.info("Done generating Join example data");
+            return null;
+        };
+      executorService.submit(generateJoinDataTask);
+    }
+
+    public void produceStockTransactions(final String topic) {
+        Callable<Void> generateStockTask = () -> {
+            final Map<String, Object> configs = producerConfigs();
+            final Callback callback = callback();
+            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProtoSerializer.class);
+            try (Producer<String, StockTransactionProto.Transaction> producer = new KafkaProducer<>(configs)) {
+                while (keepRunning) {
+                    List<StockTransactionProto.Transaction> stockTxn = (List) DataGenerator.generateStockTransactions(50);
+                    stockTxn.stream()
+                            .map(txn -> new ProducerRecord<>(topic, "", txn))
+                            .forEach(pr -> producer.send(pr, callback));
+
+                    LOG.info("Stock Transactions batch sent");
+
+                    Thread.sleep(6000);
+                }
+            }
+            LOG.info("Done generating stock transactions");
             return null;
         };
         executorService.submit(generateStockTask);

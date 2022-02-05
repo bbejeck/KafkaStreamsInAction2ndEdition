@@ -31,9 +31,9 @@ public class ProactiveStreamsRepartition extends BaseStreamsApplication {
         final StreamsBuilder builder = new StreamsBuilder();
         final Serde<String> stringSerde = Serdes.String();
 
-        KStream<String, String> inputStreamOne = builder.stream("count-input", Consumed.with(stringSerde, stringSerde))
-                .selectKey(((k, v) -> v.substring(0,6)));
-
+        KStream<String, String> originalStreamOne = builder.stream("count-input", Consumed.with(stringSerde, stringSerde));
+        KStream<String, String> inputStreamOne = originalStreamOne.selectKey(((k, v) -> v.substring(0,6)));
+        
         KStream<String, String> inputStreamTwo = builder.stream("second-input", Consumed.with(stringSerde, stringSerde));
 
         KStream<String, String> repartitioned = inputStreamOne.repartition(Repartitioned

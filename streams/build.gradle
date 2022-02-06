@@ -180,5 +180,9 @@ schemaRegistry {
         mainClass = "bbejeck.chapter_3.consumer.avro.AvroReferenceCollegeConsumer"
     }
 
+    clean {
+        delete 'out'
+    }
+
 
 }

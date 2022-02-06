@@ -118,5 +118,9 @@ schemaRegistry {
         mainClass = "bbejeck.chapter_3.consumer.avro.AvroConsumer"
     }
 
+    clean {
+        delete 'out'
+    }
+
 
 }

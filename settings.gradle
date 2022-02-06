@@ -1,4 +1,4 @@
-rootProject.name = 'kafka-event-streaming'
+rootProject.name = 'kafka-streams-in-action'
 
 include 'sr-backward' , 'sr-forward' , 'sr-full'
 include 'streams'

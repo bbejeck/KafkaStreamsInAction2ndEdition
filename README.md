@@ -18,28 +18,31 @@ Table of Contents
         * [A tour of the chapter 4 code](#a-tour-of-the-chapter-4-code)
         * [Test Code](#test-code)
     * [Chapter 6](#chapter-6)
-      * [A tour of the chapter 6 code](#a-tour-of-the-chapter-6-code)
-      * [Chapter 6 Test Code](#chapter-6-test-code)
+        * [A tour of the chapter 6 code](#a-tour-of-the-chapter-6-code)
+        * [Chapter 6 Test Code](#chapter-6-test-code)
+    * [Chapter 7](#chapter-7)
+        * [A tour fo chapter 7 code](#a-tour-of-the-chapter-7-code)
+        * [Chapter 7 Test Code](#chapter-7-test-code)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-# KafkaEventStreaming
+# Kafka Streams in Action 2nd Edition
 Source code repository for the 2nd Edition of Kafka Streams in Action
 
 ## Prerequisites
 
-The source code for [Event Streaming with Kafka Streams and ksqlDB](https://www.manning.com/books/event-streaming-with-kafka-streams-and-ksqldb) has a few 
+The source code for [Kafka Streams in Action 2nd Edition](https://www.manning.com/books/kafka-streams-in-action-second-edition) has a few 
 prerequisites you'll need to make sure you have installed to get everything working smoothly.
 
-1. Java, the project uses version 14 from [AdoptOpenJDK](https://adoptopenjdk.net/).
-2. [Gradle](https://gradle.org/) version 7.0  Although you don't need to install Gradle if you don't have it.
+1. Java, the project uses version 17 from [Temurin 17](https://projects.eclipse.org/projects/adoptium.temurin/).
+2. [Gradle](https://gradle.org/) version 7.2  Although you don't need to install Gradle if you don't have it since 
    the included Gradle "wrapper" script will install it if needed.  Use `./gradlew` for mac OS/'nix and `gradlew.bat` on Windows.
-3. [Docker Desktop](https://www.docker.com/products/docker-desktop) version 3.3.1
+3. [Docker Desktop](https://www.docker.com/products/docker-desktop) version 4.3.2
 4. [Git](https://git-scm.com/) version 2.31.1
 
 I've tried to make everything platform neutral, but just for context here's the environment
 that everything was developed and tested:
-1. OS: macOS Catalina 10.15.7
+1. OS: macOS Monterey 12.1
 2. Shell: `zsh`
 3. IDE: IntelliJ IDEA 
 
@@ -320,7 +323,7 @@ what's found in each package:
 
 ## Chapter 6
 
-Chapter 6 starts the coverage of Kafka Streams.  There are server sample applications demonstrating the core principals covered in chapter 6.  Currently, there aren't any 
+Chapter 6 starts the coverage of Kafka Streams.  There are several sample applications demonstrating the core principals covered in chapter 6.  Currently, there aren't any 
 tests, but I'll get those done soon.
 
 **FOR ALL THE EXAMPLES YOU"LL NEED TO MAKE SURE TO RUN `docker-compose up -d` BEFOREHAND SO YOU"LL HAVE A LIVE BROKER FOR KAFKA STREAMS TO CONNECT TO**
@@ -371,6 +374,58 @@ instances in the application.
 ### Chapter 6 Test Code
 
 Coming soon!
+
+## Chapter 7
+
+Chapter 7 covers stateful operations in Kafka Streams.  There are several sample applications demonstrating using reduce, aggregation and joins.  Chapter 7 also covered
+using state stores.  Several of the example applications have a version using the default, persistent stores and another version showing how to use an in-memory store.
+
+**FOR ALL THE EXAMPLES YOU"LL NEED TO MAKE SURE TO RUN `docker-compose up -d` BEFOREHAND SO YOU"LL HAVE A LIVE BROKER FOR KAFKA STREAMS TO CONNECT TO**
+
+Here's a brief description of the example code in chapter 7.  Instead of detailing each class, I've broken the description down by 
+category covered in the book.
+
+### A tour of the chapter 7 code
+
+* **bbejeck.chapter_7.aggregator** package
+
+Contains an implementation of an [Aggregator](https://javadoc.io/static/org.apache.kafka/kafka-streams/3.1.0/org/apache/kafka/streams/kstream/Aggregator.html)
+interface.  The `StreamsStockTransactionAggregations` example uses this `Aggregator`.
+
+* **bbejeck.chapter_7.joiner** package
+
+Contains an implementation of a  `Joiner` interface used in the `KafkaStreamsJoinsApp`
+
+* Counting
+
+For demonstrating the use of `count()` there is the `StreamsCountingApplication` The `StreamsCountingInMemoryApplication` uses the same functionality
+but uses an in-memory state store.
+
+* Reduce
+
+For demonstrating the use of `reduce` there is the `StreamsPokerGameReducer` application and the `StreamsPokerGameInMemoryStoreReducer` using an in-memory store
+
+* Aggregation
+
+To show how to perform a more complex `Aggregation` there is the `StreamsStockTransactionAggregations` example.
+
+* Joins
+
+To demonstrate the use of joins there is the `KafkaStreamsJoinsApp`.  Over time, I'll add additional examples showing the different join types.
+
+* Repartitioning
+
+To demonstrate the various ways to repartition the data there a several examples:
+
+   * `SteamsChangeKeyThenReuseRepartition` - shows how reusing a `KStream` after changing the key can lead to multiple, redundant repartition nodes
+   * `ProactiveStreamsRepartition` - demonstrates how to manually perform a repartition using the `repartition` operation
+   * `OptimizingStreamsRepartition` - shows how KafkaStreams will remove redundant repartition nodes when configured to do so
+   * `RepartitionForThroughput` - This application is an example of how to use the `repartition` operation to repartition to a higher number partitions to achieve a higher number of tasks for higher throughput of the KafkaStreams application.
+
+### Chapter 7 Test Code
+
+There are some unit tests for the chapter 7 example applications.  There's not a test for every example at the moment, but I plan to have a test for
+every class soon.
 
 
 

@@ -35,10 +35,11 @@ public class SalesConsumerClient {
                 ConsumerRecords<String, ProductTransaction> consumerRecords = consumer.poll(Duration.ofSeconds(5));
                 consumerRecords.forEach(record -> {
                     ProductTransaction pt = record.value();
-                    LOG.info("Sale for {} with product {} for a total sale of {}",
+                    LOG.info("Sale for {} with product {} for a total sale of {} on partition {}",
                             record.key(),
                             pt.getProductName(),
-                            pt.getQuantity() * pt.getPrice());
+                            pt.getQuantity() * pt.getPrice(),
+                            record.partition());
                 });
             }
             LOG.info("All done consuming records now");

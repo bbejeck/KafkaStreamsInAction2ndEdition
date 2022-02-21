@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +37,10 @@ public class SalesProduceConsumeApplication {
 
     public static void main(String[] args) throws Exception {
         LOG.info("Starting the produce consume example");
-        Topics.create(TOPIC_NAME);
+        Topics.delete(TOPIC_NAME);
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "localhost:9092");
+        Topics.create(props,TOPIC_NAME, 4, (short)1);
         LOG.info("Created topic {}", TOPIC_NAME);
         CountDownLatch stopLatch = new CountDownLatch(1);
         DataSource<ProductTransaction> salesDataSource = new SalesDataSource();

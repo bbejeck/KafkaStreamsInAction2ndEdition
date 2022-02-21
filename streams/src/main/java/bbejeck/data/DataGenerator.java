@@ -116,7 +116,8 @@ public class DataGenerator {
         Instant instant = Instant.now();
 
         while (counter++ < numberRecords) {
-            builder.setCustomerName(company.name())
+            int customOrder = random.nextInt(4);
+            builder.setCustomerName(customOrder == 0 ? "CUSTOM" : company.name())
                     .setPrice(Double.parseDouble(commerce.price()))
                     .setProductName(commerce.productName())
                     .setTimestamp(instant.plusSeconds(5L * counter).truncatedTo(ChronoUnit.SECONDS).toEpochMilli())

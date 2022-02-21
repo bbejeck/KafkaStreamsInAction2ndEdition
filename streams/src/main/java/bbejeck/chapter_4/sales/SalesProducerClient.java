@@ -4,7 +4,10 @@ import bbejeck.chapter_4.avro.ProductTransaction;
 import bbejeck.data.DataSource;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.KafkaException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,20 +30,21 @@ public class SalesProducerClient {
 
     public SalesProducerClient(final Map<String, Object> producerConfigs,
                                final DataSource<ProductTransaction> salesDataSource) {
-        this.producerConfigs = producerConfigs;
+        this.producerConfigs = producerConfigs;                                     
         this.salesDataSource = salesDataSource;
     }
 
     public void runProducer() {
         try (Producer<String, ProductTransaction> producer = new KafkaProducer<>(producerConfigs)) {
             final String topicName = (String)producerConfigs.get("topic.name");
+            producerConfigs.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomOrderPartitioner.class);
             LOG.info("Created producer instance with {}", producerConfigs);
             while(keepProducing) {
                 Collection<ProductTransaction> purchases = salesDataSource.fetch();
-                LOG.info("Received sales data");
+                LOG.info("Received sales data {}",purchases);
                 purchases.forEach(purchase -> {
                     ProducerRecord<String, ProductTransaction> producerRecord = new ProducerRecord<>(topicName, purchase.getCustomerName(), purchase);
-                    producer.send(producerRecord, (metadata, exception) -> {
+                    producer.send(producerRecord, (RecordMetadata metadata, Exception exception) -> {
                         if (exception != null) {
                             LOG.error("Error producing records ", exception);
                         } else {
@@ -56,6 +60,8 @@ public class SalesProducerClient {
                 }
             }
             LOG.info("Producer loop exiting now");
+        } catch (KafkaException exception) {
+            LOG.error("Caught exception trying to produce a record", exception);
         }
     }
 

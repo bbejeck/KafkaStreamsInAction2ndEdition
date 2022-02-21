@@ -5,6 +5,7 @@ import bbejeck.data.DataGenerator;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.KafkaException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,6 +51,8 @@ public class PipeliningProducerClient {
                 }
             }
             LOG.info("Producer loop exiting now");
+        } catch (KafkaException e) {
+            LOG.error("Problems with producing or the producer", e);
         }
     }
 

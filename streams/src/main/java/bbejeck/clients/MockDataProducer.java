@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -154,6 +156,33 @@ public class MockDataProducer implements AutoCloseable {
             return null;
         };
         executorService.submit(generateStockTask);
+    }
+
+    public void produceRecordsForWindowedExample(final String topic, long advance, ChronoUnit unit) {
+        Callable<Void> generateWindowedValuesTask = () -> {
+            final Map<String, Object> configs = producerConfigs();
+            final Callback callback = callback();
+            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+            List<String> lordOfTheRings = DataGenerator.getLordOfTheRingsCharacters(10);
+            Instant instant = Instant.now();
+            try (Producer<String, String> producer = new KafkaProducer<>(configs)) {
+                while (keepRunning) {
+                    List<String> phrase = (List<String>) DataGenerator.generateRandomText();
+                    for (int i = 0; i < 10; i++) {
+                        String key = lordOfTheRings.get(i);
+                        String value = phrase.get(i);
+                        ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, 1, instant.toEpochMilli(), key, value);
+                        producer.send(producerRecord, callback);
+                    }
+                    instant = instant.plus(advance, unit);
+                    LOG.info("Windowed record batch sent");
+                    Thread.sleep(1000);
+                }
+            }
+            LOG.info("Done generating windowed alerts");
+            return null;
+        };
+        executorService.submit(generateWindowedValuesTask);
     }
 
     public void produceJoinExampleRecords(final String purchaseTopic, final String coffeeTopic) {

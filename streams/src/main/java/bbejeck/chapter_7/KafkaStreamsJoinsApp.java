@@ -1,10 +1,10 @@
 package bbejeck.chapter_7;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_6.proto.RetailPurchaseProto;
+import bbejeck.chapter_6.proto.RetailPurchaseProto.RetailPurchase;
 import bbejeck.chapter_7.joiner.PurchaseJoiner;
-import bbejeck.chapter_7.proto.CoffeePurchaseProto;
-import bbejeck.chapter_8.proto.PromotionProto;
+import bbejeck.chapter_7.proto.CoffeePurchaseProto.CoffeePurchase;
+import bbejeck.chapter_8.proto.PromotionProto.Promotion;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;
@@ -36,18 +36,18 @@ public class KafkaStreamsJoinsApp extends BaseStreamsApplication {
     @Override
     public Topology topology(Properties streamProperties) {
         StreamsBuilder builder = new StreamsBuilder();
-        Serde<CoffeePurchaseProto.CoffeePurchase> coffeeSerde = SerdeUtil.protobufSerde(CoffeePurchaseProto.CoffeePurchase.class);
-        Serde<RetailPurchaseProto.RetailPurchase> retailSerde = SerdeUtil.protobufSerde(RetailPurchaseProto.RetailPurchase.class);
-        Serde<PromotionProto.Promotion> promotionSerde = SerdeUtil.protobufSerde(PromotionProto.Promotion.class);
+        Serde<CoffeePurchase> coffeeSerde = SerdeUtil.protobufSerde(CoffeePurchase.class);
+        Serde<RetailPurchase> retailSerde = SerdeUtil.protobufSerde(RetailPurchase.class);
+        Serde<Promotion> promotionSerde = SerdeUtil.protobufSerde(Promotion.class);
         Serde<String> stringSerde = Serdes.String();
 
-        ValueJoiner<CoffeePurchaseProto.CoffeePurchase, RetailPurchaseProto.RetailPurchase, PromotionProto.Promotion> purchaseJoiner = new PurchaseJoiner();
+        ValueJoiner<CoffeePurchase, RetailPurchase, Promotion> purchaseJoiner = new PurchaseJoiner();
         JoinWindows thirtyMinuteWindow = JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofMinutes(30));
 
-        KStream<String, CoffeePurchaseProto.CoffeePurchase> coffeePurchaseKStream = builder.stream("coffee-purchase", Consumed.with(stringSerde, coffeeSerde));
-        KStream<String, RetailPurchaseProto.RetailPurchase> retailPurchaseKStream = builder.stream("retail-purchase", Consumed.with(stringSerde, retailSerde));
+        KStream<String, CoffeePurchase> coffeePurchaseKStream = builder.stream("coffee-purchase", Consumed.with(stringSerde, coffeeSerde));
+        KStream<String, RetailPurchase> retailPurchaseKStream = builder.stream("retail-purchase", Consumed.with(stringSerde, retailSerde));
 
-        KStream<String, PromotionProto.Promotion> promotionStream = coffeePurchaseKStream.join(retailPurchaseKStream, purchaseJoiner,
+        KStream<String, Promotion> promotionStream = coffeePurchaseKStream.join(retailPurchaseKStream, purchaseJoiner,
                 thirtyMinuteWindow,
                 StreamJoined.with(stringSerde,
                         coffeeSerde,

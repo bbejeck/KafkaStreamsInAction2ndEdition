@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package bbejeck.chapter_8.proto;
+option java_outer_classname = "SensorInfoProto";
+
+message SensorInfo {
+  string id = 1;
+  string geohash = 2;
+  int32  generation = 3;
+  int64 deployed = 4;
+}

@@ -1,10 +1,10 @@
 package bbejeck.chapter_6;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_6.proto.PatternProto;
-import bbejeck.chapter_6.proto.PurchasedItemProto;
-import bbejeck.chapter_6.proto.RetailPurchaseProto;
-import bbejeck.chapter_6.proto.RewardAccumulatorProto;
+import bbejeck.chapter_6.proto.PatternProto.Pattern;
+import bbejeck.chapter_6.proto.PurchasedItemProto.PurchasedItem;
+import bbejeck.chapter_6.proto.RetailPurchaseProto.RetailPurchase;
+import bbejeck.chapter_6.proto.RewardAccumulatorProto.RewardAccumulator;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;
@@ -46,23 +46,23 @@ public class ZMartKafkaStreamsFilteringBranchingApp extends BaseStreamsApplicati
     private static final String COFFEE = "coffee";
     private static final String COFFEE_TOPIC = "coffee-topic";
 
-    static final ValueMapper<RetailPurchaseProto.RetailPurchase, RetailPurchaseProto.RetailPurchase> creditCardMapper = retailPurchase -> {
+    static final ValueMapper<RetailPurchase, RetailPurchase> creditCardMapper = retailPurchase -> {
         String[] parts = retailPurchase.getCreditCardNumber().split("-");
         String maskedCardNumber = CC_NUMBER_REPLACEMENT + parts[parts.length - 1];
-        return RetailPurchaseProto.RetailPurchase.newBuilder(retailPurchase).setCreditCardNumber(maskedCardNumber).build();
+        return RetailPurchase.newBuilder(retailPurchase).setCreditCardNumber(maskedCardNumber).build();
     };
 
-    static final ValueMapper<PurchasedItemProto.PurchasedItem, PatternProto.Pattern> patternObjectMapper = purchasedItem -> {
-        PatternProto.Pattern.Builder patternBuilder = PatternProto.Pattern.newBuilder();
+    static final ValueMapper<PurchasedItem, Pattern> patternObjectMapper = purchasedItem -> {
+        Pattern.Builder patternBuilder = Pattern.newBuilder();
         patternBuilder.setAmount(purchasedItem.getPrice());
         patternBuilder.setDate(purchasedItem.getPurchaseDate());
         patternBuilder.setItem(purchasedItem.getItem());
         return patternBuilder.build();
     };
 
-    static final ValueMapper<RetailPurchaseProto.RetailPurchase,
-            RewardAccumulatorProto.RewardAccumulator> rewardObjectMapper = retailPurchase -> {
-        RewardAccumulatorProto.RewardAccumulator.Builder rewardBuilder = RewardAccumulatorProto.RewardAccumulator.newBuilder();
+    static final ValueMapper<RetailPurchase,
+            RewardAccumulator> rewardObjectMapper = retailPurchase -> {
+        RewardAccumulator.Builder rewardBuilder = RewardAccumulator.newBuilder();
         rewardBuilder.setCustomerId(retailPurchase.getPurchasedItems(0).getCustomerId());
         double purchaseTotal = retailPurchase.getPurchasedItemsList().stream()
                 .mapToDouble((purchasedItem -> purchasedItem.getQuantity() * purchasedItem.getPrice()))
@@ -72,8 +72,8 @@ public class ZMartKafkaStreamsFilteringBranchingApp extends BaseStreamsApplicati
         return rewardBuilder.build();
     };
 
-    static final KeyValueMapper<String, RetailPurchaseProto.RetailPurchase,
-            Iterable<KeyValue<String, PurchasedItemProto.PurchasedItem>>> retailTransactionToPurchases =
+    static final KeyValueMapper<String, RetailPurchase,
+            Iterable<KeyValue<String, PurchasedItem>>> retailTransactionToPurchases =
             (key, value) -> {
                 String zipcode = value.getZipCode();
                 return value.getPurchasedItemsList().stream()
@@ -83,43 +83,43 @@ public class ZMartKafkaStreamsFilteringBranchingApp extends BaseStreamsApplicati
 
     @Override
     public Topology topology(Properties streamProperties) {
-        Serde<RetailPurchaseProto.RetailPurchase> retailPurchaseSerde =
-                SerdeUtil.protobufSerde(RetailPurchaseProto.RetailPurchase.class);
-        Serde<PatternProto.Pattern> purchasePatternSerde =
-                SerdeUtil.protobufSerde(PatternProto.Pattern.class);
-        Serde<RewardAccumulatorProto.RewardAccumulator> rewardAccumulatorSerde =
-                SerdeUtil.protobufSerde(RewardAccumulatorProto.RewardAccumulator.class);
+        Serde<RetailPurchase> retailPurchaseSerde =
+                SerdeUtil.protobufSerde(RetailPurchase.class);
+        Serde<Pattern> purchasePatternSerde =
+                SerdeUtil.protobufSerde(Pattern.class);
+        Serde<RewardAccumulator> rewardAccumulatorSerde =
+                SerdeUtil.protobufSerde(RewardAccumulator.class);
         Serde<String> stringSerde = Serdes.String();
 
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
-        KStream<String, RetailPurchaseProto.RetailPurchase> retailPurchaseKStream =
+        KStream<String, RetailPurchase> retailPurchaseKStream =
                 streamsBuilder.stream(TRANSACTIONS, Consumed.with(stringSerde, retailPurchaseSerde))
                         .mapValues(creditCardMapper);
 
-        KStream<String, PatternProto.Pattern> patternKStream = retailPurchaseKStream
+        KStream<String, Pattern> patternKStream = retailPurchaseKStream
                 .flatMap(retailTransactionToPurchases)
                 .mapValues(patternObjectMapper);
 
         patternKStream.to(PATTERNS, Produced.with(stringSerde, purchasePatternSerde));
 
-        KStream<String, RewardAccumulatorProto.RewardAccumulator> rewardsKStream =
+        KStream<String, RewardAccumulator> rewardsKStream =
                 retailPurchaseKStream.mapValues(rewardObjectMapper)
                         .filter((key, potentialReward) -> potentialReward.getPurchaseTotal() > 10.00);
 
         rewardsKStream.peek((key, value) -> System.out.println("Found a reward over 10 dollars " + value.getPurchaseTotal()))
                 .to(REWARDS, Produced.with(stringSerde, rewardAccumulatorSerde));
 
-        Predicate<String, RetailPurchaseProto.RetailPurchase> isCoffee =
+        Predicate<String, RetailPurchase> isCoffee =
                 (key, purchase) -> purchase.getDepartment().equalsIgnoreCase(COFFEE);
 
-        Predicate<String, RetailPurchaseProto.RetailPurchase> isElectronics =
+        Predicate<String, RetailPurchase> isElectronics =
                 (key, purchase) -> purchase.getDepartment().equalsIgnoreCase(ELECTRONICS);
 
-        ForeachAction<String, RetailPurchaseProto.RetailPurchase> branchingPrint =
+        ForeachAction<String, RetailPurchase> branchingPrint =
                 (key, value) -> System.out.println("Branch " + value.getDepartment() + " of number of items " + value.getPurchasedItemsList().size());
 
-        Produced<String, RetailPurchaseProto.RetailPurchase> retailProduced = Produced.with(stringSerde, retailPurchaseSerde);
+        Produced<String, RetailPurchase> retailProduced = Produced.with(stringSerde, retailPurchaseSerde);
         retailPurchaseKStream.split()
                 .branch(isCoffee,
                         Branched.withConsumer(coffeeStream -> coffeeStream.peek(branchingPrint).to(COFFEE_TOPIC, retailProduced)))

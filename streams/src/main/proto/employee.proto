@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bbejeck.chapter_8.proto;
+option java_outer_classname = "EmployeeProto";
+
+message Employee {
+  string name = 1;
+  string department = 2;
+  int32 years_employed = 3;
+  string id = 4;
+  string address = 5;
+}

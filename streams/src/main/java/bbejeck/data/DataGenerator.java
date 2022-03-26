@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Stream;
 
 /**
  * Utility class that provides various methods for generating data
@@ -271,13 +272,9 @@ public class DataGenerator {
     }
 
 
-    private static List<String> getLordOfTheRingsCharacters(int number) {
+    public static List<String> getLordOfTheRingsCharacters(int number) {
         LordOfTheRings lordOfTheRings = new Faker().lordOfTheRings();
-        List<String> characters = new ArrayList<>();
-        for (int i = 0; i < number; i++) {
-            characters.add(lordOfTheRings.character());
-        }
-        return characters;
+        return Stream.generate(lordOfTheRings::character).limit(number).toList();
     }
 
     private static List<String> getHarryPotterCharacters(int number) {
@@ -305,5 +302,6 @@ public class DataGenerator {
         DataGenerator.generateRandomText().forEach(System.out::println);
         DataGenerator.generateSensorReadings(10).entrySet().forEach(System.out::println);
         DataGenerator.generateStockAlertsForKTableAggregateExample().forEach(System.out::println);
+        DataGenerator.getLordOfTheRingsCharacters(10).forEach(System.out::println);
     }
 }

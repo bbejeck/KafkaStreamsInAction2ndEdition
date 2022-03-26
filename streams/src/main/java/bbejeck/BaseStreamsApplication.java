@@ -24,6 +24,10 @@ public abstract class BaseStreamsApplication {
         }
     }
 
+    public Properties properties() {
+        return streamProperties;
+    }
+
     public <K, V> ForeachAction<K, V> printKV(String label) {
         return (key, value) -> System.out.printf("%s: key[%s] value[%s] %n",label, key, value);
     }

@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 
 /**
@@ -29,6 +30,8 @@ import java.util.Properties;
 public class StreamsCountHoppingWindow extends BaseStreamsApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamsCountHoppingWindow.class);
+    String inputTopic = "hopping-count-input";
+    String outputTopic = "hopping-count-output";
 
     @Override
     public Topology topology(Properties streamProperties) {
@@ -36,7 +39,7 @@ public class StreamsCountHoppingWindow extends BaseStreamsApplication {
         Serde<String> stringSerde = Serdes.String();
         Serde<Long> longSerde = Serdes.Long();
 
-        KStream<String, String> countStream = builder.stream("counting-input",
+        KStream<String, String> countStream = builder.stream(inputTopic,
                 Consumed.with(stringSerde, stringSerde));
         countStream.groupByKey()
                 .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(1))
@@ -45,29 +48,23 @@ public class StreamsCountHoppingWindow extends BaseStreamsApplication {
                 .toStream()
                 .peek(printKV("Hopping Window results"))
                 .map((windowedKey, value) -> KeyValue.pair(windowedKey.key(), value))
-                .to("counting-output", Produced.with(stringSerde, longSerde));
+                .to(outputTopic, Produced.with(stringSerde, longSerde));
 
         return builder.build();
     }
 
     public static void main(String[] args) throws Exception {
         // used only to produce data for this application, not typical usage
-        Topics.maybeDeleteThenCreate("counting-input", "counting-output");
         StreamsCountHoppingWindow streamsCountHoppingWindow = new StreamsCountHoppingWindow();
+        Topics.maybeDeleteThenCreate(streamsCountHoppingWindow.inputTopic, streamsCountHoppingWindow.outputTopic);
         Properties properties = getProperties();
         Topology topology = streamsCountHoppingWindow.topology(properties);
         try (KafkaStreams kafkaStreams = new KafkaStreams(topology, properties);
              MockDataProducer mockDataProducer = new MockDataProducer()) {
-            LOG.info("Hopping Window app started");
             kafkaStreams.start();
-            mockDataProducer.produceRandomTextDataWithKeyFunction(text -> {
-                if (text == null) {
-                    return "0";
-                } else {
-                    return Integer.toString(text.length() % 3);
-                }
-            }, "counting-input");
-            Thread.sleep(30000);
+            LOG.info("Hopping Window app started");
+            mockDataProducer.produceRecordsForWindowedExample(streamsCountHoppingWindow.inputTopic, 25, ChronoUnit.SECONDS);
+            Thread.sleep(60000);
         }
     }
 

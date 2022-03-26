@@ -27,7 +27,6 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.ForeachAction;
-import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,14 +50,13 @@ public class KafkaStreamsYellingAppWithPeek extends BaseStreamsApplication {
         Serde<String> stringSerde = Serdes.String();
         StreamsBuilder builder = new StreamsBuilder();
 
-        KStream<String, String> simpleFirstStream = builder.stream("src-topic",
+        builder.stream("src-topic",
                         Consumed.with(stringSerde, stringSerde))
-                .peek(sysout);
-        KStream<String, String> upperCasedStream = simpleFirstStream
-                .mapValues((key, value) -> value.toUpperCase())
-                .peek(sysout);
-
-        upperCasedStream.to("out-topic", Produced.with(stringSerde, stringSerde));
+                .peek(sysout)
+                .mapValues(value -> value.toUpperCase())
+                .peek(sysout)
+                .to("out-topic",
+                        Produced.with(stringSerde, stringSerde));
 
         return builder.build(streamProperties);
     }

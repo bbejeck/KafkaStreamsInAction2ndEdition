@@ -1,10 +1,10 @@
 package bbejeck.chapter_6;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_6.proto.PatternProto;
-import bbejeck.chapter_6.proto.PurchasedItemProto;
-import bbejeck.chapter_6.proto.RetailPurchaseProto;
-import bbejeck.chapter_6.proto.RewardAccumulatorProto;
+import bbejeck.chapter_6.proto.PatternProto.Pattern;
+import bbejeck.chapter_6.proto.PurchasedItemProto.PurchasedItem;
+import bbejeck.chapter_6.proto.RetailPurchaseProto.RetailPurchase;
+import bbejeck.chapter_6.proto.RewardAccumulatorProto.RewardAccumulator;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;
@@ -43,23 +43,23 @@ public class ZMartKafkaStreamsApp extends BaseStreamsApplication {
     private static final String REWARDS = "rewards";
     private static final String PURCHASES = "purchases";
 
-    static final ValueMapper<RetailPurchaseProto.RetailPurchase, RetailPurchaseProto.RetailPurchase> creditCardMapper = retailPurchase -> {
+    static final ValueMapper<RetailPurchase, RetailPurchase> creditCardMapper = retailPurchase -> {
         String[] parts = retailPurchase.getCreditCardNumber().split("-");
         String maskedCardNumber = CC_NUMBER_REPLACEMENT + parts[parts.length - 1];
-        return RetailPurchaseProto.RetailPurchase.newBuilder(retailPurchase).setCreditCardNumber(maskedCardNumber).build();
+        return RetailPurchase.newBuilder(retailPurchase).setCreditCardNumber(maskedCardNumber).build();
     };
 
-    static final ValueMapper<PurchasedItemProto.PurchasedItem, PatternProto.Pattern> patternObjectMapper = purchasedItem -> {
-        PatternProto.Pattern.Builder patternBuilder = PatternProto.Pattern.newBuilder();
+    static final ValueMapper<PurchasedItem, Pattern> patternObjectMapper = purchasedItem -> {
+        Pattern.Builder patternBuilder = Pattern.newBuilder();
         patternBuilder.setAmount(purchasedItem.getPrice());
         patternBuilder.setDate(purchasedItem.getPurchaseDate());
         patternBuilder.setItem(purchasedItem.getItem());
         return patternBuilder.build();
     };
 
-    static final ValueMapper<RetailPurchaseProto.RetailPurchase,
-            RewardAccumulatorProto.RewardAccumulator> rewardObjectMapper = retailPurchase -> {
-        RewardAccumulatorProto.RewardAccumulator.Builder rewardBuilder = RewardAccumulatorProto.RewardAccumulator.newBuilder();
+    static final ValueMapper<RetailPurchase,
+                             RewardAccumulator> rewardObjectMapper = retailPurchase -> {
+        RewardAccumulator.Builder rewardBuilder = RewardAccumulator.newBuilder();
         rewardBuilder.setCustomerId(retailPurchase.getPurchasedItems(0).getCustomerId());
         double purchaseTotal = retailPurchase.getPurchasedItemsList().stream()
                 .mapToDouble((purchasedItem -> purchasedItem.getQuantity() * purchasedItem.getPrice()))
@@ -69,8 +69,8 @@ public class ZMartKafkaStreamsApp extends BaseStreamsApplication {
         return rewardBuilder.build();
     };
 
-    static final KeyValueMapper<String, RetailPurchaseProto.RetailPurchase,
-            Iterable<KeyValue<String, PurchasedItemProto.PurchasedItem>>> retailTransactionToPurchases =
+    static final KeyValueMapper<String, RetailPurchase,
+            Iterable<KeyValue<String, PurchasedItem>>> retailTransactionToPurchases =
             (key, value) -> {
                 String zipcode = value.getZipCode();
                 return value.getPurchasedItemsList().stream()
@@ -81,53 +81,53 @@ public class ZMartKafkaStreamsApp extends BaseStreamsApplication {
     @Override
     public Topology topology(Properties streamProperties) {
         Serde<String> stringSerde = Serdes.String();
-        Serde<RetailPurchaseProto.RetailPurchase> retailPurchaseSerde;
-        Serde<PatternProto.Pattern> purchasePatternSerde;
-        Serde<RewardAccumulatorProto.RewardAccumulator> rewardAccumulatorSerde;
+        Serde<RetailPurchase> retailPurchaseSerde;
+        Serde<Pattern> purchasePatternSerde;
+        Serde<RewardAccumulator> rewardAccumulatorSerde;
 
         if (useSchemaRegistry) {
             final String schemaRegistryUrl = "http://localhost:8081";
             final Map<String, Object> configs =
                     Map.of(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
             retailPurchaseSerde =
-                    new KafkaProtobufSerde<>(RetailPurchaseProto.RetailPurchase.class);
+                    new KafkaProtobufSerde<>(RetailPurchase.class);
             purchasePatternSerde =
-                    new KafkaProtobufSerde<>(PatternProto.Pattern.class);
+                    new KafkaProtobufSerde<>(Pattern.class);
             rewardAccumulatorSerde =
-                    new KafkaProtobufSerde<>(RewardAccumulatorProto.RewardAccumulator.class);
+                    new KafkaProtobufSerde<>(RewardAccumulator.class);
             retailPurchaseSerde.configure(configs, false);
             purchasePatternSerde.configure(configs, false);
             rewardAccumulatorSerde.configure(configs, false);
         } else {
 
             retailPurchaseSerde =
-                    SerdeUtil.protobufSerde(RetailPurchaseProto.RetailPurchase.class);
+                    SerdeUtil.protobufSerde(RetailPurchase.class);
             purchasePatternSerde =
-                    SerdeUtil.protobufSerde(PatternProto.Pattern.class);
+                    SerdeUtil.protobufSerde(Pattern.class);
             rewardAccumulatorSerde =
-                    SerdeUtil.protobufSerde(RewardAccumulatorProto.RewardAccumulator.class);
+                    SerdeUtil.protobufSerde(RewardAccumulator.class);
         }
 
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
-        KStream<String, RetailPurchaseProto.RetailPurchase> retailPurchaseKStream =
+        KStream<String, RetailPurchase> retailPurchaseKStream =
                 streamsBuilder.stream(TRANSACTIONS, Consumed.with(stringSerde, retailPurchaseSerde))
                         .mapValues(creditCardMapper);
 
-        KStream<String, PatternProto.Pattern> patternKStream = retailPurchaseKStream
+        KStream<String, Pattern> patternKStream = retailPurchaseKStream
                 .flatMap(retailTransactionToPurchases)
                 .mapValues(patternObjectMapper);
 
-        patternKStream.print(Printed.<String, PatternProto.Pattern>toSysOut().withLabel(PATTERNS));
+        patternKStream.print(Printed.<String, Pattern>toSysOut().withLabel(PATTERNS));
         patternKStream.to(PATTERNS, Produced.with(stringSerde, purchasePatternSerde));
 
-        KStream<String, RewardAccumulatorProto.RewardAccumulator> rewardsKStream =
+        KStream<String, RewardAccumulator> rewardsKStream =
                 retailPurchaseKStream.mapValues(rewardObjectMapper);
 
-        rewardsKStream.print(Printed.<String, RewardAccumulatorProto.RewardAccumulator>toSysOut().withLabel(REWARDS));
+        rewardsKStream.print(Printed.<String, RewardAccumulator>toSysOut().withLabel(REWARDS));
         rewardsKStream.to(REWARDS, Produced.with(stringSerde, rewardAccumulatorSerde));
 
-        retailPurchaseKStream.print(Printed.<String, RetailPurchaseProto.RetailPurchase>toSysOut().withLabel(PURCHASES));
+        retailPurchaseKStream.print(Printed.<String, RetailPurchase>toSysOut().withLabel(PURCHASES));
         retailPurchaseKStream.to(PURCHASES, Produced.with(stringSerde, retailPurchaseSerde));
 
         return streamsBuilder.build(streamProperties);

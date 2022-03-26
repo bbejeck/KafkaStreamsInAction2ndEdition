@@ -34,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Initial Kafka Streams application that "yells" at people, it's a great app to run it relieves stress.
@@ -50,8 +52,8 @@ public class KafkaStreamsYellingApp extends BaseStreamsApplication {
         StreamsBuilder builder = new StreamsBuilder();
 
         KStream<String, String> simpleFirstStream = builder.stream("src-topic",
-                Consumed.with(stringSerde, stringSerde));
-        KStream<String, String> upperCasedStream = simpleFirstStream.mapValues((key, value) -> value.toUpperCase());
+                Consumed.with(Serdes.String(), Serdes.String()));
+        KStream<String, String> upperCasedStream = simpleFirstStream.mapValues(value -> value.toUpperCase());
 
         upperCasedStream.print(Printed.toSysOut());
         upperCasedStream.to("out-topic", Produced.with(stringSerde, stringSerde));
@@ -66,12 +68,13 @@ public class KafkaStreamsYellingApp extends BaseStreamsApplication {
         KafkaStreamsYellingApp yellingApp = new KafkaStreamsYellingApp();
         Topology topology = yellingApp.topology(streamProperties);
         LOG.info("Topology description {}", topology.describe());
+        CountDownLatch doneLatch = new CountDownLatch(1);
         try (KafkaStreams kafkaStreams = new KafkaStreams(topology, streamProperties);
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             LOG.info("Hello World Yelling App Started");
             kafkaStreams.start();
             mockDataProducer.produceRandomTextData();
-            Thread.sleep(35000);
+            doneLatch.await(35000, TimeUnit.MILLISECONDS);
             LOG.info("Shutting down the Yelling APP now");
         }
     }

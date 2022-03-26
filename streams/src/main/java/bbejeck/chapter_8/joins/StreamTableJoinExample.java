@@ -1,8 +1,8 @@
 package bbejeck.chapter_8.joins;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_8.proto.ClickEventProto;
-import bbejeck.chapter_8.proto.UserProto;
+import bbejeck.chapter_8.proto.ClickEventProto.ClickEvent;
+import bbejeck.chapter_8.proto.UserProto.User;
 import bbejeck.utils.SerdeUtil;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -27,15 +27,15 @@ public class StreamTableJoinExample extends BaseStreamsApplication {
     public Topology topology(Properties streamProperties) {
         StreamsBuilder builder = new StreamsBuilder();
         Serde<String> stringSerde = Serdes.String();
-        Serde<ClickEventProto.ClickEvent> clickEventSerde = SerdeUtil.protobufSerde(ClickEventProto.ClickEvent.class);
-        Serde<UserProto.User> userSerde = SerdeUtil.protobufSerde(UserProto.User.class);
-        ValueJoiner<ClickEventProto.ClickEvent, UserProto.User, String> clickEventJoiner = (clickEvent, user) -> user.getName() +" clicked " + clickEvent.getUrl();
+        Serde<ClickEvent> clickEventSerde = SerdeUtil.protobufSerde(ClickEvent.class);
+        Serde<User> userSerde = SerdeUtil.protobufSerde(User.class);
+        ValueJoiner<ClickEvent, User, String> clickEventJoiner = (clickEvent, user) -> user.getName() +" clicked " + clickEvent.getUrl();
 
-        KStream<String, ClickEventProto.ClickEvent> clickEventKStream =
+        KStream<String, ClickEvent> clickEventKStream =
                 builder.stream("click-events",
                         Consumed.with(stringSerde, clickEventSerde));
 
-        KTable<String, UserProto.User> userTable =
+        KTable<String, User> userTable =
                 builder.table("users",
                         Consumed.with(stringSerde, userSerde));
 

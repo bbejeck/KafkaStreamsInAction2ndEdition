@@ -5,7 +5,7 @@ option java_outer_classname = "SensorInfoProto";
 
 message SensorInfo {
   string id = 1;
-  string geohash = 2;
+  string latlong = 2;
   int32  generation = 3;
   int64 deployed = 4;
 }

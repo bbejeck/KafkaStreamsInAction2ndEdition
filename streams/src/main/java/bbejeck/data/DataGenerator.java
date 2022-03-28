@@ -7,7 +7,11 @@ import bbejeck.chapter_6.proto.RetailPurchaseProto;
 import bbejeck.chapter_6.proto.SensorProto;
 import bbejeck.chapter_7.proto.CoffeePurchaseProto;
 import bbejeck.chapter_7.proto.StockTransactionProto;
+import bbejeck.chapter_8.proto.ClickEventProto;
+import bbejeck.chapter_8.proto.EmployeeProto;
+import bbejeck.chapter_8.proto.SensorInfoProto;
 import bbejeck.chapter_8.proto.StockAlertProto;
+import bbejeck.chapter_8.proto.UserProto;
 import com.github.javafaker.Address;
 import com.github.javafaker.Bool;
 import com.github.javafaker.Business;
@@ -26,11 +30,15 @@ import com.google.protobuf.AbstractMessage;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -57,7 +65,7 @@ public class DataGenerator {
         Collection<String> text = new ArrayList<>();
         int randomTextCount = 10;
         for (int i = 0; i < randomTextCount; i++) {
-            int whichFaker = number.numberBetween(1, 6);
+            int whichFaker = number.numberBetween(1, 5);
             switch (whichFaker) {
                 case 1 -> text.add(shakespeare.hamletQuote());
                 case 2 -> text.add(shakespeare.asYouLikeItQuote());
@@ -206,6 +214,8 @@ public class DataGenerator {
 
     public static Collection<RetailPurchaseProto.RetailPurchase> generatePurchasedItems(final int numberRecords) {
         int counter = 0;
+        int maxNumberEmployees = 10;
+        int employeeCounter = 0;
         final List<RetailPurchaseProto.RetailPurchase> retailPurchases = new ArrayList<>();
         Faker faker = new Faker();
         Commerce commerce = faker.commerce();
@@ -237,7 +247,7 @@ public class DataGenerator {
             }
             retailBuilder.setDepartment(departments.get(random.nextInt(3)));
             retailBuilder.setStoreId(commerce.department());
-            retailBuilder.setEmployeeId(idNumber.invalid());
+            retailBuilder.setEmployeeId(Integer.toString(employeeCounter++ % maxNumberEmployees));
             retailBuilder.setCustomerId(customerId);
             retailBuilder.setCreditCardNumber(business.creditCardNumber());
             retailBuilder.setZipCode(address.zipCode());
@@ -271,6 +281,72 @@ public class DataGenerator {
         return transactions;
     }
 
+    public static Collection<UserProto.User> generateUsers(int num) {
+        Faker faker = new Faker();
+        UserProto.User.Builder builder = UserProto.User.newBuilder();
+        int[] ids = IntStream.range(0, num).toArray();
+        return Arrays.stream(ids).mapToObj(id -> {
+            builder.setAddress(faker.address().fullAddress());
+            builder.setId(id);
+            builder.setAge(faker.number().numberBetween(20, 65));
+            builder.setName(faker.name().fullName());
+            return builder.build();
+        }).toList();
+    }
+
+    public static Collection<ClickEventProto.ClickEvent> generateClickEvents(int numberUsers, int numEvents) {
+        Faker faker = new Faker();
+        ClickEventProto.ClickEvent.Builder builder = ClickEventProto.ClickEvent.newBuilder();
+        AtomicInteger counter = new AtomicInteger(0);
+        return Stream.generate(()->{
+               builder.setUrl(faker.company().url());
+               builder.setUserId(counter.getAndIncrement() % numberUsers);
+               builder.setTime(Instant.now().toEpochMilli());
+               return builder.build();
+        }).limit(numEvents).toList();
+    }
+
+    public static Collection<EmployeeProto.Employee> generateEmployees(int numberEmployees) {
+        Faker faker = new Faker();
+        EmployeeProto.Employee.Builder builder = EmployeeProto.Employee.newBuilder();
+        AtomicInteger employeeIdCounter = new AtomicInteger(0);
+        return Stream.generate(() -> {
+            builder.setAddress(faker.address().fullAddress());
+            builder.setId(Integer.toString(employeeIdCounter.getAndIncrement()));
+            builder.setDepartment(faker.commerce().department());
+            builder.setName(faker.name().fullName());
+            builder.setYearsEmployed(faker.number().numberBetween(1,16));
+            return builder.build();
+        }).limit(numberEmployees).toList();
+    }
+
+    public static Collection<SensorProto.Sensor> generateSensorReadingsList(int numberReadings) {
+        SensorProto.Sensor.Builder sensorBuilder = SensorProto.Sensor.newBuilder();
+        List<SensorProto.Sensor.Type> types = List.of(SensorProto.Sensor.Type.TEMPERATURE, SensorProto.Sensor.Type.PROXIMITY);
+        Faker faker = new Faker();
+       return Stream.generate(() -> {
+            sensorBuilder.setSensorType(types.get(faker.number().numberBetween(0,2)));
+            sensorBuilder.setReading(faker.number().randomDouble(2,1,300));
+            sensorBuilder.setId(Integer.toString(faker.number().numberBetween(0,11)));
+            return sensorBuilder.build();
+        }).limit(numberReadings).toList();
+    }
+
+    public static Collection<SensorInfoProto.SensorInfo> generateSensorInfo(int numberInfoObjects) {
+        SensorInfoProto.SensorInfo.Builder sensorInfoBuilder = SensorInfoProto.SensorInfo.newBuilder();
+        int maxIds = 10;
+        AtomicInteger idCounter = new AtomicInteger(0);
+        Faker faker = new Faker();
+        return Stream.generate(() -> {
+            sensorInfoBuilder.setId(Integer.toString(idCounter.getAndIncrement() % maxIds));
+            sensorInfoBuilder.setGeneration(faker.number().numberBetween(0,4));
+            sensorInfoBuilder.setLatlong(faker.address().latitude()+":"+faker.address().longitude());
+            sensorInfoBuilder.setDeployed(faker.date().past(1825, TimeUnit.DAYS).getTime());
+            return sensorInfoBuilder.build();
+        }).limit(numberInfoObjects).toList();
+    }
+
+
 
     public static List<String> getLordOfTheRingsCharacters(int number) {
         LordOfTheRings lordOfTheRings = new Faker().lordOfTheRings();
@@ -298,10 +374,13 @@ public class DataGenerator {
     public static void main(String[] args) {
         DataGenerator.generateProductTransactions(10).forEach(System.out::println);
         DataGenerator.generateStockTransaction(10).forEach(System.out::println);
-        DataGenerator.generatePurchasedItems(10).forEach(System.out::println);
+        DataGenerator.generatePurchasedItems(30).forEach(System.out::println);
         DataGenerator.generateRandomText().forEach(System.out::println);
         DataGenerator.generateSensorReadings(10).entrySet().forEach(System.out::println);
         DataGenerator.generateStockAlertsForKTableAggregateExample().forEach(System.out::println);
         DataGenerator.getLordOfTheRingsCharacters(10).forEach(System.out::println);
+        DataGenerator.generateUsers(10).forEach(System.out::println);
+        DataGenerator.generateClickEvents(10, 20).forEach(System.out::println);
+        DataGenerator.generateSensorInfo(11).forEach(System.out::println);
     }
 }

@@ -25,9 +25,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * User: Bill Bejeck
- * Date: 9/20/21
- * Time: 5:38 PM
+ * Example of a sliding window with a count
  */
 public class StreamsCountSlidingWindow extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(StreamsCountSlidingWindow.class);
@@ -43,7 +41,7 @@ public class StreamsCountSlidingWindow extends BaseStreamsApplication {
         KStream<String, String> countStream = builder.stream(inputTopic,
                 Consumed.with(stringSerde,stringSerde));
         countStream.groupByKey()
-                .windowedBy(SlidingWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(30)))
+                .windowedBy(SlidingWindows.ofTimeDifferenceAndGrace(Duration.ofSeconds(30), Duration.ofSeconds(1)))
                 .count(Materialized.as("Sliding-window-counting-store"))
                 .toStream()
                 .peek(printKV("Sliding Window results"))
@@ -64,7 +62,7 @@ public class StreamsCountSlidingWindow extends BaseStreamsApplication {
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             streams.start();
             LOG.info("Sliding window application started");
-            mockDataProducer.produceRecordsForWindowedExample(streamsCountSlidingWindow.inputTopic, 15, ChronoUnit.SECONDS);
+            mockDataProducer.produceRecordsForWindowedExample(streamsCountSlidingWindow.inputTopic, 10, ChronoUnit.SECONDS);
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await(60, TimeUnit.SECONDS);
         }

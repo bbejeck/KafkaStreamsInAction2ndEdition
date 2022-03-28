@@ -25,9 +25,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * User: Bill Bejeck
- * Date: 9/20/21
- * Time: 5:38 PM
+ * Example of a Session window aggregation
  */
 public class StreamsCountSessionWindow extends BaseStreamsApplication {
      private static final Logger LOG = LoggerFactory.getLogger(StreamsCountSessionWindow.class);

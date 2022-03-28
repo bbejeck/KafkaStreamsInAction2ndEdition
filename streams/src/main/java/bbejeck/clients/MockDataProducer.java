@@ -50,6 +50,16 @@ public class MockDataProducer implements AutoCloseable {
     private volatile boolean keepRunning = true;
     private final Random random = new Random();
 
+    public record JoinData<R1, R2, K1, K2>(String firstTopic,
+                                           String secondTopic,
+                                           Supplier<Collection<R1>> firstRecordsGenerator,
+                                           Supplier<Collection<R2>> secondRecordsGenerator,
+                                           Function<R1, K1> firstKeyFunction,
+                                           Function<R2, K2> secondKeyFunction,
+                                           Object firstSerializerClass,
+                                           Object secondSerializerClass) {}
+
+
     public MockDataProducer() {
     }
 
@@ -160,27 +170,27 @@ public class MockDataProducer implements AutoCloseable {
 
     public void produceRecordsForWindowedExample(final String topic, long advance, ChronoUnit unit) {
         Callable<Void> generateWindowedValuesTask = () -> {
-            final Map<String, Object> configs = producerConfigs();
-            final Callback callback = callback();
-            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-            List<String> lordOfTheRings = DataGenerator.getLordOfTheRingsCharacters(10);
-            Instant instant = Instant.now();
-            try (Producer<String, String> producer = new KafkaProducer<>(configs)) {
-                while (keepRunning) {
-                    List<String> phrase = (List<String>) DataGenerator.generateRandomText();
-                    for (int i = 0; i < 10; i++) {
-                        String key = lordOfTheRings.get(i);
-                        String value = phrase.get(i);
-                        ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, 1, instant.toEpochMilli(), key, value);
-                        producer.send(producerRecord, callback);
+                final Map<String, Object> configs = producerConfigs();
+                final Callback callback = callback();
+                configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+                List<String> lordOfTheRings = DataGenerator.getLordOfTheRingsCharacters(10);
+                Instant instant = Instant.now();
+                try (Producer<String, String> producer = new KafkaProducer<>(configs)) {
+                    while (keepRunning) {
+                        List<String> phrase = (List<String>) DataGenerator.generateRandomText();
+                        for (int i = 0; i < 10; i++) {
+                            String key = lordOfTheRings.get(i);
+                            String value = phrase.get(i);
+                            ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, 0, instant.toEpochMilli(), key, value);
+                            producer.send(producerRecord, callback);
+                        }
+                        instant = instant.plus(advance, unit);
+                        LOG.info("Windowed record batch sent");
+                        Thread.sleep(1000);
                     }
-                    instant = instant.plus(advance, unit);
-                    LOG.info("Windowed record batch sent");
-                    Thread.sleep(1000);
                 }
-            }
-            LOG.info("Done generating windowed alerts");
-            return null;
+                LOG.info("Done generating windowed alerts");
+                return null;
         };
         executorService.submit(generateWindowedValuesTask);
     }
@@ -206,6 +216,29 @@ public class MockDataProducer implements AutoCloseable {
             return null;
         };
       executorService.submit(generateJoinDataTask);
+    }
+
+    public <R1, R2, K1, K2> void produceProtoJoinRecords(final JoinData<R1, R2, K1, K2> joinData) {
+        Callable<Void> generateJoinDataTask = () -> {
+            final Map<String, Object> configs = producerConfigs();
+            final Map<String, Object> configsII = producerConfigs();
+            final Callback callback = callback();
+            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, joinData.firstSerializerClass());
+            configsII.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, joinData.secondSerializerClass());
+            try (Producer<K1, R1> producerI = new KafkaProducer<>(configs);
+                 Producer<K2, R2> producerII = new KafkaProducer<>(configsII)) {
+                while (keepRunning) {
+                    joinData.firstRecordsGenerator.get().forEach(v -> producerI.send(new ProducerRecord<>(joinData.firstTopic, joinData.firstKeyFunction().apply(v), v), callback));
+                    LOG.info("Produced first join records batch");
+                    joinData.secondRecordsGenerator.get().forEach(v -> producerII.send(new ProducerRecord<>(joinData.secondTopic, joinData.secondKeyFunction().apply(v), v), callback));
+                    LOG.info(("Produced second join records batch"));
+                    Thread.sleep(500);
+                }
+            }
+            LOG.info("Done generating records for a join example");
+            return null;
+        };
+        executorService.submit(generateJoinDataTask);
     }
 
     public void produceStockTransactions(final String topic) {

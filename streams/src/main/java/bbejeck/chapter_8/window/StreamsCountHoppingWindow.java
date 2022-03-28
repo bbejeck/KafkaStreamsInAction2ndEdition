@@ -23,9 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 
 /**
- * User: Bill Bejeck
- * Date: 9/20/21
- * Time: 5:38 PM
+ * Example of a Hopping window aggregation operation
  */
 public class StreamsCountHoppingWindow extends BaseStreamsApplication {
 
@@ -54,12 +52,12 @@ public class StreamsCountHoppingWindow extends BaseStreamsApplication {
     }
 
     public static void main(String[] args) throws Exception {
-        // used only to produce data for this application, not typical usage
         StreamsCountHoppingWindow streamsCountHoppingWindow = new StreamsCountHoppingWindow();
         Topics.maybeDeleteThenCreate(streamsCountHoppingWindow.inputTopic, streamsCountHoppingWindow.outputTopic);
         Properties properties = getProperties();
         Topology topology = streamsCountHoppingWindow.topology(properties);
         try (KafkaStreams kafkaStreams = new KafkaStreams(topology, properties);
+             // used only to produce data for this application, not typical usage
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             kafkaStreams.start();
             LOG.info("Hopping Window app started");

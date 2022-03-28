@@ -3,13 +3,17 @@ package bbejeck.chapter_8.window;
 import bbejeck.BaseStreamsApplication;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.Topics;
+import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
+import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +25,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * User: Bill Bejeck
- * Date: 9/20/21
- * Time: 5:38 PM
+ * The same hopping count example but the underlying key from
+ * the window is extracted
  */
 public class StreamsCountHoppingWindowExtractKey extends BaseStreamsApplication {
      private static final Logger LOG = LoggerFactory.getLogger(StreamsCountHoppingWindowExtractKey.class);
@@ -32,14 +35,17 @@ public class StreamsCountHoppingWindowExtractKey extends BaseStreamsApplication 
     @Override
     public Topology topology(Properties streamProperties) {
         StreamsBuilder builder = new StreamsBuilder();
-        KStream<String, String> countStream = builder.stream(inputTopic);
+        Serde<String> stringSerde = Serdes.String();
+        Serde<Long> longSerde = Serdes.Long();
+        KStream<String, String> countStream = builder.stream(inputTopic, Consumed.with(stringSerde, stringSerde));
         countStream.groupByKey()
                 .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(1))
                         .advanceBy(Duration.ofSeconds(10)))
                 .count(Materialized.as("hopping-window-counting-store"))
                 .toStream()
                 .map((windowKey, value) -> KeyValue.pair(windowKey.key(), value))
-                .to(outputTopic);
+                .peek(printKV("Hopping Window results (key extracted)"))
+                .to(outputTopic, Produced.with(stringSerde, longSerde));
 
         return builder.build();
     }

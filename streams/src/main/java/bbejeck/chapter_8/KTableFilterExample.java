@@ -19,9 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
- * User: Bill Bejeck
- * Date: 11/7/21
- * Time: 5:27 PM
+ * Example of a filter operation with a KTable
  */
 public class KTableFilterExample extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(KTableFilterExample.class);

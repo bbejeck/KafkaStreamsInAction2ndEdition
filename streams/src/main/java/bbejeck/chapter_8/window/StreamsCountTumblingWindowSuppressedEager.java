@@ -29,9 +29,9 @@ import static org.apache.kafka.streams.kstream.Suppressed.BufferConfig.maxRecord
 import static org.apache.kafka.streams.kstream.Suppressed.untilTimeLimit;
 
 /**
- * User: Bill Bejeck
- * Date: 9/20/21
- * Time: 5:38 PM
+ * A tumbling window with suppression to show a final result per key when a window closes.
+ * This example uses eager configuration meaning a result may be released before the window
+ * closes due to either a configuration for max memory or messages
  */
 public class StreamsCountTumblingWindowSuppressedEager extends BaseStreamsApplication {
      private static final Logger LOG = LoggerFactory.getLogger(StreamsCountTumblingWindowSuppressedEager.class);

@@ -21,9 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
- * User: Bill Bejeck
- * Date: 11/7/21
- * Time: 5:27 PM
+ * Example of a basic count operation with a KTable
  */
 public class KTableCountExample extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(KTableCountExample.class);

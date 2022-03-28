@@ -1,8 +1,8 @@
 package bbejeck.chapter_8;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_8.proto.SegmentAggregateProto;
-import bbejeck.chapter_8.proto.StockAlertProto;
+import bbejeck.chapter_8.proto.SegmentAggregateProto.SegmentAggregate;
+import bbejeck.chapter_8.proto.StockAlertProto.StockAlert;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;
@@ -27,46 +27,44 @@ import java.util.Objects;
 import java.util.Properties;
 
 /**
- * User: Bill Bejeck
- * Date: 11/26/21
- * Time: 7:22 PM
+ * An example of a KTable aggregation operation
  */
 public class KTableAggregationExample extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(KTableAggregationExample.class);
     private final Serde<String> stringSerde = Serdes.String();
-    private final Serde<StockAlertProto.StockAlert> stockAlertSerde = SerdeUtil.protobufSerde(StockAlertProto.StockAlert.class);
-    private final Serde<SegmentAggregateProto.SegmentAggregate> segmentSerde = SerdeUtil.protobufSerde(SegmentAggregateProto.SegmentAggregate.class);
-    private final Initializer<SegmentAggregateProto.SegmentAggregate> segmentInitializer = () -> SegmentAggregateProto.SegmentAggregate.newBuilder().build();
+    private final Serde<StockAlert> stockAlertSerde = SerdeUtil.protobufSerde(StockAlert.class);
+    private final Serde<SegmentAggregate> segmentSerde = SerdeUtil.protobufSerde(SegmentAggregate.class);
+    private final Initializer<SegmentAggregate> segmentInitializer = () -> SegmentAggregate.newBuilder().build();
 
     @Override
     public Topology topology(Properties streamProperties) {
         final StreamsBuilder builder = new StreamsBuilder();
 
-        final Aggregator<String, StockAlertProto.StockAlert, SegmentAggregateProto.SegmentAggregate> adderAggregator = (key, newStockAlert, currentAgg) -> {
-            SegmentAggregateProto.SegmentAggregate.Builder aggBuilder = SegmentAggregateProto.SegmentAggregate.newBuilder(currentAgg);
+        final Aggregator<String, StockAlert, SegmentAggregate> adderAggregator = (key, newStockAlert, currentAgg) -> {
+            SegmentAggregate.Builder aggBuilder = SegmentAggregate.newBuilder(currentAgg);
             System.out.printf("Adder     : -> key %s stock alert %s and aggregate %s %n", key, strip(newStockAlert), strip(currentAgg));
             long currentShareVolume = newStockAlert.getShareVolume();
             double currentDollarVolume = newStockAlert.getShareVolume() * newStockAlert.getSharePrice();
             aggBuilder.setShareVolume(currentAgg.getShareVolume() + currentShareVolume);
             aggBuilder.setDollarVolume(currentAgg.getDollarVolume() + currentDollarVolume);
-            SegmentAggregateProto.SegmentAggregate updatedAggregate = aggBuilder.build();
+            SegmentAggregate updatedAggregate = aggBuilder.build();
             System.out.printf("Adder     : <- updated aggregate %s %n", strip(updatedAggregate));
             return updatedAggregate;
         };
 
-        final Aggregator<String, StockAlertProto.StockAlert, SegmentAggregateProto.SegmentAggregate> subtractorAggregator = (key, prevStockAlert, currentAgg) -> {
-            SegmentAggregateProto.SegmentAggregate.Builder aggBuilder = SegmentAggregateProto.SegmentAggregate.newBuilder(currentAgg);
+        final Aggregator<String, StockAlert, SegmentAggregate> subtractorAggregator = (key, prevStockAlert, currentAgg) -> {
+            SegmentAggregate.Builder aggBuilder = SegmentAggregate.newBuilder(currentAgg);
             System.out.printf("Subtractor: -> key %s stock alert %s and aggregate %s %n", key, strip(prevStockAlert), strip(currentAgg));
             long prevShareVolume = prevStockAlert.getShareVolume();
             double prevDollarVolume = prevStockAlert.getShareVolume() * prevStockAlert.getSharePrice();
             aggBuilder.setShareVolume(currentAgg.getShareVolume() - prevShareVolume);
             aggBuilder.setDollarVolume(currentAgg.getDollarVolume() - prevDollarVolume);
-            SegmentAggregateProto.SegmentAggregate updatedAggregate = aggBuilder.build();
+            SegmentAggregate updatedAggregate = aggBuilder.build();
             System.out.printf("Subtractor: <- updated aggregate %s %n", strip(updatedAggregate));
             return updatedAggregate;
         };
 
-        KTable<String, StockAlertProto.StockAlert> stockTable =
+        KTable<String, StockAlert> stockTable =
                 builder.table("stock-alert",
                         Consumed.with(stringSerde, stockAlertSerde));
 

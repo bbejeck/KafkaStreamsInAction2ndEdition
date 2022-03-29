@@ -51,6 +51,7 @@ public class StreamsCountingInMemoryApplication extends BaseStreamsApplication {
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             streams.start();
             LOG.info("Started StreamsCountingInMemoryApplication App");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceRandomTextDataWithKeyFunction(Functions.rotatingStringKeyFunction(5), "counting-input");
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await();

@@ -32,6 +32,7 @@ import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -175,6 +176,7 @@ public class MockDataProducer implements AutoCloseable {
                 configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
                 List<String> lordOfTheRings = DataGenerator.getLordOfTheRingsCharacters(10);
                 Instant instant = Instant.now();
+                AtomicInteger logCounter = new AtomicInteger(0);
                 try (Producer<String, String> producer = new KafkaProducer<>(configs)) {
                     while (keepRunning) {
                         List<String> phrase = (List<String>) DataGenerator.generateRandomText();
@@ -185,7 +187,9 @@ public class MockDataProducer implements AutoCloseable {
                             producer.send(producerRecord, callback);
                         }
                         instant = instant.plus(advance, unit);
-                        LOG.info("Windowed record batch sent");
+                        if (logCounter.getAndIncrement() % 25 == 0) {
+                          LOG.info("Windowed record batch sent [only logged for the first batch and every 25th one afterwards]");
+                        }
                         Thread.sleep(1000);
                     }
                 }
@@ -269,18 +273,18 @@ public class MockDataProducer implements AutoCloseable {
             final Map<String, Object> configs = producerConfigs();
             final Callback callback = callback();
             configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-
+            AtomicInteger logCounter = new AtomicInteger(0);
             try (Producer<String, String> producer = new KafkaProducer<>(configs)) {
                 while (keepRunning) {
                     List<String> textValues = (List) DataGenerator.generateRandomText();
                     textValues.set(random.nextInt(textValues.size()), null);
                     textValues.set(random.nextInt(textValues.size()), null);
-                    System.out.println("Sending values " + textValues);
                     textValues.stream()
                             .map(text -> new ProducerRecord<>(topic, keyFunction.apply(text), text))
                             .forEach(pr -> producer.send(pr, callback));
-
-                    LOG.info("Text batch sent");
+                    if (logCounter.getAndIncrement() % 25 == 0) {
+                        LOG.info("Text batch sent [only printed for first batch and every 25 batches afterwards]");
+                    }
                         Thread.sleep(6000);
 
                 }

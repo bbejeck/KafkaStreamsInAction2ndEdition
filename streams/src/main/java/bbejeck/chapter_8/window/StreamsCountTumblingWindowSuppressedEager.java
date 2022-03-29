@@ -69,6 +69,7 @@ public class StreamsCountTumblingWindowSuppressedEager extends BaseStreamsApplic
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             streams.start();
             LOG.info("Suppressed eager application started");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceRecordsForWindowedExample(streamsCountTumblingWindowSuppressedEager.inputTopic, 15, ChronoUnit.SECONDS);
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await(60, SECONDS);

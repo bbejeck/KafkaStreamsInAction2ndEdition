@@ -2,8 +2,8 @@ package bbejeck.chapter_7;
 
 import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_7.aggregator.StockAggregator;
-import bbejeck.chapter_7.proto.StockAggregateProto;
-import bbejeck.chapter_7.proto.StockTransactionProto;
+import bbejeck.chapter_7.proto.StockAggregateProto.Aggregate;
+import bbejeck.chapter_7.proto.StockTransactionProto.Transaction;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;
@@ -39,16 +39,16 @@ public class StreamsStockTransactionAggregations extends BaseStreamsApplication 
     public Topology topology(final Properties streamProperties) {
         StreamsBuilder builder = new StreamsBuilder();
         
-        StockAggregateProto.Aggregate initialAggregate =
-                StockAggregateProto.Aggregate.newBuilder().build();
+        Aggregate initialAggregate =
+                Aggregate.newBuilder().build();
 
         Serde<String> stringSerde = Serdes.String();
-        Serde<StockTransactionProto.Transaction> txnSerde =
-                SerdeUtil.protobufSerde(StockTransactionProto.Transaction.class);
-        Serde<StockAggregateProto.Aggregate> aggregateSerde =
-                SerdeUtil.protobufSerde(StockAggregateProto.Aggregate.class);
+        Serde<Transaction> txnSerde =
+                SerdeUtil.protobufSerde(Transaction.class);
+        Serde<Aggregate> aggregateSerde =
+                SerdeUtil.protobufSerde(Aggregate.class);
 
-        KStream<String, StockTransactionProto.Transaction> transactionKStream =
+        KStream<String, Transaction> transactionKStream =
                 builder.stream("stock-transactions", Consumed.with(stringSerde, txnSerde));
 
         transactionKStream.groupBy((key, value) -> value.getSymbol(), Grouped.with(Serdes.String(), txnSerde))
@@ -73,6 +73,7 @@ public class StreamsStockTransactionAggregations extends BaseStreamsApplication 
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             streams.start();
             LOG.info("Started the streamsStockTransactionAggregations application");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceStockTransactions("stock-transactions");
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await();

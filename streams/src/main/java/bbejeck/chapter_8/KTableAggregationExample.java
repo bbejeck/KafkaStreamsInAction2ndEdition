@@ -96,6 +96,8 @@ public class KTableAggregationExample extends BaseStreamsApplication {
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             kafkaStreams.cleanUp();
             kafkaStreams.start();
+            LOG.info("KTableAggregation started");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceStockAlertsForKtableAggregateExample("stock-alert");
             Thread.sleep(45000);
         }

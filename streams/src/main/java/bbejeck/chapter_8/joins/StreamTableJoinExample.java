@@ -68,7 +68,6 @@ public class StreamTableJoinExample extends BaseStreamsApplication {
         Properties properties = new Properties();
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "stream-table-join-example");
-        properties.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
         Topology topology = streamTableJoinExample.topology(properties);
 
         JoinData<User, ClickEvent, String, String> streamTableJoin = new JoinData<>(streamTableJoinExample.rightInputTableTopic,

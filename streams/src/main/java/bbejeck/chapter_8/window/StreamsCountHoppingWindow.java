@@ -61,6 +61,7 @@ public class StreamsCountHoppingWindow extends BaseStreamsApplication {
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             kafkaStreams.start();
             LOG.info("Hopping Window app started");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceRecordsForWindowedExample(streamsCountHoppingWindow.inputTopic, 25, ChronoUnit.SECONDS);
             Thread.sleep(60000);
         }

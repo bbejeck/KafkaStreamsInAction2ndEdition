@@ -59,6 +59,8 @@ public class KTableFilterExample extends BaseStreamsApplication {
         try (KafkaStreams kafkaStreams = new KafkaStreams(topology, properties);
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             kafkaStreams.start();
+            LOG.info("KTable Filter started");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceRandomTextDataWithKeyFunction(keyFunction, "table-filter-input");
             Thread.sleep(45000);
         }

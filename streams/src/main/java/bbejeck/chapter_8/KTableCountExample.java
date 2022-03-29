@@ -68,6 +68,8 @@ public class KTableCountExample extends BaseStreamsApplication {
         try (KafkaStreams kafkaStreams = new KafkaStreams(topology, properties);
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             kafkaStreams.start();
+            LOG.info("KTable count app started");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceRandomTextDataWithKeyFunction(keyFunction, "table-input");
             Thread.sleep(45000);
         }

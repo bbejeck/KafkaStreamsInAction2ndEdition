@@ -55,6 +55,7 @@ public class StreamsPokerGameReducer extends BaseStreamsApplication {
                 MockDataProducer mockDataProducer = new MockDataProducer() ) {
             streams.start();
             LOG.info("Started the StreamsPokerGameReducerApp");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceFixedNamesWithScores("poker-game");
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await();

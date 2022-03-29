@@ -61,6 +61,7 @@ public class StreamsCountSessionWindow extends BaseStreamsApplication {
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             streams.start();
             LOG.info("Session window application started");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceRecordsForWindowedExample(streamsCountSessionWindow.inputTopic, 2, ChronoUnit.MINUTES);
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await(60, TimeUnit.SECONDS);

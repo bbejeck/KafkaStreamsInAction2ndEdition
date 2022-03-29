@@ -68,6 +68,7 @@ public class StreamsCountTumblingWindowSuppressedStrict extends BaseStreamsAppli
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             streams.start();
             LOG.info("Count tumbling strict suppressed started");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceRecordsForWindowedExample(streamsCountTumblingWindowSuppressedStrict.inputTopic, 25, ChronoUnit.SECONDS);
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await(60, TimeUnit.SECONDS);

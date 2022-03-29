@@ -61,6 +61,7 @@ public class StreamsCountTumblingWindow extends BaseStreamsApplication {
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             streams.start();
             LOG.info("Tumbling window example started");
+            LOG.info("Patience! aggregations and windowed operations take 30 seconds+ to display");
             mockDataProducer.produceRecordsForWindowedExample(streamsCountTumblingWindow.inputTopic, 15, ChronoUnit.SECONDS);
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await(60, TimeUnit.SECONDS);

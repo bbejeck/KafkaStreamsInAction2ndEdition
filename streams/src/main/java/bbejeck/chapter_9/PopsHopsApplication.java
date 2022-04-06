@@ -1,0 +1,90 @@
+package bbejeck.chapter_9;
+
+
+import bbejeck.BaseStreamsApplication;
+import bbejeck.chapter_9.processor.BeerPurchaseProcessor;
+import bbejeck.chapter_9.processor.LoggingProcessor;
+import bbejeck.chapter_9.proto.BearPurchaseProto.BeerPurchase;
+import bbejeck.clients.MockDataProducer;
+import bbejeck.utils.SerdeUtil;
+import bbejeck.utils.Topics;
+import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.serialization.Serializer;
+import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.processor.FailOnInvalidTimestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.apache.kafka.streams.Topology.AutoOffsetReset.LATEST;
+
+public class PopsHopsApplication extends BaseStreamsApplication {
+    static final Logger LOG = LoggerFactory.getLogger(PopsHopsApplication.class);
+    final static String INPUT_TOPIC = "beer-purchases";
+    final static String INTERNATIONAL_OUTPUT_TOPIC = "international-sales";
+    final static String DOMESTIC_OUTPUT_TOPIC = "domestic-sales";
+
+    @Override
+    public Topology topology(Properties streamProperties) {
+        Serde<BeerPurchase> beerPurchaseSerde = SerdeUtil.protobufSerde(BeerPurchase.class);
+        Deserializer<BeerPurchase> beerPurchaseDeserializer = beerPurchaseSerde.deserializer();
+        Serde<String> stringSerde = Serdes.String();
+        Deserializer<String> stringDeserializer = stringSerde.deserializer();
+        Serializer<String> stringSerializer = stringSerde.serializer();
+        Serializer<BeerPurchase> beerPurchaseSerializer = beerPurchaseSerde.serializer();
+        Map<String, Double> conversionRates = Map.of("EURO", 1.1, "POUND", 1.31);
+
+        Topology topology = new Topology();
+
+        String domesticSalesSink = "domestic-beer-sales";
+        String internationalSalesSink = "international-beer-sales";
+        String purchaseSourceNodeName = "beer-purchase-source";
+        String purchaseProcessor = "purchase-processor";
+        String printingProcessor = "PrintingProcessor";
+
+        topology.addSource(LATEST,
+                        purchaseSourceNodeName,
+                        new FailOnInvalidTimestamp(),
+                        stringDeserializer,
+                        beerPurchaseDeserializer,
+                        INPUT_TOPIC)
+                .addProcessor(purchaseProcessor,
+                        () -> new BeerPurchaseProcessor(domesticSalesSink, internationalSalesSink, conversionRates),
+                        purchaseSourceNodeName)
+                .addProcessor(printingProcessor,
+                        () -> new LoggingProcessor<String, BeerPurchase, String, BeerPurchase>(printingProcessor),
+                        purchaseProcessor)
+                .addSink(internationalSalesSink, INTERNATIONAL_OUTPUT_TOPIC, stringSerializer, beerPurchaseSerializer, printingProcessor)
+                .addSink(domesticSalesSink, DOMESTIC_OUTPUT_TOPIC, stringSerializer, beerPurchaseSerializer, purchaseProcessor);
+        
+        return topology;
+    }
+
+    public static void main(String[] args) throws Exception {
+        PopsHopsApplication popsHopsApplication = new PopsHopsApplication();
+        Topics.maybeDeleteThenCreate(PopsHopsApplication.INPUT_TOPIC,
+                PopsHopsApplication.DOMESTIC_OUTPUT_TOPIC,
+                PopsHopsApplication.INTERNATIONAL_OUTPUT_TOPIC);
+        Properties properties = new Properties();
+        properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "pops-hops-application");
+        Topology topology = popsHopsApplication.topology(properties);
+        try (KafkaStreams streams = new KafkaStreams(topology, properties);
+             MockDataProducer mockDataProducer = new MockDataProducer()) {
+            streams.start();
+            LOG.info("PopsHops application started");
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            countDownLatch.await(60, TimeUnit.SECONDS);
+        }
+    }
+
+
+}

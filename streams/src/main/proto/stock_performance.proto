@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package bbejeck.chapter_9.proto;
+option java_outer_classname = "StockPerformanceProto";
+
+message StockPerformance {
+
+  double currentPrice = 1;
+  double priceDifferential = 2;
+  double shareDifferential = 3;
+  int32 currentShareVolume = 4;
+  double currentAveragePrice = 5;
+  double currentAverageVolume = 6;
+  repeated double shareVolumeLookback = 7;
+  repeated double sharePriceLookback = 8;
+  int64 lastUpdateSent = 9;
+}

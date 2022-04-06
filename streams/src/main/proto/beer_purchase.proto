@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package bbejeck.chapter_9.proto;
+option java_outer_classname = "BearPurchaseProto";
+
+message BeerPurchase {
+  double totalSale = 1;
+  int32 numberCases = 2;
+  string beerType = 3;
+
+  enum Currency {
+     EURO = 0;
+     POUND = 1;
+     DOLLAR = 2;
+  }
+  Currency currency = 4;
+}

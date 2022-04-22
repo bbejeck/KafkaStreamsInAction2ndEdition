@@ -11,15 +11,15 @@ import java.util.Map;
 
 public class BeerPurchaseProcessor extends ContextualProcessor<String, BeerPurchase, String, BeerPurchase> {
 
-    private final String domesticSalesNode;
-    private final String internationalSalesNode;
+    private final String domesticSalesSink;
+    private final String internationalSalesSink;
     private final Map<String, Double> conversionRates;
 
-    public BeerPurchaseProcessor(final String domesticSalesNode,
-                                 final String internationalSalesNode,
+    public BeerPurchaseProcessor(final String domesticSalesSink,
+                                 final String internationalSalesSink,
                                  final Map<String,Double> conversionRates) {
-        this.domesticSalesNode = domesticSalesNode;
-        this.internationalSalesNode = internationalSalesNode;
+        this.domesticSalesSink = domesticSalesSink;
+        this.internationalSalesSink = internationalSalesSink;
         this.conversionRates = conversionRates;
     }
 
@@ -29,18 +29,16 @@ public class BeerPurchaseProcessor extends ContextualProcessor<String, BeerPurch
         String key  = beerPurchaseRecord.key();
         BeerPurchase.Currency transactionCurrency = beerPurchase.getCurrency();
         if (transactionCurrency != BeerPurchase.Currency.DOLLAR) {
-            BeerPurchase dollarBeerPurchase;
             BeerPurchase.Builder builder = BeerPurchase.newBuilder(beerPurchase);
             double internationalSaleAmount = beerPurchase.getTotalSale();
             String pattern = "###.##";
             DecimalFormat decimalFormat = new DecimalFormat(pattern);
             builder.setCurrency(BeerPurchase.Currency.DOLLAR);
             builder.setTotalSale(Double.parseDouble(decimalFormat.format(convertToDollars(transactionCurrency.name(),internationalSaleAmount))));
-            dollarBeerPurchase = builder.build();
-            Record<String, BeerPurchase> convertedBeerPurchaseRecord = new Record<>(key,dollarBeerPurchase, beerPurchaseRecord.timestamp());
-            context().forward(convertedBeerPurchaseRecord, internationalSalesNode);
+            Record<String, BeerPurchase> convertedBeerPurchaseRecord = new Record<>(key,builder.build(), beerPurchaseRecord.timestamp());
+            context().forward(convertedBeerPurchaseRecord, internationalSalesSink);
         } else {
-            context().forward(beerPurchaseRecord, domesticSalesNode);
+            context().forward(beerPurchaseRecord, domesticSalesSink);
         }
     }
 

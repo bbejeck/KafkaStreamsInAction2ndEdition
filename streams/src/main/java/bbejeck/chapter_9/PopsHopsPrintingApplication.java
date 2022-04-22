@@ -3,6 +3,7 @@ package bbejeck.chapter_9;
 
 import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_9.processor.BeerPurchaseProcessor;
+import bbejeck.chapter_9.processor.LoggingProcessor;
 import bbejeck.chapter_9.proto.BearPurchaseProto.BeerPurchase;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
@@ -25,8 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.apache.kafka.streams.Topology.AutoOffsetReset.LATEST;
 
-public class PopsHopsApplication extends BaseStreamsApplication {
-    static final Logger LOG = LoggerFactory.getLogger(PopsHopsApplication.class);
+public class PopsHopsPrintingApplication extends BaseStreamsApplication {
+    static final Logger LOG = LoggerFactory.getLogger(PopsHopsPrintingApplication.class);
     final static String INPUT_TOPIC = "beer-purchases";
     final static String INTERNATIONAL_OUTPUT_TOPIC = "international-sales";
     final static String DOMESTIC_OUTPUT_TOPIC = "domestic-sales";
@@ -44,7 +45,9 @@ public class PopsHopsApplication extends BaseStreamsApplication {
         Topology topology = new Topology();
 
         String domesticSalesSink = "domestic-beer-sales";
+        String domesticPrintingProcessor = "domestic-printing";
         String internationalSalesSink = "international-beer-sales";
+        String internationalPrintingProcessor =  "international-printing";
         String purchaseSourceNodeName = "beer-purchase-source";
         String purchaseProcessor = "purchase-processor";
 
@@ -55,29 +58,35 @@ public class PopsHopsApplication extends BaseStreamsApplication {
                         beerPurchaseDeserializer,
                         INPUT_TOPIC)
                 .addProcessor(purchaseProcessor,
-                        () -> new BeerPurchaseProcessor(domesticSalesSink,
+                        () -> new BeerPurchaseProcessor(domesticPrintingProcessor,
                                                         internationalSalesSink,
                                                         conversionRates),
                         purchaseSourceNodeName)
+                .addProcessor(domesticPrintingProcessor,
+                        () -> new LoggingProcessor<String, BeerPurchase, String, BeerPurchase>("Domestic-Sales:"),
+                        purchaseProcessor)
+                .addProcessor(internationalPrintingProcessor,
+                        () -> new LoggingProcessor<String, BeerPurchase, String, BeerPurchase>("International-Sales:"),
+                        purchaseProcessor)
                 .addSink(internationalSalesSink,
                         INTERNATIONAL_OUTPUT_TOPIC,
                         stringSerializer,
                         beerPurchaseSerializer,
-                        purchaseProcessor)
+                        internationalPrintingProcessor)
                 .addSink(domesticSalesSink,
                         DOMESTIC_OUTPUT_TOPIC,
                         stringSerializer,
                         beerPurchaseSerializer,
-                        purchaseProcessor);
+                        domesticPrintingProcessor);
         
         return topology;
     }
 
     public static void main(String[] args) throws Exception {
-        PopsHopsApplication popsHopsApplication = new PopsHopsApplication();
-        Topics.maybeDeleteThenCreate(PopsHopsApplication.INPUT_TOPIC,
-                PopsHopsApplication.DOMESTIC_OUTPUT_TOPIC,
-                PopsHopsApplication.INTERNATIONAL_OUTPUT_TOPIC);
+        PopsHopsPrintingApplication popsHopsApplication = new PopsHopsPrintingApplication();
+        Topics.maybeDeleteThenCreate(PopsHopsPrintingApplication.INPUT_TOPIC,
+                PopsHopsPrintingApplication.DOMESTIC_OUTPUT_TOPIC,
+                PopsHopsPrintingApplication.INTERNATIONAL_OUTPUT_TOPIC);
         Properties properties = new Properties();
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "pops-hops-application");

@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class LoggingProcessor<KIn, VIn, KOut, VOut> extends ContextualProcessor<KIn, VIn, KIn, VIn> {
-     private static final Logger LOG = LoggerFactory.getLogger(LoggingProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LoggingProcessor.class);
     private final String name;
 
 

@@ -4,7 +4,7 @@ package bbejeck.chapter_9;
 import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_7.proto.StockTransactionProto.Transaction;
 import bbejeck.chapter_9.processor.LoggingProcessor;
-import bbejeck.chapter_9.processor.StockPerformanceProcessor;
+import bbejeck.chapter_9.processor.StockPerformanceProcessorSupplier;
 import bbejeck.chapter_9.proto.StockPerformanceProto.StockPerformance;
 import bbejeck.utils.SerdeUtil;
 import org.apache.kafka.common.serialization.Deserializer;
@@ -40,16 +40,28 @@ public class StockPerformanceApplication extends BaseStreamsApplication {
 
         Topology topology = new Topology();
         String stocksStateStore = "stock-performance-store";
-        double differentialThreshold = 0.02;
 
         KeyValueBytesStoreSupplier storeSupplier = Stores.inMemoryKeyValueStore(stocksStateStore);
-        StoreBuilder<KeyValueStore<String, StockPerformance>> storeBuilder = Stores.keyValueStoreBuilder(storeSupplier, Serdes.String(), stockPerformanceSerde);
+        StoreBuilder<KeyValueStore<String, StockPerformance>> storeBuilder =
+                Stores.keyValueStoreBuilder(storeSupplier,
+                        Serdes.String(),
+                        stockPerformanceSerde);
 
-        topology.addSource("stocks-source", stringDeserializer, stockTransactionDeserializer,"stock-transactions")
-                .addProcessor("stocks-processor", () -> new StockPerformanceProcessor(stocksStateStore, differentialThreshold), "stocks-source")
-                .addStateStore(storeBuilder,"stocks-processor")
-                .addProcessor("stocks-logging", ()-> new LoggingProcessor<>("Performance Logging"), "stocks-processor")
-                .addSink("stocks-sink", "stock-performance", stringSerializer, stockPerformanceSerializer, "stocks-processor");
+        topology.addSource("stocks-source",
+                        stringDeserializer,
+                        stockTransactionDeserializer,
+                        "stock-transactions")
+                .addProcessor("stocks-processor",
+                        new StockPerformanceProcessorSupplier(storeBuilder),
+                        "stocks-source")
+                .addProcessor("stocks-logging",
+                        () -> new LoggingProcessor<>("Performance Logging"),
+                        "stocks-processor")
+                .addSink("stocks-sink",
+                        "stock-performance",
+                        stringSerializer,
+                        stockPerformanceSerializer,
+                        "stocks-processor");
 
         return topology;
     }

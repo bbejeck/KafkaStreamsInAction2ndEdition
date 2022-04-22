@@ -31,17 +31,18 @@ public class StockPerformancePunctuator implements Punctuator {
 
     @Override
     public void punctuate(long timestamp) {
-        KeyValueIterator<String, StockPerformance> performanceIterator = keyValueStore.all();
+        try (KeyValueIterator<String, StockPerformance> performanceIterator = keyValueStore.all()) {
 
-        while (performanceIterator.hasNext()) {
-            KeyValue<String, StockPerformance> keyValue = performanceIterator.next();
-            String key = keyValue.key;
-            StockPerformance stockPerformance = keyValue.value;
+            while (performanceIterator.hasNext()) {
+                KeyValue<String, StockPerformance> keyValue = performanceIterator.next();
+                String key = keyValue.key;
+                StockPerformance stockPerformance = keyValue.value;
 
-            if (stockPerformance != null) {
-                if (stockPerformance.getPriceDifferential() >= differentialThreshold ||
-                        stockPerformance.getShareDifferential() >= differentialThreshold) {
-                    context.forward(new Record<>(key, stockPerformance, timestamp));
+                if (stockPerformance != null) {
+                    if (stockPerformance.getPriceDifferential() >= differentialThreshold ||
+                            stockPerformance.getShareDifferential() >= differentialThreshold) {
+                        context.forward(new Record<>(key, stockPerformance, timestamp));
+                    }
                 }
             }
         }

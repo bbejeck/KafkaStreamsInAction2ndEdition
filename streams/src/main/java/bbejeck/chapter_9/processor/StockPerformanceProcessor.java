@@ -17,13 +17,12 @@ import java.util.List;
 public class StockPerformanceProcessor extends ContextualProcessor<String, Transaction, String, StockPerformance> {
 
     private KeyValueStore<String, StockPerformance> keyValueStore;
-    private String stateStoreName;
-    private double differentialThreshold;
-    private static int MAX_LOOK_BACK = 20;
+    private final String stateStoreName;
+    private final double differentialThreshold = 0.02;
+    private static final int MAX_LOOK_BACK = 20;
 
-    public StockPerformanceProcessor(String stateStoreName, double differentialThreshold) {
+    public StockPerformanceProcessor(String stateStoreName) {
         this.stateStoreName = stateStoreName;
-        this.differentialThreshold = differentialThreshold;
     }
 
     @Override
@@ -34,7 +33,7 @@ public class StockPerformanceProcessor extends ContextualProcessor<String, Trans
                 context,
                 keyValueStore);
 
-        context().schedule(Duration.ofMillis(10000), PunctuationType.WALL_CLOCK_TIME, punctuator);
+        context().schedule(Duration.ofMillis(10000), PunctuationType.STREAM_TIME, punctuator);
     }
 
     @Override

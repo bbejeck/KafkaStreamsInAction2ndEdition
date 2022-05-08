@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bbejeck.chapter_9.proto;
+option java_outer_classname = "SensorAggregationProto";
+
+message SensorAggregation {
+  string sensor_id = 1;
+  int64 start_time = 2;
+  int64 end_time = 3;
+  repeated double readings = 4;
+  double average_temp = 5;
+}

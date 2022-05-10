@@ -57,7 +57,7 @@ public class DataDrivenAggregate implements ProcessorSupplier<String, Sensor, St
 
         @Override
         public void process(Record<String, Sensor> sensorRecord) {
-            lastObservedStreamTime = sensorRecord.timestamp();
+            lastObservedStreamTime = Math.max(lastObservedStreamTime, sensorRecord.timestamp());
             SensorAggregation sensorAgg = store.get(sensorRecord.key());
             SensorAggregation.Builder builder;
 

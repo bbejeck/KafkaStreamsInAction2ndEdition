@@ -67,7 +67,7 @@ public class DataDrivenAggregate implements ProcessorSupplier<String, Sensor, St
                     builder.setStartTime(sensorRecord.timestamp());
                     builder.setSensorId(sensorRecord.value().getId());
                 } else {
-                    builder = SensorAggregation.newBuilder(sensorAgg);
+                    builder = sensorAgg.toBuilder();
                 }
                 builder.setEndTime(sensorRecord.timestamp());
                 builder.addReadings(sensorRecord.value().getReading());

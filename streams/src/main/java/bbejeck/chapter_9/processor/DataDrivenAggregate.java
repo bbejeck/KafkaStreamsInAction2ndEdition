@@ -75,7 +75,7 @@ public class DataDrivenAggregate implements ProcessorSupplier<String, Sensor, St
                 store.put(sensorRecord.key(), builder.build());
             } else if (stopAggregation.test(sensorRecord.value()) && sensorAgg != null) {
                 store.delete(sensorRecord.key());
-                context().forward(new Record<>(sensorRecord.key(), sensorAgg, sensorRecord.timestamp()));
+                context().forward(new Record<>(sensorRecord.key(), sensorAgg, lastObservedStreamTime));
             }
         }
 
@@ -91,7 +91,7 @@ public class DataDrivenAggregate implements ProcessorSupplier<String, Sensor, St
             }
             toRemove.forEach(entry -> {
                 store.delete(entry.key);
-                context().forward(new Record<>(entry.key, entry.value, entry.value.getEndTime()));
+                context().forward(new Record<>(entry.key, entry.value, lastObservedStreamTime));
             });
         }
     }

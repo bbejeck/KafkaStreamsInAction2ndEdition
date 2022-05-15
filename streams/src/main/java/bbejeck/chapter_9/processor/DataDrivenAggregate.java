@@ -47,6 +47,7 @@ public class DataDrivenAggregate implements ProcessorSupplier<String, Sensor, St
     private class DataDrivenAggregateProcessor extends ContextualProcessor<String, Sensor, String, SensorAggregation> {
         KeyValueStore<String, SensorAggregation> store;
         long lastObservedStreamTime = Long.MIN_VALUE;
+        int emitCounter = 5;
 
         @Override
         public void init(ProcessorContext<String, SensorAggregation> context) {
@@ -60,6 +61,7 @@ public class DataDrivenAggregate implements ProcessorSupplier<String, Sensor, St
             lastObservedStreamTime = Math.max(lastObservedStreamTime, sensorRecord.timestamp());
             SensorAggregation sensorAgg = store.get(sensorRecord.key());
             SensorAggregation.Builder builder;
+            boolean shouldForward = false;
 
             if (shouldAggregate.test(sensorRecord.value())) {
                 if (sensorAgg == null) {
@@ -72,9 +74,16 @@ public class DataDrivenAggregate implements ProcessorSupplier<String, Sensor, St
                 builder.setEndTime(sensorRecord.timestamp());
                 builder.addReadings(sensorRecord.value().getReading());
                 builder.setAverageTemp(builder.getReadingsList().stream().mapToDouble(num -> num).average().getAsDouble());
-                store.put(sensorRecord.key(), builder.build());
+                sensorAgg = builder.build();
+                shouldForward  = sensorAgg.getReadingsList().size() % emitCounter == 0;
+                store.put(sensorRecord.key(), sensorAgg);
+
             } else if (stopAggregation.test(sensorRecord.value()) && sensorAgg != null) {
                 store.delete(sensorRecord.key());
+                shouldForward = true;
+            }
+
+            if (shouldForward) {
                 context().forward(new Record<>(sensorRecord.key(), sensorAgg, lastObservedStreamTime));
             }
         }

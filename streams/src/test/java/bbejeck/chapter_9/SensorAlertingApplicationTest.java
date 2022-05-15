@@ -20,6 +20,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -136,6 +137,42 @@ class SensorAlertingApplicationTest {
         KeyValueStore<String, SensorAggregationProto.SensorAggregation> store = topologyTestDriver.getKeyValueStore("aggregation-store");
         assertEquals(0, store.approximateNumEntries());
     }
+
+    @Test
+    @DisplayName("SensorAggregate should emit for every five readings")
+    void shouldEmitAggregationsForEveryFiveReadings() {
+
+        SensorProto.Sensor.Builder builder = SensorProto.Sensor.newBuilder();
+
+        Instant instant = Instant.now();
+        Instant instantPlusFour = instant.plusSeconds(4);
+        Instant instantPlusNine = instant.plusSeconds(9);
+        List<SensorProto.Sensor> sensors = Stream.generate(() -> builder.setId("1").setSensorType(SensorProto.Sensor.Type.TEMPERATURE).setReading(50.0).build()).limit(10).toList();
+
+        testInputTopic.pipeKeyValueList(sensors.stream().map(s -> KeyValue.pair("1", s)).toList(),
+                instant,
+                Duration.ofSeconds(1));
+
+        SensorAggregationProto.SensorAggregation firstExpectedSensorAggregation = SensorAggregationProto.SensorAggregation.newBuilder()
+                .setSensorId("1")
+                .setStartTime(instant.toEpochMilli())
+                .setEndTime(instantPlusFour.toEpochMilli())
+                .setAverageTemp(50.0)
+                .addAllReadings(Stream.generate(()-> 50.00).limit(5).toList()).build();
+
+
+        SensorAggregationProto.SensorAggregation secondExpectedSensorAggregation = SensorAggregationProto.SensorAggregation.newBuilder()
+                .setSensorId("1")
+                .setStartTime(instant.toEpochMilli())
+                .setEndTime(instantPlusNine.toEpochMilli())
+                .setAverageTemp(50.0)
+                .addAllReadings(Stream.generate(()-> 50.00).limit(10).toList()).build();
+
+        List<SensorAggregationProto.SensorAggregation> expectedSensorAggregations = List.of(firstExpectedSensorAggregation, secondExpectedSensorAggregation);
+        List<SensorAggregationProto.SensorAggregation> actualSensorAggregations = testOutputTopic.readValuesToList();
+        assertEquals(expectedSensorAggregations, actualSensorAggregations);
+    }
+
 
 }
     

@@ -24,7 +24,7 @@ public class BaseProxyInterceptingKafkaContainerTest {
 
     static {
         Network network = Network.newNetwork();
-        KAFKA = new ProxyInterceptingKafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"))
+        KAFKA = new ProxyInterceptingKafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.1.0"))
                 .withExposedPorts(9093)
                 .withNetwork(network);
 

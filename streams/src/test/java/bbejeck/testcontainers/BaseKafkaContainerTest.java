@@ -14,7 +14,7 @@ public class BaseKafkaContainerTest {
     }
 
     static {
-        KAFKA = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.0.0"));
+        KAFKA = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.1.0"));
         KAFKA.start();
     }
     

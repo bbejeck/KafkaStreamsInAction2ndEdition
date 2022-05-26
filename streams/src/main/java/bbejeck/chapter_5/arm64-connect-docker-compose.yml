@@ -3,7 +3,7 @@ version: '2'
 
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.1.0
+    image: ghcr.io/arm64-compat/confluentinc/cp-zookeeper:7.1.1
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -13,7 +13,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker:
-    image: confluentinc/cp-kafka:7.1.0
+    image: ghcr.io/arm64-compat/confluentinc/cp-kafka:7.1.1
     hostname: broker
     container_name: broker
     depends_on:
@@ -45,25 +45,13 @@ services:
       CONNECT_CONFIG_STORAGE_TOPIC: _kafka-connect-configs
       CONNECT_OFFSET_STORAGE_TOPIC: _kafka-connect-offsets
       CONNECT_STATUS_STORAGE_TOPIC: _kafka-connect-status
-      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
       CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
-
-  kafkacat:
-    image: edenhill/kafkacat:1.5.0
-    container_name: kafkacat
-    links:
-      - broker
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        apk add jq;
-        while [ 1 -eq 1 ];do sleep 60;done
 
   postgres:
     # *-----------------------------*
@@ -76,4 +64,4 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - ./cities.sql:/docker-entrypoint-initdb.d/cities.sql
+      - ./orientation_students.sql:/docker-entrypoint-initdb.d/cities.sql

@@ -1,4 +1,4 @@
-FROM confluentinc/cp-kafka-connect-base:7.1.0
+FROM ghcr.io/arm64-compat/confluentinc/cp-kafka-connect:7.1.1
 
 ENV CONNECT_PLUGIN_PATH="/usr/share/java,/usr/share/confluent-hub-components"
 

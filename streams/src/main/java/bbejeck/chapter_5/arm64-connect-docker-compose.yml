@@ -32,7 +32,7 @@ services:
     image: localimage/kafka-connect-jdbc:latest
     build:
       context: .
-      dockerfile: Connect-Dockerfile
+      dockerfile: arm64-Connect-Dockerfile
     container_name: connect
     depends_on:
       - broker

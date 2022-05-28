@@ -40,3 +40,4 @@ scratch.txt
 
 *.out
 !/gradle/wrapper/gradle-wrapper.jar
+/streams/src/main/java/bbejeck/chapter_5/chap_5_scratch.txt

@@ -1,5 +1,10 @@
-docker-compose -f arm64-connect-docker-compose.yml up
+docker-compose -f arm64-connect-docker-compose.yml up --build
 docker-compose -f arm64-connect-docker-compose.yml down -v
+
+docker exec -it broker /bin/bash
+
+kafka-console-consumer --topic postgres_orientation_students --bootstrap-server localhost:9092 --from-beginning --property print.key=true
+
 
 
 curl -i -X PUT http://localhost:8083/connectors/jdbc_source_connector_example/config \
@@ -12,37 +17,36 @@ curl -i -X PUT http://localhost:8083/connectors/jdbc_source_connector_example/co
             "mode":"timestamp",
             "timestamp.column.name":"ts",
             "topic.prefix":"postgres_",
-            "value.converter.schemas.enable": "false"
+            "value.converter":"org.apache.kafka.connect.json.JsonConverter",
+            "value.converter.schemas.enable": "false",
         }'
 
+curl -i -X PUT http://localhost:8083/connectors/jdbc_source_connector_example/config \
+      -H "Content-Type: application/json" \
+      -d '{
+             "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+             "connection.url": "jdbc:postgresql://postgres:5432/postgres",
+             "connection.user": "postgres",
+             "connection.password": "postgres",
+             "mode":"timestamp",
+             "timestamp.column.name":"ts",
+             "topic.prefix":"postgres_",
+             "value.converter":"org.apache.kafka.connect.json.JsonConverter",
+             "value.converter.schemas.enable": "false",
+             "transforms":"copyFieldToKey, extractKeyFromStruct, maskSsn",
+             "transforms.copyFieldToKey.type":"org.apache.kafka.connect.transforms.ValueToKey",
+             "transforms.copyFieldToKey.fields":"user_name",
+             "transforms.extractKeyFromStruct.type":"org.apache.kafka.connect.transforms.ExtractField$Key",
+             "transforms.extractKeyFromStruct.field":"user_name",
+             "transforms.maskSsn.type":"org.apache.kafka.connect.transforms.MaskField$Value",
+             "transforms.maskSsn.fields":"ssn",
+             "transforms.maskSsn.replacement":"xxx-xx-xxxx"
+         }'
 
-
-
-,
-            "transforms":"copyFieldToKey,extractKeyFromStruct",
-            "transforms.copyFieldToKey.type":"org.apache.kafka.connect.transforms.ValueToKey",
-            "transforms.copyFieldToKey.fields":"city_id",
-            "transforms.extractKeyFromStruct.type":"org.apache.kafka.connect.transforms.ExtractField$Key",
-            "transforms.extractKeyFromStruct.field":"city_id"
 
 
 echo 'SELECT * FROM orientation_students;' | docker exec -i postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB'
 echo "UPDATE orientation_students set full_name='Dr Stephen Strange' where user_name='timemaster'" | docker exec -i postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB'
 
 
- curl -s http://localhost:8083/connectors/jdbc_source_connector_example/status
-
-
-After created this shows up:
-
- HTTP/1.1 201 Created
- Date: Sat, 28 May 2022 18:21:20 GMT
- Location: http://localhost:8083/connectors/jdbc_source_connector_example
- Content-Type: application/json
- Content-Length: 380
- Server: Jetty(9.4.43.v20210629)
-
- {"name":"jdbc_source_connector_example","config":{"connector.class":"io.confluent.connect.jdbc.JdbcSourceConnector","connection.url":"jdbc:postgresql://postgres:5432/postgres","connection.user":"postgres","connection.password":"postgres","mode":"timestamp","timestamp.column.name":"ts","topic.prefix":"postgres_","name":"jdbc_source_connector_example"},"tasks":[],"type":"source"}%
-
- After status check this shows up
- {{"name":"jdbc_source_connector_example","connector":{"state":"RUNNING","worker_id":"connect:8083"},"tasks":[{"id":0,"state":"RUNNING","worker_id":"connect:8083"}],"type":"source"}% 
+curl -s http://localhost:8083/connectors/jdbc_source_connector_example/status

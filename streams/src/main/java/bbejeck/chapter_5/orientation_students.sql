@@ -4,7 +4,7 @@ CREATE TABLE orientation_students
 (
     ssn        VARCHAR(11)  NOT NULL,
     email      VARCHAR(255) NOT NULL,
-    user_name  VARCHAR(255) NOT NULL,
+    user_name  VARCHAR(255) NOT NULL PRIMARY KEY ,
     full_name  VARCHAR(255) NOT NULL,
     address    VARCHAR(255) NOT NULL,
     state      VARCHAR(255) NOT NULL,

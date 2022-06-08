@@ -1,5 +1,4 @@
 FROM ghcr.io/arm64-compat/confluentinc/cp-kafka-connect:7.1.1
 
-ENV CONNECT_PLUGIN_PATH="/usr/share/java,/usr/share/confluent-hub-components"
-
 RUN confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:10.4.1
+RUN confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:13.0.0

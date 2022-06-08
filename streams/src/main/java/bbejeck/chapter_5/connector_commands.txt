@@ -7,19 +7,20 @@ kafka-console-consumer --topic postgres_orientation_students --bootstrap-server 
 
 
 
-curl -i -X PUT http://localhost:8083/connectors/jdbc_source_connector_example/config \
-     -H "Content-Type: application/json" \
-     -d '{
-            "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
-            "connection.url": "jdbc:postgresql://postgres:5432/postgres",
-            "connection.user": "postgres",
-            "connection.password": "postgres",
-            "mode":"timestamp",
-            "timestamp.column.name":"ts",
-            "topic.prefix":"postgres_",
-            "value.converter":"org.apache.kafka.connect.json.JsonConverter",
-            "value.converter.schemas.enable": "false",
-        }'
+    curl -i -X PUT http://localhost:8083/connectors/jdbc_source_connector_example/config \
+         -H "Content-Type: application/json" \
+         -d '{
+                "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+                "connection.url": "jdbc:postgresql://postgres:5432/postgres",
+                "connection.user": "postgres",
+                "connection.password": "postgres",
+                "mode":"timestamp",
+                "timestamp.column.name":"ts",
+                "topic.prefix":"postgres_",
+                "tasks.max":"1",
+                "value.converter":"org.apache.kafka.connect.json.JsonConverter",
+                "value.converter.schemas.enable": "false",
+            }'
 
 curl -i -X PUT http://localhost:8083/connectors/jdbc_source_connector_example/config \
       -H "Content-Type: application/json" \
@@ -31,6 +32,7 @@ curl -i -X PUT http://localhost:8083/connectors/jdbc_source_connector_example/co
              "mode":"timestamp",
              "timestamp.column.name":"ts",
              "topic.prefix":"postgres_",
+             "tasks.max":"1",
              "value.converter":"org.apache.kafka.connect.json.JsonConverter",
              "value.converter.schemas.enable": "false",
              "transforms":"copyFieldToKey, extractKeyFromStruct, maskSsn",
@@ -50,3 +52,30 @@ echo "UPDATE orientation_students set full_name='Dr Stephen Strange' where user_
 
 
 curl -s http://localhost:8083/connectors/jdbc_source_connector_example/status
+
+curl -i -X PUT localhost:8083/connectors/student-info-elasticsearch-connector/config \
+    -H "Content-Type: application/json" \
+	-d '{
+	        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+			"connection.url": "http://elasticsearch:9200",
+			"connection.username":"elastic",
+			"connection.password":"elastic",
+			"tasks.max": "1",
+			"topics": "postgres_orientation_students",
+			"type.name": "_doc",
+			"value.converter": "org.apache.kafka.connect.json.JsonConverter",
+			"value.converter.schemas.enable": "false",
+			"schema.ignore": "true",
+			"key.ignore": "false",
+		    "errors.tolerance":"all",
+		    "errors.deadletterqueue.topic.name":"orientation_student_dlq",
+		    "errors.deadletterqueue.context.headers.enable": "true",
+		    "errors.deadletterqueue.topic.replication.factor": "1"
+	    }'
+
+curl -X DELETE http://localhost:8083/connectors/student-info-elasticsearch-connector
+
+ELASTIC SEARCH COMMANDS
+curl -X GET 'http://localhost:9200/_cat/indices?v' -u elastic:elastic
+curl -X GET 'http://localhost:9200/postgres_orientation_students/_search'  -u elastic:elastic
+curl -XGET localhost:9200/

@@ -35,8 +35,8 @@ class StockTickerSourceTaskTest {
                 "batch.size", "100",
                 "symbols", "CFLT",
                 "token", "8827348937243XXXXXX");
-        HttpClient mockHttpClient = mock(HttpClient.class);
         String expectedJson = Files.readString(Paths.get("streams/src/test/java/bbejeck/chapter_5/connector/example-api-results.json"));
+        HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
         when(mockHttpClient.send(isA(HttpRequest.class), isA(HttpResponse.BodyHandlers.ofString().getClass()))).thenReturn(mockResponse);
         when(mockResponse.body()).thenReturn(expectedJson);
@@ -46,6 +46,8 @@ class StockTickerSourceTaskTest {
         sourceTask.start(configs);
         List<SourceRecord> returnedSourceRecords = sourceTask.poll();
 
+        verify(mockHttpClient).send(isA(HttpRequest.class), isA(HttpResponse.BodyHandlers.ofString().getClass()));
+        verify(mockResponse).body();
         Assertions.assertEquals(100, returnedSourceRecords.size());
         List<StockTickerSourceTask.EodRecord> actualEodRecords = returnedSourceRecords.stream().map(r -> {
             try {

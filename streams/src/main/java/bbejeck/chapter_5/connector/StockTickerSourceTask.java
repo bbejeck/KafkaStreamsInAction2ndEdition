@@ -1,6 +1,6 @@
 package bbejeck.chapter_5.connector;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.utils.AppInfoParser;
 import org.apache.kafka.connect.data.Schema;
@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.StreamSupport;
 
 /**
  * User: Bill Bejeck
@@ -71,12 +72,13 @@ public class StockTickerSourceTask extends SourceTask {
         HttpResponse<String> response;
         try {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            ApiResult apiResult = objectMapper.readValue(response.body(), ApiResult.class);
             AtomicLong counter = new AtomicLong(0);
-            return apiResult.data().stream().map(eodRecord -> {
+            JsonNode apiResult = objectMapper.readTree(response.body());
+
+            return StreamSupport.stream(apiResult.get("data").spliterator(), false).map(entry -> {
                 Map<String, String> sourcePartition = Collections.singletonMap("API", apiUrl);
                 Map<String, Long> sourceOffset = Collections.singletonMap("index", counter.getAndIncrement());
-                return new SourceRecord(sourcePartition, sourceOffset, topic, null, VALUE_SCHEMA, convertToJson(objectMapper, eodRecord));
+                return new SourceRecord(sourcePartition, sourceOffset, topic, null, VALUE_SCHEMA, entry.toString());
             }).toList();
 
         } catch (IOException e) {
@@ -97,25 +99,4 @@ public class StockTickerSourceTask extends SourceTask {
     void setHttpClient(HttpClient httpClient) {
         this.httpClient = httpClient;
     }
-
-    private String convertToJson(ObjectMapper objectMapper, EodRecord eod) {
-        try {
-            return objectMapper.writeValueAsString(eod);
-        } catch (JsonProcessingException e) {
-            throw new ConnectException(e);
-        }
-    }
-
-    record Pagination(int limit, int offset, int count, int total) {
-    }
-
-    record EodRecord(double open, double high, double low, double close, double volume, double adj_high, double adj_low,
-                     double adj_close, double adj_open, double adj_volume, double split_factor,
-                     double dividend, String symbol, String exchange, String date) {
-    }
-
-    record ApiResult(Pagination pagination, List<EodRecord> data) {
-    }
-
-
 }

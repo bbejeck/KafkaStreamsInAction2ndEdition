@@ -1,12 +1,13 @@
 package bbejeck.chapter_5.connector;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -15,7 +16,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 class StockTickerSourceTaskTest {
@@ -38,25 +42,24 @@ class StockTickerSourceTaskTest {
         String expectedJson = Files.readString(Paths.get("streams/src/test/java/bbejeck/chapter_5/connector/example-api-results.json"));
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
-        when(mockHttpClient.send(isA(HttpRequest.class), isA(HttpResponse.BodyHandlers.ofString().getClass()))).thenReturn(mockResponse);
+        
+        when(mockHttpClient.send(Mockito.isA(HttpRequest.class), Mockito.isA(HttpResponse.BodyHandlers.ofString().getClass()))).thenReturn(mockResponse);
         when(mockResponse.body()).thenReturn(expectedJson);
-        StockTickerSourceTask.ApiResult expectedResult = objectMapper.readValue(expectedJson, StockTickerSourceTask.ApiResult.class);
+      
+        JsonNode expectedResult = objectMapper.readTree(expectedJson).get("data");
+        List<String> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(JsonNode::toString).toList();
 
         sourceTask.setHttpClient(mockHttpClient);
         sourceTask.start(configs);
         List<SourceRecord> returnedSourceRecords = sourceTask.poll();
+        List<String> actualEodRecords = returnedSourceRecords.stream().map(r -> (String)r.value()).toList();
 
-        verify(mockHttpClient).send(isA(HttpRequest.class), isA(HttpResponse.BodyHandlers.ofString().getClass()));
+        verify(mockHttpClient).send(Mockito.isA(HttpRequest.class), Mockito.isA(HttpResponse.BodyHandlers.ofString().getClass()));
         verify(mockResponse).body();
-        Assertions.assertEquals(100, returnedSourceRecords.size());
-        List<StockTickerSourceTask.EodRecord> actualEodRecords = returnedSourceRecords.stream().map(r -> {
-            try {
-                return objectMapper.readValue((String)r.value(), StockTickerSourceTask.EodRecord.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
-        Assertions.assertIterableEquals(expectedResult.data(), actualEodRecords);
+        
+        assertThat( returnedSourceRecords.size(), is(100));
+        assertThat(actualEodRecords, everyItem(not("")));
+        Assertions.assertIterableEquals(expectedDataEntries, actualEodRecords);
     }
 
 }

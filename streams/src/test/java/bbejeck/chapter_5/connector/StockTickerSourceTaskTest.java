@@ -3,7 +3,6 @@ package bbejeck.chapter_5.connector;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.connect.source.SourceRecord;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,8 @@ import java.util.stream.StreamSupport;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 import static org.mockito.Mockito.*;
 
 class StockTickerSourceTaskTest {
@@ -57,9 +58,9 @@ class StockTickerSourceTaskTest {
         verify(mockHttpClient).send(Mockito.isA(HttpRequest.class), Mockito.isA(HttpResponse.BodyHandlers.ofString().getClass()));
         verify(mockResponse).body();
         
-        assertThat( returnedSourceRecords.size(), is(100));
-        assertThat(actualEodRecords, everyItem(not("")));
-        Assertions.assertIterableEquals(expectedDataEntries, actualEodRecords);
+        assertThat(returnedSourceRecords, hasSize(100));
+        assertThat(actualEodRecords, everyItem(not(emptyOrNullString())));
+        assertThat(expectedDataEntries, equalTo(actualEodRecords));
     }
 
 }

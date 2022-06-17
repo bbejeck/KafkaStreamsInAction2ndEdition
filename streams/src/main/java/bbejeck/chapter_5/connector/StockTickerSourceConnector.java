@@ -26,14 +26,19 @@ public class StockTickerSourceConnector extends SourceConnector {
     public static final String TOKEN_CONFIG = "token";
     public static final String TASK_BATCH_SIZE_CONFIG = "batch.size";
     public static final String TICKER_SYMBOL_CONFIG = "symbols";
+    public static final String RESULT_NODE = "result.node";
+    public static final String API_POLL_INTERVAL = "api.poll.interval";
 
     public static final int DEFAULT_TASK_BATCH_SIZE = 2000;
 
     private static final ConfigDef CONFIG_DEF = new ConfigDef()
+
             .define(API_URL_CONFIG, ConfigDef.Type.STRING, ConfigDef.Importance.HIGH, "URL for the desired API call")
+            .define(API_POLL_INTERVAL, ConfigDef.Type.LONG, 10_000, ConfigDef.Importance.MEDIUM, "Time to set for polling interval in millis")
             .define(TOPIC_CONFIG, ConfigDef.Type.STRING, ConfigDef.Importance.HIGH, "The topic to publish data to")
             .define(TICKER_SYMBOL_CONFIG, ConfigDef.Type.LIST, ConfigDef.Importance.HIGH, "Comma separated list of ticker symbols to follow")
-            .define(TOKEN_CONFIG, ConfigDef.Type.STRING, ConfigDef.Importance.HIGH, "The security token for authorizing the API call")
+            .define(TOKEN_CONFIG, ConfigDef.Type.PASSWORD, ConfigDef.Importance.HIGH, "The security token for authorizing the API call")
+            .define(RESULT_NODE, ConfigDef.Type.STRING, "data", ConfigDef.Importance.MEDIUM, "The name of the json node that is the parent of stock API results")
             .define(TASK_BATCH_SIZE_CONFIG, ConfigDef.Type.INT, DEFAULT_TASK_BATCH_SIZE, ConfigDef.Importance.LOW,
                     "The maximum number of records the Source task can read the stock API feed at one time");
 
@@ -42,15 +47,20 @@ public class StockTickerSourceConnector extends SourceConnector {
     private List<String> symbols;
     private String topic;
     private int batchSize;
+    private long pollTime;
+
+    private String resultNode;
 
     @Override
     public void start(Map<String, String> props) {
         AbstractConfig config = new AbstractConfig(CONFIG_DEF, props);
         apiUrl = config.getString(API_URL_CONFIG);
-        token = config.getString(TOKEN_CONFIG);
+        token = config.getPassword(TOKEN_CONFIG).value();
         topic = config.getString(TOPIC_CONFIG);
         symbols = config.getList(TICKER_SYMBOL_CONFIG);
         batchSize = config.getInt(TASK_BATCH_SIZE_CONFIG);
+        pollTime = config.getLong(API_POLL_INTERVAL);
+        resultNode = config.getString(RESULT_NODE);
         validate(props);
     }
 
@@ -71,6 +81,8 @@ public class StockTickerSourceConnector extends SourceConnector {
             taskConfig.put(TOKEN_CONFIG, token);
             taskConfig.put(TASK_BATCH_SIZE_CONFIG, Integer.toString(batchSize));
             taskConfig.put(TICKER_SYMBOL_CONFIG, String.join(",", symbolGroup));
+            taskConfig.put(API_POLL_INTERVAL, Long.toString(pollTime));
+            taskConfig.put(RESULT_NODE, resultNode);
             taskConfigs.add(taskConfig);
         }
         return taskConfigs;

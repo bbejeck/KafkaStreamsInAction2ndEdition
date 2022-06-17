@@ -3,11 +3,15 @@ package bbejeck.chapter_5.connector;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.utils.AppInfoParser;
+import org.apache.kafka.common.utils.SystemTime;
+import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -27,6 +31,7 @@ import java.util.stream.StreamSupport;
  * Time: 1:43 PM
  */
 public class StockTickerSourceTask extends SourceTask {
+    private static final Logger LOG = LoggerFactory.getLogger(StockTickerSourceTask.class);
     private HttpClient httpClient;
     private URI uri;
     private final StringBuilder stringBuilder = new StringBuilder();
@@ -34,7 +39,18 @@ public class StockTickerSourceTask extends SourceTask {
     private static final Schema VALUE_SCHEMA = Schema.STRING_SCHEMA;
     private String apiUrl;
     private String topic;
+    private String resultNode;
+    private long timeBetweenPoll = 10_000L;
+    private final Time sourceTime;
+    private final AtomicLong lastUpdate = new AtomicLong(0);
 
+    public StockTickerSourceTask(Time sourceTime) {
+        this.sourceTime = sourceTime;
+    }
+
+    public StockTickerSourceTask() {
+        this.sourceTime = new SystemTime();
+    }
 
     @Override
     public void start(Map<String, String> props) {
@@ -45,6 +61,10 @@ public class StockTickerSourceTask extends SourceTask {
         }
         apiUrl = props.get(StockTickerSourceConnector.API_URL_CONFIG);
         topic = props.get(StockTickerSourceConnector.TOPIC_CONFIG);
+        timeBetweenPoll = Long.parseLong(props.get(StockTickerSourceConnector.API_POLL_INTERVAL));
+        lastUpdate.set(sourceTime.milliseconds() - timeBetweenPoll);
+        resultNode = props.get(StockTickerSourceConnector.RESULT_NODE);
+
         try {
             uri = new URI(getRequestString(props));
         } catch (URISyntaxException e) {
@@ -64,6 +84,14 @@ public class StockTickerSourceTask extends SourceTask {
 
     @Override
     public List<SourceRecord> poll() throws InterruptedException {
+        final long nextUpdate = lastUpdate.get() + timeBetweenPoll;
+        final long now = sourceTime.milliseconds();
+        final long sleepMs = nextUpdate - now;
+
+        if (sleepMs > 0) {
+            LOG.trace("Waiting {} ms to poll API feed next", nextUpdate - now);
+            sourceTime.sleep(sleepMs);
+        }
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
                 .GET()
@@ -75,12 +103,20 @@ public class StockTickerSourceTask extends SourceTask {
             AtomicLong counter = new AtomicLong(0);
             JsonNode apiResult = objectMapper.readTree(response.body());
 
-            return StreamSupport.stream(apiResult.get("data").spliterator(), false).map(entry -> {
+            List<SourceRecord> sourceRecords = StreamSupport.stream(apiResult.get(resultNode).spliterator(), false).map(entry -> {
                 Map<String, String> sourcePartition = Collections.singletonMap("API", apiUrl);
                 Map<String, Long> sourceOffset = Collections.singletonMap("index", counter.getAndIncrement());
                 return new SourceRecord(sourcePartition, sourceOffset, topic, null, VALUE_SCHEMA, entry.toString());
             }).toList();
 
+            lastUpdate.set(sourceTime.milliseconds());
+
+            if (!sourceRecords.isEmpty()) {
+                return sourceRecords;
+            } else {
+                sourceTime.sleep(1000);
+            }
+            return null;
         } catch (IOException e) {
             throw new ConnectException(e);
         }

@@ -2,6 +2,7 @@ package bbejeck.chapter_5.connector;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.kafka.common.utils.AppInfoParser;
 import org.apache.kafka.common.utils.SystemTime;
 import org.apache.kafka.common.utils.Time;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -89,7 +91,7 @@ public class StockTickerSourceTask extends SourceTask {
         final long sleepMs = nextUpdate - now;
 
         if (sleepMs > 0) {
-            LOG.trace("Waiting {} ms to poll API feed next", nextUpdate - now);
+            LOG.debug("Waiting {} ms to poll API feed next", nextUpdate - now);
             sourceTime.sleep(sleepMs);
         }
         HttpRequest request = HttpRequest.newBuilder()
@@ -99,11 +101,18 @@ public class StockTickerSourceTask extends SourceTask {
                 .build();
         HttpResponse<String> response;
         try {
+            LOG.debug("Request sent {}", request);
+            //TODO update with error handling code and add a way to shutdown if
+            // multiple responses are empty
+
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             AtomicLong counter = new AtomicLong(0);
             JsonNode apiResult = objectMapper.readTree(response.body());
-
-            List<SourceRecord> sourceRecords = StreamSupport.stream(apiResult.get(resultNode).spliterator(), false).map(entry -> {
+            ArrayNode tickerResults = (ArrayNode) apiResult.get(resultNode);
+            LOG.debug("Retrieved {} records", tickerResults.size());
+            Stream<JsonNode> stockRecordStream = StreamSupport.stream(tickerResults.spliterator(), false);
+            
+            List<SourceRecord> sourceRecords = stockRecordStream.map(entry -> {
                 Map<String, String> sourcePartition = Collections.singletonMap("API", apiUrl);
                 Map<String, Long> sourceOffset = Collections.singletonMap("index", counter.getAndIncrement());
                 return new SourceRecord(sourcePartition, sourceOffset, topic, null, VALUE_SCHEMA, entry.toString());
@@ -111,12 +120,7 @@ public class StockTickerSourceTask extends SourceTask {
 
             lastUpdate.set(sourceTime.milliseconds());
 
-            if (!sourceRecords.isEmpty()) {
-                return sourceRecords;
-            } else {
-                sourceTime.sleep(1000);
-            }
-            return null;
+           return sourceRecords;
         } catch (IOException e) {
             throw new ConnectException(e);
         }

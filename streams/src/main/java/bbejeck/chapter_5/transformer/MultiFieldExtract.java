@@ -90,9 +90,7 @@ public abstract class MultiFieldExtract<R extends ConnectRecord<R>> implements T
         }
         final Struct updatedValue = new Struct(updatedSchema);
 
-        for (Field field : updatedValue.schema().fields()) {
-            updatedValue.put(field.name(), value.get(field.name()));
-        }
+        updatedValue.schema().fields().forEach(field -> updatedValue.put(field.name(), value.get(field.name())));
        return newRecord(connectRecord, updatedSchema, updatedValue);
     }
 

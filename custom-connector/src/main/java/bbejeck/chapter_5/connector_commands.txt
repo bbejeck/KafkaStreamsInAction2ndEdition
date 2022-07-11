@@ -73,6 +73,23 @@ curl -i -X PUT localhost:8083/connectors/student-info-elasticsearch-connector/co
 		    "errors.deadletterqueue.topic.replication.factor": "1"
 	    }'
 
+// Add HttpCLient dependency
+curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
+    -H "Content-Type: application/json" \
+	-d '{
+	        "connector.class": "bbejeck.chapter_5.connector.StockTickerSourceConnector",
+			"connection.url": "http://elasticsearch:9200",
+			"connection.username":"elastic",
+			"connection.password":"elastic",
+			"tasks.max": "1",
+			"topics": "postgres_orientation_students",
+			"type.name": "_doc",
+			"value.converter": "org.apache.kafka.connect.json.JsonConverter",
+			"value.converter.schemas.enable": "false",
+			"schema.ignore": "true",
+			"key.ignore": "false"
+	    }'
+
 curl -X DELETE http://localhost:8083/connectors/student-info-elasticsearch-connector
 
 ELASTIC SEARCH COMMANDS

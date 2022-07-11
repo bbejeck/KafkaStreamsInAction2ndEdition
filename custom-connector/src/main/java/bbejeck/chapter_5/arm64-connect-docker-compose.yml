@@ -53,6 +53,8 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+    volumes:
+        - ../../../../../build/libs:/usr/share/java/bbejeck-chapter_5-connector
 
   postgres:
     # *-----------------------------*

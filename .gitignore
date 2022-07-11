@@ -36,8 +36,8 @@ out
 .idea/
 
 
-scratch.txt
+*scratch.txt
 
 *.out
 !/gradle/wrapper/gradle-wrapper.jar
-/streams/src/main/java/bbejeck/chapter_5/chap_5_scratch.txt
+/custom-connector/src/main/java/bbejeck/chapter_5/chap_5_scratch.txt

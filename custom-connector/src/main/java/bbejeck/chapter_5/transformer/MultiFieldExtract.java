@@ -16,6 +16,7 @@ import org.apache.kafka.connect.transforms.util.SimpleConfig;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.apache.kafka.connect.transforms.util.Requirements.requireMap;
 import static org.apache.kafka.connect.transforms.util.Requirements.requireStruct;
@@ -75,7 +76,7 @@ public abstract class MultiFieldExtract<R extends ConnectRecord<R>> implements T
     private R applySchemaless(R connectRecord) {
         final Map<String, Object> originalRecord = requireMap(operatingValue(connectRecord), PURPOSE);
         final Map<String, Object> newRecord = new LinkedHashMap<>();
-        List<Map.Entry<String,Object>> filteredEntryList = originalRecord.entrySet().stream().filter(entry -> fieldNamesToExtract.contains(entry.getKey())).toList();
+        List<Map.Entry<String,Object>> filteredEntryList = originalRecord.entrySet().stream().filter(entry -> fieldNamesToExtract.contains(entry.getKey())).collect(Collectors.toList());
         filteredEntryList.forEach(entry -> newRecord.put(entry.getKey(), entry.getValue()));
         return newRecord(connectRecord, null, newRecord);
     }
@@ -98,7 +99,7 @@ public abstract class MultiFieldExtract<R extends ConnectRecord<R>> implements T
 
     private Schema makeUpdatedSchema(Schema schema) {
         final SchemaBuilder builder = SchemaUtil.copySchemaBasics(schema, SchemaBuilder.struct());
-        List<Field> filteredFields = schema.fields().stream().filter(fld -> fieldNamesToExtract.contains(fld.name())).toList();
+        List<Field> filteredFields = schema.fields().stream().filter(fld -> fieldNamesToExtract.contains(fld.name())).collect(Collectors.toList());
         filteredFields.forEach(field -> builder.field(field.name(), field.schema()));
         return builder.build();
     }

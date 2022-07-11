@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -43,7 +44,7 @@ class StockTickerSourceTaskTest {
                 "api.poll.interval", "5000",
                 "result.node", "data",
                 "token", "8827348937243XXXXXX");
-        String expectedJson = Files.readString(Paths.get("streams/src/test/java/bbejeck/chapter_5/connector/example-api-results.json"));
+        String expectedJson = Files.readString(Paths.get("src/test/java/bbejeck/chapter_5/connector/example-api-results.json"));
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
 
@@ -51,12 +52,12 @@ class StockTickerSourceTaskTest {
         when(mockResponse.body()).thenReturn(expectedJson);
 
         JsonNode expectedResult = objectMapper.readTree(expectedJson).get("data");
-        List<String> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(JsonNode::toString).toList();
+        List<String> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(JsonNode::toString).collect(Collectors.toList());
 
         sourceTask.setHttpClient(mockHttpClient);
         sourceTask.start(configs);
         List<SourceRecord> returnedSourceRecords = sourceTask.poll();
-        List<String> actualEodRecords = returnedSourceRecords.stream().map(r -> (String) r.value()).toList();
+        List<String> actualEodRecords = returnedSourceRecords.stream().map(r -> (String) r.value()).collect(Collectors.toList());
 
         verify(mockHttpClient).send(Mockito.isA(HttpRequest.class), Mockito.isA(HttpResponse.BodyHandlers.ofString().getClass()));
         verify(mockResponse).body();

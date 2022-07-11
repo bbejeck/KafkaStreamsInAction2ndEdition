@@ -10,7 +10,6 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -74,7 +74,6 @@ public class StockTickerSourceTask extends SourceTask {
         }
     }
 
-    @NotNull
     String getRequestString(Map<String, String> props) {
         return stringBuilder.append(props.get(StockTickerSourceConnector.API_URL_CONFIG))
                 .append("?")
@@ -116,7 +115,7 @@ public class StockTickerSourceTask extends SourceTask {
                 Map<String, String> sourcePartition = Collections.singletonMap("API", apiUrl);
                 Map<String, Long> sourceOffset = Collections.singletonMap("index", counter.getAndIncrement());
                 return new SourceRecord(sourcePartition, sourceOffset, topic, null, VALUE_SCHEMA, entry.toString());
-            }).toList();
+            }).collect(Collectors.toList());
 
             lastUpdate.set(sourceTime.milliseconds());
 

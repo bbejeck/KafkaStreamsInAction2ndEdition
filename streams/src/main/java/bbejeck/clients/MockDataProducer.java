@@ -317,21 +317,19 @@ public class MockDataProducer implements AutoCloseable {
         executorService.submit(generateTask);
     }
 
-    public <K, V> void produceWithKeyValueSupplier(Supplier<K> keySupplier,
-                                                   Supplier<V> valueSupplier,
-                                                   Serializer<K> keySerializer,
-                                                   Serializer<V> valueSerializer,
-                                                   final String topic) {
+    public <K, V> void produceWithProducerRecordSupplier(Supplier<ProducerRecord<K, V>> producerRecordSupplier,
+                                                         Serializer<K> keySerializer,
+                                                         Serializer<V> valueSerializer) {
         Callable<Void> generateTask = () -> {
             final Map<String, Object> configs = producerConfigs();
             final Callback callback = callback();
-            configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
-            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+            configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer.getClass());
+            configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer.getClass());
 
             try (Producer<K, V> producer = new KafkaProducer<>(configs)) {
                 while (keepRunning) {
                     for (int i = 0; i < 15; i++) {
-                      producer.send(new ProducerRecord<>(topic, keySupplier.get(), valueSupplier.get()), callback);
+                      producer.send(producerRecordSupplier.get(), callback);
                     }
                     LOG.info("Batch sent");
                     Thread.sleep(6000);

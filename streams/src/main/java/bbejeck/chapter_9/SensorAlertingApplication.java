@@ -5,11 +5,17 @@ import bbejeck.chapter_6.proto.SensorProto.Sensor;
 import bbejeck.chapter_9.processor.DataDrivenAggregate;
 import bbejeck.chapter_9.processor.LoggingProcessor;
 import bbejeck.chapter_9.proto.SensorAggregationProto.SensorAggregation;
+import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
+import bbejeck.utils.Topics;
+import com.github.javafaker.Faker;
+import com.github.javafaker.Number;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.Serializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
@@ -20,9 +26,12 @@ import org.apache.kafka.streams.state.internals.RocksDbKeyValueBytesStoreSupplie
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * User: Bill Bejeck
@@ -73,14 +82,36 @@ public class SensorAlertingApplication extends BaseStreamsApplication {
 
     public static void main(String[] args) throws Exception {
         SensorAlertingApplication sensorAlertingApplication = new SensorAlertingApplication();
+        Topics.maybeDeleteThenCreate(INPUT_TOPIC, OUTPUT_TOPIC);
         Properties properties = new Properties();
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "sensor-alerting-application");
         Topology topology = sensorAlertingApplication.topology(properties);
-        try (KafkaStreams streams = new KafkaStreams(topology, properties)) {
+        Serializer<Sensor> sensorSerializer = SerdeUtil.protobufSerde(Sensor.class).serializer();
+        try (KafkaStreams streams = new KafkaStreams(topology, properties);
+                MockDataProducer mockDataProducer = new MockDataProducer()) {
+                mockDataProducer.produceWithProducerRecordSupplier(sensorProducerRecordSupplier,
+                        new StringSerializer(),
+                        sensorSerializer);
             streams.start();
+            LOG.info("Starting the SensorAlertApplication");
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await(60, TimeUnit.SECONDS);
         }
     }
+
+    static Supplier<ProducerRecord<String, Sensor>> sensorProducerRecordSupplier = new Supplier<>() {
+        private final Faker faker = new Faker();
+        private final Sensor.Builder sensorBuilder = Sensor.newBuilder();
+        private final List<String> sensorIds = Stream.generate(() -> faker.idNumber().valid()).limit(5).toList();
+        private final Number fakeNumber = faker.number();
+        @Override
+        public ProducerRecord<String, Sensor> get() {
+            Sensor sensor = sensorBuilder.setId(sensorIds.get(fakeNumber.numberBetween(0, sensorIds.size())))
+                    .setReading(fakeNumber.randomDouble(2, 10, 100))
+                    .setSensorType(Sensor.Type.forNumber(fakeNumber.numberBetween(1,3)))
+                    .build();
+            return new ProducerRecord<>(INPUT_TOPIC, sensor.getId(), sensor);
+        }
+    };
 }

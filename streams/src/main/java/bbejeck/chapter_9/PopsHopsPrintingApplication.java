@@ -65,7 +65,7 @@ public class PopsHopsPrintingApplication extends BaseStreamsApplication {
                         INPUT_TOPIC)
                 .addProcessor(purchaseProcessor,
                         () -> new BeerPurchaseProcessor(domesticPrintingProcessor,
-                                                        internationalSalesSink,
+                                                        internationalPrintingProcessor,
                                                         conversionRates),
                         purchaseSourceNodeName)
                 .addProcessor(domesticPrintingProcessor,

@@ -12,6 +12,7 @@ import org.apache.kafka.streams.state.KeyValueStore;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StockPerformanceProcessor extends ContextualProcessor<String, Transaction, String, StockPerformance> {
@@ -50,23 +51,31 @@ public class StockPerformanceProcessor extends ContextualProcessor<String, Trans
                 stockPerformanceBuilder = stockPerformance.toBuilder();
             }
 
+            List<Double> sharePriceLookbackListMutable = new ArrayList<>(stockPerformanceBuilder.getSharePriceLookbackList());
+            List<Double> shareVolumeLookbackListMutable = new ArrayList<>(stockPerformanceBuilder.getShareVolumeLookbackList());
 
             stockPerformanceBuilder.setPriceDifferential(calculateDifferentialFromAverage(currentTransaction.getSharePrice(),
                     stockPerformanceBuilder.getCurrentAveragePrice()));
 
             stockPerformanceBuilder.setCurrentAveragePrice(calculateNewAverage(currentTransaction.getSharePrice(),
                     stockPerformanceBuilder.getCurrentAveragePrice(),
-                    stockPerformanceBuilder.getSharePriceLookbackList()));
+                    sharePriceLookbackListMutable));
 
             stockPerformanceBuilder.setShareDifferential(calculateDifferentialFromAverage(currentTransaction.getNumberShares(),
                     stockPerformanceBuilder.getCurrentAverageVolume()));
 
             stockPerformanceBuilder.setCurrentAverageVolume(calculateNewAverage(currentTransaction.getNumberShares(),
-                    stockPerformanceBuilder.getCurrentAverageVolume(), stockPerformanceBuilder.getShareVolumeLookbackList()));
+                    stockPerformanceBuilder.getCurrentAverageVolume(),
+                    shareVolumeLookbackListMutable));
 
             stockPerformanceBuilder.setLastUpdateSent(Instant.now().toEpochMilli());
+            stockPerformanceBuilder.clearSharePriceLookback();
+            stockPerformanceBuilder.clearShareVolumeLookback();
 
-            keyValueStore.put(symbol, stockPerformance);
+            stockPerformanceBuilder.addAllSharePriceLookback(sharePriceLookbackListMutable);
+            stockPerformanceBuilder.addAllShareVolumeLookback(shareVolumeLookbackListMutable);
+
+            keyValueStore.put(symbol, stockPerformanceBuilder.build());
         }
     }
 

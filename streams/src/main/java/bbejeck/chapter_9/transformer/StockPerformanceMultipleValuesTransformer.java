@@ -48,20 +48,29 @@ public class StockPerformanceMultipleValuesTransformer implements Transformer<St
                 stockPerformanceBuilder = stockPerformance.toBuilder();
             }
 
+            List<Double> sharePriceLookbackListMutable = new ArrayList<>(stockPerformanceBuilder.getSharePriceLookbackList());
+            List<Double> shareVolumeLookbackListMutable = new ArrayList<>(stockPerformanceBuilder.getShareVolumeLookbackList());
+            stockPerformanceBuilder.clearSharePriceLookback();
+            stockPerformanceBuilder.clearShareVolumeLookback();
+
             stockPerformanceBuilder.setPriceDifferential(calculateDifferentialFromAverage(transaction.getSharePrice(),
                     stockPerformanceBuilder.getCurrentAveragePrice()));
 
             stockPerformanceBuilder.setCurrentAveragePrice(calculateNewAverage(transaction.getSharePrice(),
                     stockPerformanceBuilder.getCurrentAveragePrice(),
-                    stockPerformanceBuilder.getSharePriceLookbackList()));
+                    sharePriceLookbackListMutable));
 
             stockPerformanceBuilder.setShareDifferential(calculateDifferentialFromAverage(transaction.getNumberShares(),
                     stockPerformanceBuilder.getCurrentAverageVolume()));
 
             stockPerformanceBuilder.setCurrentAverageVolume(calculateNewAverage(transaction.getNumberShares(),
-                    stockPerformanceBuilder.getCurrentAverageVolume(), stockPerformanceBuilder.getShareVolumeLookbackList()));
+                    stockPerformanceBuilder.getCurrentAverageVolume(),
+                    shareVolumeLookbackListMutable));
 
-            keyValueStore.put(symbol, stockPerformance);
+            stockPerformanceBuilder.addAllSharePriceLookback(sharePriceLookbackListMutable);
+            stockPerformanceBuilder.addAllShareVolumeLookback(shareVolumeLookbackListMutable);
+
+            keyValueStore.put(symbol, stockPerformanceBuilder.build());
         }
         return null;
     }

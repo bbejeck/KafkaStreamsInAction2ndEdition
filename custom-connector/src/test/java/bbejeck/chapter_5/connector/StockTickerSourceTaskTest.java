@@ -18,10 +18,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class StockTickerSourceTaskTest {
@@ -42,7 +42,7 @@ class StockTickerSourceTaskTest {
                 "batch.size", "100",
                 "symbols", "CFLT",
                 "api.poll.interval", "5000",
-                "result.node", "data",
+                "result.node.path", "/data",
                 "token", "8827348937243XXXXXX");
         String expectedJson = Files.readString(Paths.get("src/test/java/bbejeck/chapter_5/connector/example-api-results.json"));
         HttpClient mockHttpClient = mock(HttpClient.class);
@@ -52,18 +52,51 @@ class StockTickerSourceTaskTest {
         when(mockResponse.body()).thenReturn(expectedJson);
 
         JsonNode expectedResult = objectMapper.readTree(expectedJson).get("data");
-        List<String> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(JsonNode::toString).collect(Collectors.toList());
+        List<Map<String, Object>> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn -> sourceTask.toMap(jn)).collect(Collectors.toList());
 
         sourceTask.setHttpClient(mockHttpClient);
         sourceTask.start(configs);
         List<SourceRecord> returnedSourceRecords = sourceTask.poll();
-        List<String> actualEodRecords = returnedSourceRecords.stream().map(r -> (String) r.value()).collect(Collectors.toList());
+        List<Map<String, Object>> actualEodRecords = returnedSourceRecords.stream().map(r -> (Map<String, Object>) r.value()).collect(Collectors.toList());
 
         verify(mockHttpClient).send(Mockito.isA(HttpRequest.class), Mockito.isA(HttpResponse.BodyHandlers.ofString().getClass()));
         verify(mockResponse).body();
 
         assertThat(returnedSourceRecords, hasSize(100));
-        assertThat(actualEodRecords, everyItem(not(emptyOrNullString())));
+        assertThat(expectedDataEntries, equalTo(actualEodRecords));
+    }
+
+    @Test
+    @DisplayName("Should retrieve quotes from Yahoo feed")
+    void getStockQuotesYahoo() throws Exception {
+        Map<String, String> configs = Map.of("api.url", "http://api.marketstack.com/v1/eod",
+                "topic", "foo",
+                "batch.size", "100",
+                "symbols", "CFLT",
+                "api.poll.interval", "5000",
+                "result.node.path", "/quoteResponse/result",
+                "token", "8827348937243XXXXXX");
+        String expectedJson = Files.readString(Paths.get("src/test/java/bbejeck/chapter_5/connector/yahoo-api-expected-results.json"));
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        HttpResponse<String> mockResponse = mock(HttpResponse.class);
+
+        when(mockHttpClient.send(Mockito.isA(HttpRequest.class), Mockito.isA(HttpResponse.BodyHandlers.ofString().getClass()))).thenReturn(mockResponse);
+        when(mockResponse.body()).thenReturn(expectedJson);
+
+        JsonNode expectedFullResponse = objectMapper.readTree(expectedJson);
+        JsonNode expectedResult = expectedFullResponse.at("/quoteResponse/result");
+        assertTrue(expectedResult.isArray());
+        List<Map<String,Object>> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn -> sourceTask.toMap(jn)).collect(Collectors.toList());
+
+        sourceTask.setHttpClient(mockHttpClient);
+        sourceTask.start(configs);
+        List<SourceRecord> returnedSourceRecords = sourceTask.poll();
+        List<Map<String, Object>> actualEodRecords = returnedSourceRecords.stream().map(r -> (Map<String, Object>) r.value()).collect(Collectors.toList());
+
+        verify(mockHttpClient).send(Mockito.isA(HttpRequest.class), Mockito.isA(HttpResponse.BodyHandlers.ofString().getClass()));
+        verify(mockResponse).body();
+
+        assertThat(returnedSourceRecords, hasSize(3));
         assertThat(expectedDataEntries, equalTo(actualEodRecords));
     }
 

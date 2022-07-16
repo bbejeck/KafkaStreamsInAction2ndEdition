@@ -73,21 +73,26 @@ curl -i -X PUT localhost:8083/connectors/student-info-elasticsearch-connector/co
 		    "errors.deadletterqueue.topic.replication.factor": "1"
 	    }'
 
-// Add HttpCLient dependency
+
 curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
     -H "Content-Type: application/json" \
 	-d '{
 	        "connector.class": "bbejeck.chapter_5.connector.StockTickerSourceConnector",
-			"connection.url": "http://elasticsearch:9200",
-			"connection.username":"elastic",
-			"connection.password":"elastic",
+			"api.url": "https://query1.finance.yahoo.com/v7/finance/quote",
 			"tasks.max": "1",
-			"topics": "postgres_orientation_students",
-			"type.name": "_doc",
+			"topic": "yahooo_feed_results",
+            "batch.size": "100",
+            "symbols": "CFLT,AAPL,GOOG",
+            "api.poll.interval": "5000",
+            "token": "token-placeholder",
+            "result.node.path": "/quoteResponse/result",
 			"value.converter": "org.apache.kafka.connect.json.JsonConverter",
 			"value.converter.schemas.enable": "false",
+			"transforms":"extractFields",
+            "transforms.extractFields.type":"bbejeck.chapter_5.transformer.MultiFieldExtract$Value",
+            "transforms.extractFields.extract.fields":"bid,ask,displayName,symbol",
 			"schema.ignore": "true",
-			"key.ignore": "false"
+			"key.ignore": "true"
 	    }'
 
 curl -X DELETE http://localhost:8083/connectors/student-info-elasticsearch-connector
@@ -96,3 +101,15 @@ ELASTIC SEARCH COMMANDS
 curl -X GET 'http://localhost:9200/_cat/indices?v' -u elastic:elastic
 curl -X GET 'http://localhost:9200/postgres_orientation_students/_search'  -u elastic:elastic
 curl -XGET localhost:9200/
+
+
+List all connectors
+curl -s -XGET http://localhost:8083/connector-plugins | jq '.[].class'
+Expected results
+"bbejeck.chapter_5.connector.StockTickerSourceConnector"
+"io.confluent.connect.elasticsearch.ElasticsearchSinkConnector"
+"io.confluent.connect.jdbc.JdbcSinkConnector"
+"io.confluent.connect.jdbc.JdbcSourceConnector"
+"org.apache.kafka.connect.mirror.MirrorCheckpointConnector"
+"org.apache.kafka.connect.mirror.MirrorHeartbeatConnector"
+"org.apache.kafka.connect.mirror.MirrorSourceConnector"

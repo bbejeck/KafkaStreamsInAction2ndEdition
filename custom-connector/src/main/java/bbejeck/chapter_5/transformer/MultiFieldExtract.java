@@ -12,6 +12,8 @@ import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.transforms.Transformation;
 import org.apache.kafka.connect.transforms.util.SchemaUtil;
 import org.apache.kafka.connect.transforms.util.SimpleConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,7 +29,7 @@ import static org.apache.kafka.connect.transforms.util.Requirements.requireStruc
  * Time: 2:48 PM
  */
 public abstract class MultiFieldExtract<R extends ConnectRecord<R>> implements Transformation<R> {
-
+    private static final Logger LOG = LoggerFactory.getLogger(MultiFieldExtract.class);
     public static final String EXTRACT_FIELDS_CONFIG = "extract.fields";
    
 
@@ -49,11 +51,15 @@ public abstract class MultiFieldExtract<R extends ConnectRecord<R>> implements T
 
     @Override
     public R apply(R connectRecord) {
+        LOG.debug("Transforming connect record {}", connectRecord);
         if (operatingValue(connectRecord) == null) {
+            LOG.debug("Operating value is null returning null");
             return connectRecord;
         } else if (operatingSchema(connectRecord) == null) {
+            LOG.debug("No operating schema");
             return applySchemaless(connectRecord);
         } else {
+            LOG.debug("Applying transform with schema");
             return applyWithSchema(connectRecord);
         }
     }
@@ -124,6 +130,7 @@ public abstract class MultiFieldExtract<R extends ConnectRecord<R>> implements T
     public static class Value<R extends ConnectRecord<R>> extends MultiFieldExtract<R> {
         @Override
         protected Schema operatingSchema(R connectRecord) {
+            LOG.debug("Value schema is {}", connectRecord.valueSchema());
             return connectRecord.valueSchema();
         }
 

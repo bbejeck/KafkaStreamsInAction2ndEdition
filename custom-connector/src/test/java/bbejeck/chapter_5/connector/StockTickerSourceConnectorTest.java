@@ -42,7 +42,7 @@ class StockTickerSourceConnectorTest {
     void testThrowsExceptionEmptyTickerSymbols() {
         Map<String, String> userConfig = Map.of("api.url", "https://stock-ticker", "topic", "foo", "batch.size", "100", "symbols", "", "token", "abcdefg");
         ConfigException configException = Assertions.assertThrows(ConfigException.class,
-                () -> sourceConnector.start(userConfig),
+                () -> sourceConnector.validate(userConfig),
                 "ConfigException was expected");
         Assertions.assertEquals("Configuration \"symbols\" must contain at least one ticker symbol", configException.getMessage());
     }
@@ -53,7 +53,7 @@ class StockTickerSourceConnectorTest {
         String symbols = Stream.generate(() -> "CFLT").limit(101).collect(Collectors.joining(","));
         Map<String, String> userConfig = Map.of("api.url", "https://stock-ticker", "topic", "foo", "batch.size", "100", "symbols", symbols, "token", "abcdefg");
         ConfigException configException = Assertions.assertThrows(ConfigException.class,
-                () -> sourceConnector.start(userConfig),
+                () -> sourceConnector.validate(userConfig),
                 "ConfigException was expected");
         Assertions.assertEquals("Configuration \"symbols\"  has a max list of 100 ticker symbols", configException.getMessage());
     }
@@ -62,7 +62,7 @@ class StockTickerSourceConnectorTest {
     @DisplayName("Connector should only have one config group because max.tasks is one")
     void testShouldHaveOneConfigList() {
         String symbols = String.join(",", Stream.generate(() -> "CFLT").limit(10).collect(Collectors.toList()));
-        Map<String, String> userConfig = Map.of("api.url", "https://stock-ticker", "topic", "foo", "batch.size", "100", "symbols", symbols, "token", "abcdefg");
+        Map<String, String> userConfig = Map.of("api.url", "https://stock-ticker", "topic", "foo", "batch.size", "100", "symbols", symbols, "token", "abcdefg", "result.node.path", "/");
         sourceConnector.start(userConfig);
         List<Map<String, String>> configList = sourceConnector.taskConfigs(1);
         Assertions.assertEquals(1, configList.size());
@@ -72,7 +72,7 @@ class StockTickerSourceConnectorTest {
     @DisplayName("Connector should five config groups because max.tasks is five")
     void testShouldHaveFiveConfigList() {
         String symbols = String.join(",", Stream.generate(() -> "CFLT").limit(10).collect(Collectors.toList()));
-        Map<String, String> userConfig = Map.of("api.url", "https://stock-ticker", "topic", "foo", "batch.size", "100", "symbols", symbols, "token", "abcdefg");
+        Map<String, String> userConfig = Map.of("api.url", "https://stock-ticker", "topic", "foo", "batch.size", "100", "symbols", symbols, "token", "abcdefg", "result.node.path", "/");
         sourceConnector.start(userConfig);
         List<Map<String, String>> configList = sourceConnector.taskConfigs(5);
         Assertions.assertEquals(5, configList.size());

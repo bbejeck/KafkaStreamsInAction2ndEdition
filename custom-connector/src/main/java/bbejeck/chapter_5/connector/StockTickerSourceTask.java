@@ -1,8 +1,8 @@
 package bbejeck.chapter_5.connector;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.kafka.common.utils.AppInfoParser;
 import org.apache.kafka.common.utils.SystemTime;
 import org.apache.kafka.common.utils.Time;
@@ -41,7 +41,7 @@ public class StockTickerSourceTask extends SourceTask {
     private static final Schema VALUE_SCHEMA = Schema.STRING_SCHEMA;
     private String apiUrl;
     private String topic;
-    private String resultNode;
+    private String resultNodePath;
     private long timeBetweenPoll = 10_000L;
     private final Time sourceTime;
     private final AtomicLong lastUpdate = new AtomicLong(0);
@@ -65,7 +65,7 @@ public class StockTickerSourceTask extends SourceTask {
         topic = props.get(StockTickerSourceConnector.TOPIC_CONFIG);
         timeBetweenPoll = Long.parseLong(props.get(StockTickerSourceConnector.API_POLL_INTERVAL));
         lastUpdate.set(sourceTime.milliseconds() - timeBetweenPoll);
-        resultNode = props.get(StockTickerSourceConnector.RESULT_NODE);
+        resultNodePath = props.get(StockTickerSourceConnector.RESULT_NODE_PATH);
 
         try {
             uri = new URI(getRequestString(props));
@@ -107,14 +107,15 @@ public class StockTickerSourceTask extends SourceTask {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             AtomicLong counter = new AtomicLong(0);
             JsonNode apiResult = objectMapper.readTree(response.body());
-            ArrayNode tickerResults = (ArrayNode) apiResult.get(resultNode);
-            LOG.debug("Retrieved {} records", tickerResults.size());
+
+            LOG.debug("Retrieved {} results", apiResult);
+            JsonNode tickerResults = apiResult.at(resultNodePath);
             Stream<JsonNode> stockRecordStream = StreamSupport.stream(tickerResults.spliterator(), false);
             
             List<SourceRecord> sourceRecords = stockRecordStream.map(entry -> {
                 Map<String, String> sourcePartition = Collections.singletonMap("API", apiUrl);
                 Map<String, Long> sourceOffset = Collections.singletonMap("index", counter.getAndIncrement());
-                return new SourceRecord(sourcePartition, sourceOffset, topic, null, VALUE_SCHEMA, entry.toString());
+                return new SourceRecord(sourcePartition, sourceOffset, topic, null, null, toMap(entry));
             }).collect(Collectors.toList());
 
             lastUpdate.set(sourceTime.milliseconds());
@@ -123,6 +124,10 @@ public class StockTickerSourceTask extends SourceTask {
         } catch (IOException e) {
             throw new ConnectException(e);
         }
+    }
+
+     Map<String, Object> toMap(final JsonNode jsonNode) {
+        return objectMapper.convertValue(jsonNode, new TypeReference<>(){});
     }
 
     @Override

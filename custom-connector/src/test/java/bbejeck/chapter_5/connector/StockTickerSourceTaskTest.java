@@ -2,6 +2,7 @@ package bbejeck.chapter_5.connector;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,12 +53,14 @@ class StockTickerSourceTaskTest {
         when(mockResponse.body()).thenReturn(expectedJson);
 
         JsonNode expectedResult = objectMapper.readTree(expectedJson).get("data");
-        List<Map<String, Object>> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn -> sourceTask.toMap(jn)).collect(Collectors.toList());
+        List<Struct> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn ->  {
+            return sourceTask.toStruct(sourceTask.getValueSchema(jn), sourceTask.toMap(jn));
+        }).collect(Collectors.toList());
 
         sourceTask.setHttpClient(mockHttpClient);
         sourceTask.start(configs);
         List<SourceRecord> returnedSourceRecords = sourceTask.poll();
-        List<Map<String, Object>> actualEodRecords = returnedSourceRecords.stream().map(r -> (Map<String, Object>) r.value()).collect(Collectors.toList());
+        List<Struct> actualEodRecords = returnedSourceRecords.stream().map(r -> (Struct) r.value()).collect(Collectors.toList());
 
         verify(mockHttpClient).send(Mockito.isA(HttpRequest.class), Mockito.isA(HttpResponse.BodyHandlers.ofString().getClass()));
         verify(mockResponse).body();
@@ -86,12 +89,14 @@ class StockTickerSourceTaskTest {
         JsonNode expectedFullResponse = objectMapper.readTree(expectedJson);
         JsonNode expectedResult = expectedFullResponse.at("/quoteResponse/result");
         assertTrue(expectedResult.isArray());
-        List<Map<String,Object>> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn -> sourceTask.toMap(jn)).collect(Collectors.toList());
+        List<Struct> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn ->  {
+            return sourceTask.toStruct(sourceTask.getValueSchema(jn), sourceTask.toMap(jn));
+        }).collect(Collectors.toList());
 
         sourceTask.setHttpClient(mockHttpClient);
         sourceTask.start(configs);
         List<SourceRecord> returnedSourceRecords = sourceTask.poll();
-        List<Map<String, Object>> actualEodRecords = returnedSourceRecords.stream().map(r -> (Map<String, Object>) r.value()).collect(Collectors.toList());
+        List<Struct> actualEodRecords = returnedSourceRecords.stream().map(r -> (Struct) r.value()).collect(Collectors.toList());
 
         verify(mockHttpClient).send(Mockito.isA(HttpRequest.class), Mockito.isA(HttpResponse.BodyHandlers.ofString().getClass()));
         verify(mockResponse).body();

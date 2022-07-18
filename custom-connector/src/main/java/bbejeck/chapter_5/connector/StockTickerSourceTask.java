@@ -3,10 +3,13 @@ package bbejeck.chapter_5.connector;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.apache.kafka.common.utils.AppInfoParser;
 import org.apache.kafka.common.utils.SystemTime;
 import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
@@ -20,6 +23,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -111,23 +115,79 @@ public class StockTickerSourceTask extends SourceTask {
             LOG.debug("Retrieved {} results", apiResult);
             JsonNode tickerResults = apiResult.at(resultNodePath);
             Stream<JsonNode> stockRecordStream = StreamSupport.stream(tickerResults.spliterator(), false);
-            
+
             List<SourceRecord> sourceRecords = stockRecordStream.map(entry -> {
                 Map<String, String> sourcePartition = Collections.singletonMap("API", apiUrl);
                 Map<String, Long> sourceOffset = Collections.singletonMap("index", counter.getAndIncrement());
-                return new SourceRecord(sourcePartition, sourceOffset, topic, null, null, toMap(entry));
+                Schema schema = getValueSchema(entry);
+                Map<String, Object> resultsMap = toMap(entry);
+                return new SourceRecord(sourcePartition, sourceOffset, topic, null, schema, toStruct(schema, resultsMap));
             }).collect(Collectors.toList());
 
             lastUpdate.set(sourceTime.milliseconds());
 
-           return sourceRecords;
+            return sourceRecords;
         } catch (IOException e) {
             throw new ConnectException(e);
         }
     }
 
-     Map<String, Object> toMap(final JsonNode jsonNode) {
-        return objectMapper.convertValue(jsonNode, new TypeReference<>(){});
+    Map<String, Object> toMap(final JsonNode jsonNode) {
+        return objectMapper.convertValue(jsonNode, new TypeReference<>() {
+        });
+    }
+
+    Struct toStruct(Schema schema, Map<String, Object> contents) {
+        Struct struct = new Struct(schema);
+        contents.forEach(struct::put);
+        return struct;
+    }
+
+    Schema getValueSchema(final JsonNode node) {
+        SchemaBuilder schemaBuilder = SchemaBuilder.struct()
+                .name("StockApiSchema")
+                .doc("A schema dynamically created for the results of a stock-feed API schema");
+        Iterator<String> fieldNames = node.fieldNames();
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            Schema fieldSchema = getFieldSchema(node.get(fieldName));
+            schemaBuilder.field(fieldName, fieldSchema);
+        }
+        return schemaBuilder.build();
+    }
+
+    Schema getFieldSchema(final JsonNode node) {
+        JsonNodeType nodeType = node.getNodeType();
+        Schema fieldSchema;
+        switch (nodeType) {
+            case NUMBER:
+                fieldSchema = getNumberSchemaType(node);
+                break;
+            case STRING:
+                fieldSchema = Schema.OPTIONAL_STRING_SCHEMA;
+                break;
+            case BOOLEAN:
+                fieldSchema = Schema.OPTIONAL_BOOLEAN_SCHEMA;
+                break;
+            case NULL:
+                fieldSchema = Schema.OPTIONAL_BYTES_SCHEMA;
+                break;
+            default:
+                throw new IllegalStateException("Unrecognized node type " + nodeType);
+        }
+        return fieldSchema;
+    }
+
+    Schema getNumberSchemaType(final JsonNode numberNode) {
+        if (numberNode.isInt() || numberNode.isShort()) {
+            return Schema.OPTIONAL_INT32_SCHEMA;
+        } else if (numberNode.isLong()) {
+            return Schema.OPTIONAL_INT64_SCHEMA;
+        } else if (numberNode.isDouble() || numberNode.isFloat()) {
+            return Schema.OPTIONAL_FLOAT64_SCHEMA;
+        } else {
+            throw new RuntimeException("Unrecognized number type " + numberNode.getNodeType());
+        }
     }
 
     @Override

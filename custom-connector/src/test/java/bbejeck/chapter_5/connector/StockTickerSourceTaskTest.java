@@ -9,11 +9,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -45,7 +45,8 @@ class StockTickerSourceTaskTest {
                 "api.poll.interval", "5000",
                 "result.node.path", "/data",
                 "token", "8827348937243XXXXXX");
-        String expectedJson = Files.readString(Paths.get("src/test/java/bbejeck/chapter_5/connector/example-api-results.json"));
+
+        String expectedJson = getJsonFromFile("example-api-results.json");
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
 
@@ -53,7 +54,7 @@ class StockTickerSourceTaskTest {
         when(mockResponse.body()).thenReturn(expectedJson);
 
         JsonNode expectedResult = objectMapper.readTree(expectedJson).get("data");
-        List<Struct> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn ->  {
+        List<Struct> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn -> {
             return sourceTask.toStruct(sourceTask.getValueSchema(jn), sourceTask.toMap(jn));
         }).collect(Collectors.toList());
 
@@ -79,7 +80,8 @@ class StockTickerSourceTaskTest {
                 "api.poll.interval", "5000",
                 "result.node.path", "/quoteResponse/result",
                 "token", "8827348937243XXXXXX");
-        String expectedJson = Files.readString(Paths.get("src/test/java/bbejeck/chapter_5/connector/yahoo-api-expected-results.json"));
+        
+        String expectedJson = getJsonFromFile("yahoo-api-expected-results.json");
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> mockResponse = mock(HttpResponse.class);
 
@@ -89,7 +91,7 @@ class StockTickerSourceTaskTest {
         JsonNode expectedFullResponse = objectMapper.readTree(expectedJson);
         JsonNode expectedResult = expectedFullResponse.at("/quoteResponse/result");
         assertTrue(expectedResult.isArray());
-        List<Struct> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn ->  {
+        List<Struct> expectedDataEntries = StreamSupport.stream(expectedResult.spliterator(), false).map(jn -> {
             return sourceTask.toStruct(sourceTask.getValueSchema(jn), sourceTask.toMap(jn));
         }).collect(Collectors.toList());
 
@@ -103,6 +105,14 @@ class StockTickerSourceTaskTest {
 
         assertThat(returnedSourceRecords, hasSize(3));
         assertThat(expectedDataEntries, equalTo(actualEodRecords));
+    }
+
+    private String getJsonFromFile(final String jsonResultsFileName) throws IOException {
+        try (InputStream inputStream = this.getClass()
+                .getClassLoader()
+                .getResourceAsStream(jsonResultsFileName)) {
+            return new String(inputStream.readAllBytes());
+        }
     }
 
 }

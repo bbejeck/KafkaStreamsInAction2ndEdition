@@ -42,7 +42,6 @@ public class StockTickerSourceTask extends SourceTask {
     private URI uri;
     private final StringBuilder stringBuilder = new StringBuilder();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Schema VALUE_SCHEMA = Schema.STRING_SCHEMA;
     private String apiUrl;
     private String topic;
     private String resultNodePath;
@@ -65,11 +64,11 @@ public class StockTickerSourceTask extends SourceTask {
                 httpClient = HttpClient.newHttpClient();
             }
         }
-        apiUrl = props.get(StockTickerSourceConnector.API_URL_CONFIG);
-        topic = props.get(StockTickerSourceConnector.TOPIC_CONFIG);
-        timeBetweenPoll = Long.parseLong(props.get(StockTickerSourceConnector.API_POLL_INTERVAL));
+        apiUrl = props.get(StockTickerSourceConnectorConfig.API_URL_CONFIG);
+        topic = props.get(StockTickerSourceConnectorConfig.TOPIC_CONFIG);
+        timeBetweenPoll = Long.parseLong(props.get(StockTickerSourceConnectorConfig.API_POLL_INTERVAL));
         lastUpdate.set(sourceTime.milliseconds() - timeBetweenPoll);
-        resultNodePath = props.get(StockTickerSourceConnector.RESULT_NODE_PATH);
+        resultNodePath = props.get(StockTickerSourceConnectorConfig.RESULT_NODE_PATH);
 
         try {
             uri = new URI(getRequestString(props));
@@ -79,11 +78,11 @@ public class StockTickerSourceTask extends SourceTask {
     }
 
     String getRequestString(Map<String, String> props) {
-        return stringBuilder.append(props.get(StockTickerSourceConnector.API_URL_CONFIG))
+        return stringBuilder.append(props.get(StockTickerSourceConnectorConfig.API_URL_CONFIG))
                 .append("?")
-                .append("access_key=").append(props.get(StockTickerSourceConnector.TOKEN_CONFIG))
+                .append("access_key=").append(props.get(StockTickerSourceConnectorConfig.TOKEN_CONFIG))
                 .append("&")
-                .append("symbols=").append(props.get(StockTickerSourceConnector.TICKER_SYMBOL_CONFIG))
+                .append("symbols=").append(props.get(StockTickerSourceConnectorConfig.TICKER_SYMBOL_CONFIG))
                 .toString();
     }
 

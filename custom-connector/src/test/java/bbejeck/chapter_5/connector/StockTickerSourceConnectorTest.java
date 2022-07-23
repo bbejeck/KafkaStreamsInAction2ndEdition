@@ -4,6 +4,7 @@ package bbejeck.chapter_5.connector;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.connect.source.SourceConnector;
 import org.jetbrains.annotations.Contract;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +26,12 @@ class StockTickerSourceConnectorTest {
     @BeforeEach
     void setUp() {
         sourceConnector = new StockTickerSourceConnector();
+       //USE A MOCKITO SPY for partial mocking of source connector
+    }
+
+    @AfterEach
+    void tearDown() {
+        sourceConnector.stop();
     }
 
     @Test

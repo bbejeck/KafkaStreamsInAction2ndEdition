@@ -116,6 +116,30 @@ curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
 			"key.ignore": "true"
 	    }'
 
+
+curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
+    -H "Content-Type: application/json" \
+	-d '{
+	        "connector.class": "bbejeck.chapter_5.connector.StockTickerSourceConnector",
+			"api.url": "https://query1.finance.yahoo.com/v7/finance/quote",
+			"tasks.max": "1",
+			"topic": "yahoo_feed_results",
+            "batch.size": "100",
+            "api.poll.interval": "5000",
+            "token": "token-placeholder",
+            "result.node.path": "/quoteResponse/result",
+			"value.converter": "org.apache.kafka.connect.json.JsonConverter",
+			"value.converter.schemas.enable": "false",
+			"transforms":"extractFields",
+            "transforms.extractFields.type":"bbejeck.chapter_5.transformer.MultiFieldExtract$Value",
+            "transforms.extractFields.extract.fields":"bid,ask,displayName,symbol",
+			"schema.ignore": "true",
+			"key.ignore": "true"
+	    }'
+
+
+Update the ticker-symbols with these entries ,BRDCY,MSFT
+
 curl -X DELETE http://localhost:8083/connectors/student-info-elasticsearch-connector
 
 ELASTIC SEARCH COMMANDS

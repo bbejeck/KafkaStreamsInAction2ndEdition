@@ -43,13 +43,13 @@ public class StockTickerSourceConnectorMonitorThread extends Thread {
     public void run() {
         while (shutDownLatch.getCount() > 0) {
             try {
-                 if (updateSymbols()) {
+                 if (updatedSymbols()) {
                      LOG.debug("Found updated symbols requesting reconfiguration of tasks");
                      connectorContext.requestTaskReconfiguration();
                  }
 
-                boolean shuttingDown = shutDownLatch.await(monitorThreadCheckInterval, TimeUnit.MILLISECONDS);
-                if (shuttingDown) {
+                boolean isShutdown = shutDownLatch.await(monitorThreadCheckInterval, TimeUnit.MILLISECONDS);
+                if (isShutdown) {
                     return;
                 }
             } catch (InterruptedException e) {
@@ -60,7 +60,7 @@ public class StockTickerSourceConnectorMonitorThread extends Thread {
         }
     }
 
-    private boolean updateSymbols() {
+    private boolean updatedSymbols() {
         List<String> maybeNewSymbols = symbols();
         boolean foundNewSymbols = false;
         LOG.debug("Checking for any updated ticker symbols");

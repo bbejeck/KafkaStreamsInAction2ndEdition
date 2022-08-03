@@ -2,6 +2,7 @@ package bbejeck.chapter_5.connector;
 
 import org.apache.kafka.common.config.Config;
 import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.utils.AppInfoParser;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
@@ -9,6 +10,10 @@ import org.apache.kafka.connect.util.ConnectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +36,8 @@ public class StockTickerSourceConnector extends SourceConnector {
     private long pollTime;
 
     private String resultNode;
+
+    private String symbolUpdatePath;
     private StockTickerSourceConnectorMonitorThread monitorThread;
 
     @Override
@@ -43,7 +50,7 @@ public class StockTickerSourceConnector extends SourceConnector {
         batchSize = config.getInt(TASK_BATCH_SIZE_CONFIG);
         pollTime = config.getLong(API_POLL_INTERVAL);
         resultNode = config.getString(RESULT_NODE_PATH);
-        String symbolUpdatePath = config.getString(SYMBOL_UPDATE_PATH);
+        symbolUpdatePath = config.getString(SYMBOL_UPDATE_PATH);
 
         int timeoutCheck = config.getInt(RECONFIGURE_TIMEOUT_CHECK);
 
@@ -82,11 +89,15 @@ public class StockTickerSourceConnector extends SourceConnector {
     @Override
     public Config validate(Map<String, String> connectorConfigs) {
         Config config = super.validate(connectorConfigs);
-//        if (connectorConfigs.get(TICKER_SYMBOL_CONFIG).isBlank()) {
-//            throw new ConfigException("Configuration \"symbols\" must contain at least one ticker symbol");
-//        } else if (connectorConfigs.get(TICKER_SYMBOL_CONFIG).split(",").length > 100) {
-//            throw new ConfigException("Configuration \"symbols\"  has a max list of 100 ticker symbols");
-//        }
+        final Path symbolFile = Paths.get(connectorConfigs.get(SYMBOL_UPDATE_PATH));
+        try {
+            String symbols =  Files.readString(symbolFile);
+            if (symbols.isEmpty()) {
+                throw new ConfigException("Configuration \"symbols\" must contain at least one ticker symbol");
+            }
+        } catch (IOException e) {
+            throw new ConfigException(e.getMessage());
+        }
         return config;
     }
 

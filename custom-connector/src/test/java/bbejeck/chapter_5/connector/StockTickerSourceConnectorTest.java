@@ -2,6 +2,7 @@ package bbejeck.chapter_5.connector;
 
 
 import org.apache.kafka.common.config.ConfigException;
+import org.apache.kafka.common.utils.SystemTime;
 import org.apache.kafka.connect.source.SourceConnector;
 import org.apache.kafka.connect.source.SourceConnectorContext;
 import org.jetbrains.annotations.Contract;
@@ -40,8 +41,8 @@ class StockTickerSourceConnectorTest {
 
     @Test
     @DisplayName("Connector should throw exception because it's missing ticker symbols")
-    void testThrowsExceptionMissingTickerSymbols() throws Exception {
-
+    void testThrowsExceptionMissingTickerSymbols()  {
+        SystemTime time = new SystemTime();
         ArgumentCaptor<RuntimeException> exceptionCapture = ArgumentCaptor.forClass(RuntimeException.class);
         Map<String, String> userConfig = Map.of("api.url", "https://stock-ticker",
                 "topic", "foo",
@@ -51,7 +52,8 @@ class StockTickerSourceConnectorTest {
                 "result.node.path", "data");
        
         sourceConnector.start(userConfig);
-        Thread.sleep(1000);
+        // Need to give the monitor thread some time to run
+        time.sleep(250);
 
         Mockito.verify(connectorContext).raiseError(exceptionCapture.capture());
         Exception e = exceptionCapture.getValue();

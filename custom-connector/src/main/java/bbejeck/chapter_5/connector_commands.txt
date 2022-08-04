@@ -19,7 +19,7 @@ kafka-console-consumer --topic postgres_orientation_students --bootstrap-server 
                 "topic.prefix":"postgres_",
                 "tasks.max":"1",
                 "value.converter":"org.apache.kafka.connect.json.JsonConverter",
-                "value.converter.schemas.enable": "false",
+                "value.converter.schemas.enable": "false"
             }'
 
 curl -i -X PUT http://localhost:8083/connectors/jdbc_source_connector_example/config \
@@ -86,6 +86,7 @@ curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
             "api.poll.interval": "5000",
             "token": "token-placeholder",
             "result.node.path": "/quoteResponse/result",
+            "symbol.update.path": "/usr/share/java/bbejeck-chapter_5-connector/configs/ticker-symbols.txt",
 			"value.converter": "org.apache.kafka.connect.json.JsonConverter",
 			"value.converter.schemas.enable": "true",
 			"transforms":"extractFields",
@@ -107,6 +108,7 @@ curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
             "api.poll.interval": "5000",
             "token": "token-placeholder",
             "result.node.path": "/quoteResponse/result",
+            "symbol.update.path": "/usr/share/java/bbejeck-chapter_5-connector/configs/ticker-symbols.txt",
 			"value.converter": "org.apache.kafka.connect.json.JsonConverter",
 			"value.converter.schemas.enable": "false",
 			"transforms":"extractFields",

@@ -10,6 +10,7 @@ CREATE TABLE orientation_students
     state      VARCHAR(255) NOT NULL,
     major      VARCHAR(255) NOT NULL,
     overnight  CHARACTER DEFAULT 'N',
+    preferences      VARCHAR(1000),
     ts         TIMESTAMP DEFAULT NOW() NOT NULL 
 );
 
@@ -27,9 +28,9 @@ CREATE TRIGGER update_orientation_students_timestamp BEFORE UPDATE
     ON orientation_students FOR EACH ROW EXECUTE PROCEDURE
     update_ts_column_on_update();
 
-INSERT INTO orientation_students VALUES ('123-02-9865', 'vandelay@gmail.com', 'artv', 'Art Vandelay', '123 Beach Drive, Hamptons', 'NY', 'Architecture', 'Y');
-INSERT INTO orientation_students VALUES ('331-02-2865', 'brubble@hotmail.com', 'bettyrub', 'Betty Rubble', '405 Elm Street, Rockville', 'MD', 'Finance', 'N');
-INSERT INTO orientation_students VALUES ('435-12-3865', 'sstrange@marvel.com', 'timemaster', 'Stephen Strange', '177 A Bleeker Street, New York CIty', 'NY', 'Mystic Arts', 'Y');
+INSERT INTO orientation_students VALUES ('123-02-9865', 'vandelay@gmail.com', 'artv', 'Art Vandelay', '123 Beach Drive, Hamptons', 'NY', 'Architecture', 'Y', 'I like to stay in mostly and I love sports');
+INSERT INTO orientation_students VALUES ('331-02-2865', 'brubble@hotmail.com', 'bettyrub', 'Betty Rubble', '405 Elm Street, Rockville', 'MD', 'Finance', 'N', 'I go out most nights I do not like sports');
+INSERT INTO orientation_students VALUES ('435-12-3865', 'sstrange@marvel.com', 'timemaster', 'Stephen Strange', '177 A Bleeker Street, New York CIty', 'NY', 'Mystic Arts', 'Y', 'I love magic tricks and time travel');
 
 
 

@@ -93,7 +93,7 @@ public class StockTickerSourceTask extends SourceTask {
         final long sleepMs = nextUpdate - now;
 
         if (sleepMs > 0) {
-            LOG.debug("Waiting {} ms to poll API feed next", nextUpdate - now);
+            LOG.debug("Waiting {} ms to poll API feed next", sleepMs);
             sourceTime.sleep(sleepMs);
         }
         HttpRequest request = HttpRequest.newBuilder()

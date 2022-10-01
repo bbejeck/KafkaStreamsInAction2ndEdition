@@ -69,8 +69,8 @@ public class StockTickerSourceConnector extends SourceConnector {
     public List<Map<String, String>> taskConfigs(int maxTasks) {
         List<Map<String, String>> taskConfigs = new ArrayList<>();
         List<String> symbols = monitorThread.symbols();
-        int numPartitions = Math.min(symbols.size(), maxTasks);
-        List<List<String>> groupedSymbols = ConnectorUtils.groupPartitions(symbols, numPartitions);
+        int numTasks = Math.min(symbols.size(), maxTasks);
+        List<List<String>> groupedSymbols = ConnectorUtils.groupPartitions(symbols, numTasks);
         for (List<String> symbolGroup : groupedSymbols) {
             Map<String, String> taskConfig = new HashMap<>();
             taskConfig.put(TOPIC_CONFIG, topic);

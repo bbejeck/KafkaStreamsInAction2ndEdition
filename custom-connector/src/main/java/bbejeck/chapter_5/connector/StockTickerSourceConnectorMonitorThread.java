@@ -64,7 +64,7 @@ public class StockTickerSourceConnectorMonitorThread extends Thread {
         List<String> maybeNewSymbols = symbols();
         boolean foundNewSymbols = false;
         LOG.debug("Checking for any updated ticker symbols");
-        if (!Objects.equals(maybeNewSymbols, tickerSymbols)) {
+        if (!Objects.equals(maybeNewSymbols, this.tickerSymbols)) {
             tickerSymbols = new ArrayList<>(maybeNewSymbols);
             foundNewSymbols = true;
         }

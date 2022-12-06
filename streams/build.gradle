@@ -20,6 +20,7 @@ plugins {
     id "com.google.protobuf" version "0.8.18"
     id "com.github.imflog.kafka-schema-registry-gradle-plugin" version "1.1.1"
     id "com.github.davidmc24.gradle.plugin.avro" version "1.0.0"
+    id 'com.adarshr.test-logger' version '3.2.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -37,35 +38,35 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.protobuf:protobuf-java:3.18.2'
+    implementation 'com.google.protobuf:protobuf-java:3.19.6'
     implementation "org.apache.avro:avro:1.10.0"
     implementation "com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39"
     implementation 'javax.validation:validation-api:1.1.0.CR2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.6.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
     implementation 'com.github.javafaker:javafaker:1.0.2'
 
-    implementation 'org.apache.kafka:connect-api:3.2.0'
-    implementation 'org.apache.kafka:connect-transforms:3.2.0'
-    implementation('org.apache.kafka:kafka-streams:3.2.0') {
+    implementation 'org.apache.kafka:connect-api:3.3.1'
+    implementation 'org.apache.kafka:connect-transforms:3.3.1'
+    implementation('org.apache.kafka:kafka-streams:3.3.1') {
         exclude group:'org.apache.kafka', module: 'kafka-clients'
     }
-    implementation('org.apache.kafka:kafka-clients:3.2.0!!')
-    implementation('io.confluent:kafka-streams-avro-serde:7.0.1') {
+    implementation('org.apache.kafka:kafka-clients:3.3.1!!')
+    implementation('io.confluent:kafka-streams-avro-serde:7.3.0') {
         exclude group:'org.apache.kafka', module: 'kafka-clients'
         exclude group:'org.apache.kafka', module: 'kafka-streams'
     }
-    implementation('io.confluent:kafka-streams-protobuf-serde:7.0.1') {
+    implementation('io.confluent:kafka-streams-protobuf-serde:7.3.0') {
         exclude group:'org.apache.kafka', module: 'kafka-clients'
         exclude group:'org.apache.kafka', module: 'kafka-streams'
     }
 
-    implementation "io.confluent:kafka-avro-serializer:7.0.1"
-    implementation "io.confluent:kafka-protobuf-serializer:7.0.1"
-    implementation "io.confluent:kafka-json-serializer:7.0.1"
-    implementation "io.confluent:kafka-json-schema-serializer:7.0.1"
-    implementation "io.confluent:kafka-schema-registry-client:7.0.1"
-    implementation "io.confluent:kafka-json-schema-provider:7.0.1"
-    implementation "io.confluent:kafka-protobuf-provider:7.0.1"
+    implementation "io.confluent:kafka-avro-serializer:7.3.0"
+    implementation "io.confluent:kafka-protobuf-serializer:7.3.0"
+    implementation "io.confluent:kafka-json-serializer:7.3.0"
+    implementation "io.confluent:kafka-json-schema-serializer:7.3.0"
+    implementation "io.confluent:kafka-schema-registry-client:7.3.0"
+    implementation "io.confluent:kafka-json-schema-provider:7.3.0"
+    implementation "io.confluent:kafka-protobuf-provider:7.3.0"
 
     implementation "org.apache.logging.log4j:log4j-api:2.17.1"
     implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
@@ -73,7 +74,7 @@ dependencies {
 
     testImplementation(platform('org.junit:junit-bom:5.7.0'))
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation "org.apache.kafka:kafka-streams-test-utils:3.2.0"
+    testImplementation "org.apache.kafka:kafka-streams-test-utils:3.3.1"
     testImplementation "org.testcontainers:junit-jupiter:1.17.1"
     testImplementation "org.testcontainers:kafka:1.17.1"
     testImplementation "org.testcontainers:toxiproxy:1.17.1"

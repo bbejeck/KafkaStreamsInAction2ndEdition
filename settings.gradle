@@ -3,4 +3,5 @@ rootProject.name = 'kafka-streams-in-action'
 include 'sr-backward' , 'sr-forward' , 'sr-full'
 include 'streams'
 include 'custom-connector'
+include 'spring-kafka'
 

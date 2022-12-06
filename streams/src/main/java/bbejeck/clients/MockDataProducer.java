@@ -40,6 +40,7 @@ import java.util.function.Supplier;
  * This class produces records for the various Kafka Streams applications.
  * In each case the producer will run indefinitely until you call {MockDataProducer#close}
  */
+@SuppressWarnings("unchecked")
 public class MockDataProducer implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MockDataProducer.class);

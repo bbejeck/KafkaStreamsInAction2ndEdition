@@ -53,3 +53,7 @@ test {
 springBoot {
     mainClass = 'bbejeck.spring.streams.container.KafkaStreamsContainerLoanApplicationApplication'
 }
+
+clean {
+    delete 'out'
+}

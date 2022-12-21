@@ -6,7 +6,7 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * Base Kafka container for re-use across tests
  */
-public class BaseKafkaContainerTest {
+public abstract class BaseKafkaContainerTest {
 
     public static final KafkaContainer KAFKA;
 

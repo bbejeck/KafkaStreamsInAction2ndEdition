@@ -14,7 +14,7 @@ import java.util.Properties;
  * This class makes use of the Toxiproxy container
  * for simulating network issues
  */
-public class BaseProxyInterceptingKafkaContainerTest {
+public abstract class BaseProxyInterceptingKafkaContainerTest {
 
     private static final Logger LOG = LogManager.getLogger(BaseProxyInterceptingKafkaContainerTest.class);
     private static final String TOXIPROXY_NETWORK_ALIAS = "toxiproxy";

@@ -5,7 +5,7 @@ import org.testcontainers.utility.DockerImageName;
 
 /**
  * Base Kafka test container for re-use across tests.
- * This Kafka container is configure for transactional
+ * This Kafka container is configured for transactional
  * API tests and sets correct Kafka configs for using
  * transactions with a single broker
  */

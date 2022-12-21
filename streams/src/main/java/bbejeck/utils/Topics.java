@@ -45,7 +45,11 @@ public class Topics {
     }
 
     public static void delete(String... names) {
-        try (final Admin adminClient = Admin.create(getProperties())) {
+        delete(getProperties(), names);
+    }
+
+    public static void delete(final Properties props, String... names) {
+        try(final Admin adminClient = Admin.create(props)){
             adminClient.deleteTopics(Arrays.asList(names));
         }
     }
@@ -71,6 +75,10 @@ public class Topics {
 
     public static void create(final Properties props, final String name) {
         create(props, name, 1, (short) 1);
+    }
+
+    public static void create(final Properties props, final String... names) {
+        Arrays.stream(names).forEach(name -> create(props, name));
     }
 
     public static void create(final String... names) {

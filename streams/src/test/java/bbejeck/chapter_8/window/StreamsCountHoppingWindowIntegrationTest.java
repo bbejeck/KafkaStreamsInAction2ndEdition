@@ -35,10 +35,10 @@ import static org.hamcrest.Matchers.equalTo;
 class StreamsCountHoppingWindowIntegrationTest {
 
     private StreamsCountHoppingWindow streamsCountHoppingWindow;
-    private final Properties props = new Properties();
-    private Properties producerProps = new Properties();
-    private Properties consumerProps = new Properties();
-    Time time = Time.SYSTEM;
+    private final Properties kafkaStreamsProps = new Properties();
+    private final Properties producerProps = new Properties();
+    private final Properties consumerProps = new Properties();
+    private final Time time = Time.SYSTEM;
 
     @Container
     private static final KafkaContainer kafka =
@@ -47,8 +47,8 @@ class StreamsCountHoppingWindowIntegrationTest {
     @BeforeEach
     public void setUp() {
         streamsCountHoppingWindow = new StreamsCountHoppingWindow();
-        props.put("bootstrap.servers", kafka.getBootstrapServers());
-
+        kafkaStreamsProps.put("bootstrap.servers", kafka.getBootstrapServers());
+        kafkaStreamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, "hopping-windows-integration-test");
         producerProps.put("bootstrap.servers", kafka.getBootstrapServers());
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -60,21 +60,20 @@ class StreamsCountHoppingWindowIntegrationTest {
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "integration-consumer");
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        Topics.create(props, streamsCountHoppingWindow.inputTopic, streamsCountHoppingWindow.outputTopic);
+        Topics.create(kafkaStreamsProps, streamsCountHoppingWindow.inputTopic, streamsCountHoppingWindow.outputTopic);
     }
 
     @AfterEach
     public void tearDown() {
-        Topics.delete(props, streamsCountHoppingWindow.inputTopic, streamsCountHoppingWindow.outputTopic);
+        Topics.delete(kafkaStreamsProps, streamsCountHoppingWindow.inputTopic, streamsCountHoppingWindow.outputTopic);
     }
 
     @Test
     @DisplayName("Integration test for hopping window")
     void shouldHaveHoppingWindowsTest() {
-        final Topology topology = streamsCountHoppingWindow.topology(props);
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "hopping-windows-integration-test");
+        final Topology topology = streamsCountHoppingWindow.topology(kafkaStreamsProps);
         AtomicBoolean streamsStarted = new AtomicBoolean(false);
-        try (KafkaStreams kafkaStreams = new KafkaStreams(topology, props)) {
+        try (KafkaStreams kafkaStreams = new KafkaStreams(topology, kafkaStreamsProps)) {
             kafkaStreams.cleanUp();
             kafkaStreams.setStateListener((newState, oldState) -> {
                 if (newState == KafkaStreams.State.RUNNING) {
@@ -97,15 +96,24 @@ class StreamsCountHoppingWindowIntegrationTest {
                 startTimestamp += 10_000;
             }
 
-            List<KeyValue<String, Long>> expectedKeyValues = List.of(KeyValue.pair("Foo", 1L),
+            List<KeyValue<String, Long>> expectedKeyValues =
+                    List.of(KeyValue.pair("Foo", 1L),
                     KeyValue.pair("Foo", 3L),
                     KeyValue.pair("Foo", 6L),
                     KeyValue.pair("Foo", 10L),
                     KeyValue.pair("Foo", 15L),
-                    KeyValue.pair("Foo", 21L));
+                    KeyValue.pair("Foo", 21L),
+                    KeyValue.pair("Foo", 20L),
+                    KeyValue.pair("Foo", 18L),
+                    KeyValue.pair("Foo", 15L),
+                    KeyValue.pair("Foo", 11L),
+                    KeyValue.pair("Foo", 6L));
 
-
-            List<KeyValue<String, Long>> actualConsumed = TestUtils.readKeyValues(streamsCountHoppingWindow.outputTopic, consumerProps, 45_000, 6);
+            
+            List<KeyValue<String, Long>> actualConsumed = TestUtils.readKeyValues(streamsCountHoppingWindow.outputTopic,
+                    consumerProps,
+                    35_000,
+                    12);
             assertThat(actualConsumed, equalTo(expectedKeyValues));
         }
     }

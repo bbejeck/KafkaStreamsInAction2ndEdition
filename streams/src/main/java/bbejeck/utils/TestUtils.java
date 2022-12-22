@@ -8,6 +8,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.state.KeyValueIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -72,5 +74,30 @@ public class TestUtils {
             return consumedValues.subList(0, maxMessages);
         }
         return consumedValues;
+    }
+
+    public static <K, V> KeyValueIterator<K, V> kvIterator(Iterator<KeyValue<K, V>> values) {
+        return new KeyValueIterator<>() {
+            private final Iterator<KeyValue<K, V>> inner = values;
+            @Override
+            public void close() {
+
+            }
+
+            @Override
+            public K peekNextKey() {
+                throw new UnsupportedOperationException("Not supported");
+            }
+
+            @Override
+            public boolean hasNext() {
+                return inner.hasNext();
+            }
+
+            @Override
+            public KeyValue<K, V> next() {
+                return inner.next();
+            }
+        };
     }
 }

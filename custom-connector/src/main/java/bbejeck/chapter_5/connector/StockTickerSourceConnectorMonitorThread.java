@@ -5,13 +5,14 @@ import org.apache.kafka.connect.errors.ConnectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -29,24 +30,28 @@ public class StockTickerSourceConnectorMonitorThread extends Thread {
     private final ConnectorContext connectorContext;
     private final int monitorThreadCheckInterval;
     private List<String> tickerSymbols;
-    private final Path symbolUpdatePath;
+    private final HttpClient httpClient;
+
+    private final String serviceUrl;
 
     public StockTickerSourceConnectorMonitorThread(final ConnectorContext connectorContext,
                                                    final int monitorThreadCheckInterval,
-                                                   final String symbolUpdatesPath) {
+                                                   final HttpClient httpClient,
+                                                   final String serviceUrl) {
         this.connectorContext = connectorContext;
         this.monitorThreadCheckInterval = monitorThreadCheckInterval;
-        this.symbolUpdatePath = Paths.get(symbolUpdatesPath);
+        this.httpClient = httpClient;
+        this.serviceUrl = serviceUrl;
     }
 
     @Override
     public void run() {
         while (shutDownLatch.getCount() > 0) {
             try {
-                 if (updatedSymbols()) {
-                     LOG.debug("Found updated symbols requesting reconfiguration of tasks");
-                     connectorContext.requestTaskReconfiguration();
-                 }
+                if (updatedSymbols()) {
+                    LOG.debug("Found updated symbols requesting reconfiguration of tasks");
+                    connectorContext.requestTaskReconfiguration();
+                }
 
                 boolean isShutdown = shutDownLatch.await(monitorThreadCheckInterval, TimeUnit.MILLISECONDS);
                 if (isShutdown) {
@@ -71,35 +76,42 @@ public class StockTickerSourceConnectorMonitorThread extends Thread {
         return foundNewSymbols;
     }
 
-   public List<String> symbols() {
-       if (Files.exists(symbolUpdatePath)) {
-           try {
-               String symbols = Files.readString(symbolUpdatePath);
-               List<String> maybeNewSymbols = Arrays.asList(symbols.split(","));
-               if (tickerSymbols == null) {
-                   LOG.debug("Monitor thread started and found symbols {}", maybeNewSymbols);
-                    tickerSymbols = new ArrayList<>(maybeNewSymbols);
-               }
-               return maybeNewSymbols;
-           } catch (IOException e) {
-               throw new RuntimeException(e);
-           }
-       } else {
-          throw fail(new FileNotFoundException(symbolUpdatePath + " not found"));
-       }
-   }
+    public List<String> symbols() {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serviceUrl))
+                .GET()
+                .headers("Content-Type", "text/plain;charset=UTF-8")
+                .build();
+        HttpResponse<String> response;
 
-   private RuntimeException fail(Exception e) {
-           String message = "Encountered an unrecoverable error";
-           LOG.error(message, e);
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            String symbols = response.body();
+            List<String> maybeNewSymbols = Arrays.asList(symbols.split(","));
+            if (tickerSymbols == null) {
+                LOG.debug("Monitor thread started and found symbols {}", maybeNewSymbols);
+                tickerSymbols = new ArrayList<>(maybeNewSymbols);
+            }
+            return maybeNewSymbols;
+        } catch (IOException e) {
+            throw fail(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Collections.EMPTY_LIST;
+        }
+    }
 
-           RuntimeException exception = new ConnectException(message, e);
-           connectorContext.raiseError(exception);
+    private RuntimeException fail(Exception e) {
+        String message = "Encountered an unrecoverable error";
+        LOG.error(message, e);
 
-           shutdown();
-           return exception;
+        RuntimeException exception = new ConnectException(message, e);
+        connectorContext.raiseError(exception);
 
-   }
+        shutdown();
+        return exception;
+
+    }
 
     public void shutdown() {
         LOG.info("Monitor thread instructed to shutdown");

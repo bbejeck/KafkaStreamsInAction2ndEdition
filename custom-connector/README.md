@@ -5,18 +5,18 @@ Chapter 5 has several moving parts so here are some basic commands for running t
 ### Starting Docker 
 
 #### arm64
-Run this command `docker-compose -f arm64-connect-docker-compose.yml up --build` from the `src/main/java/bbejeck/chapter_5/`  to start docker.  
+Run this command `docker-compose -f arm64-connect-docker-compose.yml up --build` from the root of the `custom-connector` module to start docker.
 
 #### x86
-For Intel based mac/PC run use this command `docker-compose -f x86-connect-docker-compose.yml up --build` from the `src/main/java/bbejeck/chapter_5/`
+For Intel based mac/PC run use this command `docker-compose -f x86-connect-docker-compose.yml up --build` from the root of the `custom-connector` module to start docker.
 
 ### Stopping Docker
 
 #### arm64
-To stop docker run `docker-compose -f arm64-connect-docker-compose.yml down -v` from the `src/main/java/bbejeck/chapter_5/`
+To stop docker run `docker-compose -f arm64-connect-docker-compose.yml down -v` from the root of the `custom-connector` module
 
 #### x86
-`docker-compose -f x86-connect-docker-compose.yml down -v` from the `src/main/java/bbejeck/chapter_5/`
+`docker-compose -f x86-connect-docker-compose.yml down -v` from the root of the `custom-connector` module
 
 ### Launching the JDBC Connector
 To run the source JDBC Connector run this `curl` command from a terminal window after you've started `docker-compose` 
@@ -57,7 +57,7 @@ To update the database and see the JDBC source connector in action `echo "UPDATE
 ### Launching the ElasticSearch connector
 Use this `curl` command to start the ElasticSearch sink connector
 ```shell
-url -i -X PUT localhost:8083/connectors/student-info-elasticsearch-connector/config \
+curl -i -X PUT localhost:8083/connectors/student-info-elasticsearch-connector/config \
     -H "Content-Type: application/json" \
 	-d '{
 	      "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
@@ -84,27 +84,30 @@ To run the custom connector use this `curl` command:
 curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
     -H "Content-Type: application/json" \
 	-d '{
-	    "connector.class": "bbejeck.chapter_5.connector.StockTickerSourceConnector",
-		"api.url": "https://query1.finance.yahoo.com/v7/finance/quote",
-		"tasks.max": "1",
-		"topic": "yahoo_feed_results",
-        "batch.size": "100",
-        "symbols": "CFLT,AAPL,GOOG",
-        "api.poll.interval": "5000",
-        "token": "token-placeholder",
-        "result.node.path": "/quoteResponse/result",
-        "symbol.update.path": "/usr/share/java/bbejeck-chapter_5-connector/configs/ticker-symbols.txt",
-		"value.converter": "org.apache.kafka.connect.json.JsonConverter",
-		"value.converter.schemas.enable": "false",
-		"transforms":"extractFields",
-        "transforms.extractFields.type":"bbejeck.chapter_5.transformer.MultiFieldExtract$Value",
-        "transforms.extractFields.extract.fields":"bid,ask,displayName,symbol",
-		"schema.ignore": "true",
-		"key.ignore": "true"
+	     "connector.class": "bbejeck.chapter_5.connector.StockTickerSourceConnector",
+		 "api.url": "https://query1.finance.yahoo.com/v7/finance/quote",
+		 "service.url": "http://web-server:4567/symbols",
+		 "tasks.max": "1",
+		 "topic": "yahoo_feed_results",
+         "batch.size": "100",
+         "api.poll.interval": "5000",
+         "token": "token-placeholder",
+         "result.node.path": "/quoteResponse/result",
+		 "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+		 "value.converter.schemas.enable": "false",
+		 "transforms":"extractFields",
+         "transforms.extractFields.type":"bbejeck.chapter_5.transformer.MultiFieldExtract$Value",
+         "transforms.extractFields.extract.fields":"bid,ask,displayName,symbol",
+		 "schema.ignore": "true",
+		 "key.ignore": "true"
 	  }'
 ```
 
-To see the monitoring thread in action update the file `src/main/java/bbejeck/chapter_5/ticker-symbols.txt`  with some additional ticker symbols like `BRDCY,MSFT` ect.
+To see the monitoring thread in action, open a browser add some ticker symbols by entering a command like this 
+```shell
+  http://localhost:4567/add/BRDCY,MSFT
+```
+in the address bar
 
 ### ElasticSearch Commands
 Here are some commands to inspect the local ElasticSearch viewing results of the sink connector

@@ -1,8 +1,6 @@
 package bbejeck.chapter_5.connector;
 
-import org.apache.kafka.common.config.Config;
 import org.apache.kafka.common.config.ConfigDef;
-import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.utils.AppInfoParser;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
@@ -10,10 +8,7 @@ import org.apache.kafka.connect.util.ConnectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,9 +31,10 @@ public class StockTickerSourceConnector extends SourceConnector {
     private long pollTime;
 
     private String resultNode;
-
-    private String symbolUpdatePath;
+    private String serviceUrl;
     private StockTickerSourceConnectorMonitorThread monitorThread;
+
+    private HttpClient httpClient;
 
     @Override
     public void start(Map<String, String> props) {
@@ -50,13 +46,15 @@ public class StockTickerSourceConnector extends SourceConnector {
         batchSize = config.getInt(TASK_BATCH_SIZE_CONFIG);
         pollTime = config.getLong(API_POLL_INTERVAL);
         resultNode = config.getString(RESULT_NODE_PATH);
-        symbolUpdatePath = config.getString(SYMBOL_UPDATE_PATH);
+        serviceUrl = config.getString(SERVICE_URL_CONFIG);
+
 
         int timeoutCheck = config.getInt(RECONFIGURE_TIMEOUT_CHECK);
 
         monitorThread = new StockTickerSourceConnectorMonitorThread(context(),
                 timeoutCheck,
-                symbolUpdatePath);
+                httpClient == null ? HttpClient.newHttpClient(): httpClient,
+                serviceUrl);
         monitorThread.start();
     }
 
@@ -87,21 +85,6 @@ public class StockTickerSourceConnector extends SourceConnector {
     }
 
     @Override
-    public Config validate(Map<String, String> connectorConfigs) {
-        Config config = super.validate(connectorConfigs);
-        final Path symbolFile = Paths.get(connectorConfigs.get(SYMBOL_UPDATE_PATH));
-        try {
-            String symbols =  Files.readString(symbolFile);
-            if (symbols.isEmpty()) {
-                throw new ConfigException("Configuration \"symbols\" must contain at least one ticker symbol");
-            }
-        } catch (IOException e) {
-            throw new ConfigException(e.getMessage());
-        }
-        return config;
-    }
-
-    @Override
     public void stop() {
         if (monitorThread != null) {
             LOG.info("Stopping the monitoring thread");
@@ -122,5 +105,9 @@ public class StockTickerSourceConnector extends SourceConnector {
     @Override
     public String version() {
         return AppInfoParser.getVersion();
+    }
+
+    void setHttpClient(HttpClient httpClient) {
+        this.httpClient = httpClient;
     }
 }

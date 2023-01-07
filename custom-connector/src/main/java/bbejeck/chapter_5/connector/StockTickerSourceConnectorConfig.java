@@ -21,6 +21,7 @@ public class StockTickerSourceConnectorConfig extends AbstractConfig {
     public static final String API_POLL_INTERVAL = "api.poll.interval";
     public static final String RECONFIGURE_TIMEOUT_CHECK = "reconfigure.check";
     public static final String SYMBOL_UPDATE_PATH = "symbol.update.path";
+    public static final String SERVICE_URL_CONFIG = "service.url";
 
     public static final int DEFAULT_TASK_BATCH_SIZE = 2000;
 
@@ -32,9 +33,9 @@ public class StockTickerSourceConnectorConfig extends AbstractConfig {
             .define(TOPIC_CONFIG, ConfigDef.Type.STRING, ConfigDef.Importance.HIGH, "The topic to publish data to")
             .define(TOKEN_CONFIG, ConfigDef.Type.PASSWORD, ConfigDef.Importance.HIGH, "The security token for authorizing the API call")
             .define(RESULT_NODE_PATH, ConfigDef.Type.STRING, ConfigDef.Importance.MEDIUM, "The path to the json node that is the parent of stock API results")
-            .define(SYMBOL_UPDATE_PATH, ConfigDef.Type.STRING,  ConfigDef.Importance.HIGH, "The path containing symbols and potential updates to ticker symbols")
             .define(TASK_BATCH_SIZE_CONFIG, ConfigDef.Type.INT, DEFAULT_TASK_BATCH_SIZE, ConfigDef.Importance.LOW,
-                    "The maximum number of records the Source task can read the stock API feed at one time");
+                    "The maximum number of records the Source task can read the stock API feed at one time")
+            .define(SERVICE_URL_CONFIG, ConfigDef.Type.STRING, ConfigDef.Importance.HIGH, "The service URL to retrieve ticker symbols");
 
     public StockTickerSourceConnectorConfig(final Map<String, ?> configProps)  {
         super(CONFIG_DEF, configProps);

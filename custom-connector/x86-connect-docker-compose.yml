@@ -3,7 +3,7 @@ version: '2'
 
 services:
   zookeeper:
-    image: ghcr.io/arm64-compat/confluentinc/cp-zookeeper:7.1.1
+    image: confluentinc/cp-zookeeper:7.1.1
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -13,7 +13,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker:
-    image: ghcr.io/arm64-compat/confluentinc/cp-kafka:7.1.1
+    image: confluentinc/cp-kafka:7.1.1
     hostname: broker
     container_name: broker
     depends_on:
@@ -31,8 +31,8 @@ services:
   connect:
     image: localimage/kafka-connect-jdbc:latest
     build:
-      context: .
-      dockerfile: arm64-Connect-Dockerfile
+      context: src/main/java/bbejeck/chapter_5
+      dockerfile: x86-Connect-Dockerfile
     container_name: connect
     depends_on:
       - broker
@@ -54,8 +54,7 @@ services:
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
     volumes:
-        - ../../../../../build/libs:/usr/share/java/bbejeck-chapter_5-connector
-        - ./ticker-symbols.txt:/usr/share/java/bbejeck-chapter_5-connector/configs/ticker-symbols.txt
+      - ./build/libs:/usr/share/java/bbejeck-chapter_5-connector
 
   postgres:
     # *-----------------------------*
@@ -68,8 +67,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - ./orientation_students.sql:/docker-entrypoint-initdb.d/cities.sql
-               
+      - ./src/main/java/bbejeck/chapter_5/orientation_students.sql:/docker-entrypoint-initdb.d/cities.sql
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.2.2
     container_name: elasticsearch
@@ -82,3 +81,13 @@ services:
       - ELASTIC_USERNAME=elastic
       - ELASTIC_PASSWORD=elastic
       - xpack.security.enabled=true
+
+  web-server:
+    image: localimage/spark-webserver:latest
+    build:
+      context: .
+      dockerfile: web-server-Dockerfile
+    container_name: web-server
+    hostname: web-server
+    ports:
+      - 4567:4567

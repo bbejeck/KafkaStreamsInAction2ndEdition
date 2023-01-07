@@ -17,6 +17,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'com.adarshr.test-logger' version '2.0.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -38,8 +39,9 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0-rc1'
     implementation 'com.github.javafaker:javafaker:1.0.2'
 
-    implementation 'org.apache.kafka:connect-api:3.3.0'
-    implementation 'org.apache.kafka:connect-transforms:3.3.0'
+    implementation 'org.apache.kafka:connect-api:3.3.1'
+    implementation 'org.apache.kafka:connect-transforms:3.3.1'
+    implementation 'com.sparkjava:spark-core:2.9.4'
 
 
     implementation "org.apache.logging.log4j:log4j-api:2.17.1"
@@ -70,6 +72,19 @@ test {
 
 clean {
     delete 'out'
+}
+
+jar {
+    manifest {
+        attributes(
+                "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(" "),
+                "Main-Class": "bbejeck.chapter_5.web_server.TickerServer"
+        )
+    }
+}
+
+shadowJar {
+    minimize()
 }
 
 

@@ -72,6 +72,10 @@ public class ZMartKafkaStreamsFilteringBranchingApp extends BaseStreamsApplicati
         return rewardBuilder.build();
     };
 
+    static final Predicate<String, RetailPurchase> qualifyingPurchaseFilter = (key, value) -> value.getPurchasedItemsList().stream()
+            .mapToDouble((item -> item.getQuantity() * item.getPrice()))
+            .sum() > 10.00;
+
     static final KeyValueMapper<String, RetailPurchase,
             Iterable<KeyValue<String, PurchasedItem>>> retailTransactionToPurchases =
             (key, value) -> {
@@ -104,8 +108,9 @@ public class ZMartKafkaStreamsFilteringBranchingApp extends BaseStreamsApplicati
         patternKStream.to(PATTERNS, Produced.with(stringSerde, purchasePatternSerde));
 
         KStream<String, RewardAccumulator> rewardsKStream =
-                retailPurchaseKStream.mapValues(rewardObjectMapper)
-                        .filter((key, potentialReward) -> potentialReward.getPurchaseTotal() > 10.00);
+                retailPurchaseKStream.filter((key, value) -> value.getPurchasedItemsList().stream()
+                        .mapToDouble((item -> item.getQuantity() * item.getPrice()))
+                        .sum() > 10.00).mapValues(rewardObjectMapper);
 
         rewardsKStream.peek((key, value) -> System.out.println("Found a reward over 10 dollars " + value.getPurchaseTotal()))
                 .to(REWARDS, Produced.with(stringSerde, rewardAccumulatorSerde));

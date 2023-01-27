@@ -3,8 +3,8 @@ package bbejeck.chapter_9;
 
 import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_7.proto.StockTransactionProto.Transaction;
+import bbejeck.chapter_9.processor.StockPerformanceProcessorSupplier;
 import bbejeck.chapter_9.proto.StockPerformanceProto.StockPerformance;
-import bbejeck.chapter_9.transformer.StockPerformanceTransformer;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;
@@ -40,50 +40,46 @@ import java.util.stream.Stream;
 import static org.apache.kafka.streams.StreamsConfig.APPLICATION_ID_CONFIG;
 import static org.apache.kafka.streams.StreamsConfig.BOOTSTRAP_SERVERS_CONFIG;
 
-public class StockPerformanceStreamsAndProcessorApplication extends BaseStreamsApplication {
-      private static final Logger LOG = LoggerFactory.getLogger(StockPerformanceStreamsAndProcessorApplication.class);
+public class StockPerformanceDslAndProcessorApplication extends BaseStreamsApplication {
+     private static final Logger LOG = LoggerFactory.getLogger(StockPerformanceDslAndProcessorApplication.class);
     final static String INPUT_TOPIC = "stock-transactions";
     final static String OUTPUT_TOPIC = "stock-performance";
 
     @Override
     public Topology topology(Properties streamProperties) {
+        StreamsBuilder builder = new StreamsBuilder();
         Serde<String> stringSerde = Serdes.String();
         Serde<StockPerformance> stockPerformanceSerde = SerdeUtil.protobufSerde(StockPerformance.class);
         Serde<Transaction> stockTransactionSerde = SerdeUtil.protobufSerde(Transaction.class);
 
-
-        StreamsBuilder builder = new StreamsBuilder();
-
         String stocksStateStore = "stock-performance-store";
-        double differentialThreshold = 0.02;
-
         KeyValueBytesStoreSupplier storeSupplier = Stores.lruMap(stocksStateStore, 100);
         StoreBuilder<KeyValueStore<String, StockPerformance>> storeBuilder = Stores.keyValueStoreBuilder(storeSupplier, Serdes.String(), stockPerformanceSerde);
 
-        builder.addStateStore(storeBuilder);
-
         builder.stream(INPUT_TOPIC, Consumed.with(stringSerde, stockTransactionSerde))
-                .transform(() -> new StockPerformanceTransformer(stocksStateStore, differentialThreshold), stocksStateStore)
+                .process(new StockPerformanceProcessorSupplier(storeBuilder))
                 .peek(printKV("StockPerformance"))
-                .to(OUTPUT_TOPIC, Produced.with(stringSerde, stockPerformanceSerde));
+                .to( OUTPUT_TOPIC, Produced.with(stringSerde, stockPerformanceSerde));
+
+
         return builder.build();
     }
 
     public static void main(String[] args) throws Exception {
-        StockPerformanceStreamsAndProcessorApplication stockPerformanceStreamsAndProcessorApplication = new StockPerformanceStreamsAndProcessorApplication();
+        StockPerformanceDslAndProcessorApplication stockPerformanceDslAndProcessorApplication = new StockPerformanceDslAndProcessorApplication();
         Topics.maybeDeleteThenCreate(INPUT_TOPIC, OUTPUT_TOPIC);
         Properties properties = new Properties();
         properties.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        properties.put(APPLICATION_ID_CONFIG, "stock-performance-streams-and-processor-application");
+        properties.put(APPLICATION_ID_CONFIG, "stock-performance-streams-and-processor-multiple-values-application");
         Serializer<Transaction> transactionSerializer = SerdeUtil.protobufSerde(Transaction.class).serializer();
-        Topology topology = stockPerformanceStreamsAndProcessorApplication.topology(properties);
+        Topology topology = stockPerformanceDslAndProcessorApplication.topology(properties);
         try (KafkaStreams streams = new KafkaStreams(topology, properties);
              MockDataProducer mockDataProducer = new MockDataProducer()) {
             mockDataProducer.produceWithProducerRecordSupplier(transactionProducerRecordSupplier,
                     new StringSerializer(),
                     transactionSerializer);
             streams.start();
-            LOG.info("Starting the {}", stockPerformanceStreamsAndProcessorApplication.getClass().getSimpleName());
+            LOG.info("Started stock-performance-streams-and-processor-multiple-values-application");
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await(60, TimeUnit.SECONDS);
         }

@@ -38,9 +38,9 @@ public class StockPerformanceProcessor extends ContextualProcessor<String, Trans
     }
 
     @Override
-    public void process(Record<String, Transaction> record) {
-        String symbol = record.key();
-        Transaction currentTransaction = record.value();
+    public void process(Record<String, Transaction> transactionRecord) {
+        String symbol = transactionRecord.key();
+        Transaction currentTransaction = transactionRecord.value();
         StockPerformance.Builder stockPerformanceBuilder;
         if (symbol != null) {
             StockPerformance stockPerformance = keyValueStore.get(symbol);

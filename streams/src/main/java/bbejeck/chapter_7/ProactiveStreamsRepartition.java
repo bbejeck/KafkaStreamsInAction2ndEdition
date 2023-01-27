@@ -38,7 +38,7 @@ public class ProactiveStreamsRepartition extends BaseStreamsApplication {
 
         KStream<String, String> repartitioned = inputStreamOne.repartition(Repartitioned
                 .with(stringSerde, stringSerde)
-                .withName("proactive-repartition"));
+                .withName("proactive"));
 
         repartitioned.groupByKey().count().toStream().to("count-output", Produced.with(stringSerde, Serdes.Long()));
 

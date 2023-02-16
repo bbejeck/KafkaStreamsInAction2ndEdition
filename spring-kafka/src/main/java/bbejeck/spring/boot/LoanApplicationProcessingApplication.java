@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 
 /**
  * User: Bill Bejeck
@@ -15,7 +14,6 @@ import org.springframework.kafka.annotation.EnableKafka;
  * Time: 6:23 PM
  */
 @SpringBootApplication(scanBasePackages = {"bbejeck.spring.application" , "bbejeck.spring.datagen" })
-@EnableKafka
 @Configuration
 public class LoanApplicationProcessingApplication {
 

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package bbejeck.chapter_10.proto;
+option java_outer_classname = "StorePurchaseProto";
+
+
+message StorePurchase {
+  string customerId = 1;
+  string creditCardNumber = 2;
+  int64 purchaseDate = 3;
+  string storeId = 4;
+  double total = 5;
+}

@@ -1,4 +1,4 @@
-package bbejeck.spring.boot;
+package bbejeck.spring.application;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * Date: 10/11/22
  * Time: 6:23 PM
  */
-@SpringBootApplication(scanBasePackages = {"bbejeck.spring.application" , "bbejeck.spring.datagen" })
+@SpringBootApplication(scanBasePackages = {"bbejeck.spring.processor", "bbejeck.spring.datagen" })
 @Configuration
 public class LoanApplicationProcessingApplication {
 

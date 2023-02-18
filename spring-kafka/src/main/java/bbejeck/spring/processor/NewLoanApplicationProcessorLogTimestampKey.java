@@ -1,4 +1,4 @@
-package bbejeck.spring.application;
+package bbejeck.spring.processor;
 
 import bbejeck.spring.model.LoanApplication;
 import org.apache.kafka.clients.producer.RecordMetadata;

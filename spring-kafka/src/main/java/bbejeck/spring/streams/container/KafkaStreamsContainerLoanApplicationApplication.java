@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 
 import java.util.HashMap;
@@ -22,7 +21,6 @@ import java.util.Map;
  * Time: 6:23 PM
  */
 @SpringBootApplication(scanBasePackages = {"bbejeck.spring.datagen", "bbejeck.spring.streams.container"})
-@EnableKafka
 @Configuration
 public class KafkaStreamsContainerLoanApplicationApplication {
 

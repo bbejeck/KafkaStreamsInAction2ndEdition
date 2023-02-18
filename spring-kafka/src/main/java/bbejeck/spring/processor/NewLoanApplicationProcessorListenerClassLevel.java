@@ -1,4 +1,4 @@
-package bbejeck.spring.application;
+package bbejeck.spring.processor;
 
 import bbejeck.spring.model.LoanApplication;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import java.util.Random;
 /**
  * This class exists mostly as an example for using a KafkaListener at the class level
  * To see it in action comment out the {@code @Component}
- * annotation in the @see {@link bbejeck.spring.application.NewLoanApplicationProcessor}
+ * annotation in the @see {@link bbejeck.spring.processor.NewLoanApplicationProcessor}
  * and uncomment the one in this class.
  */
 

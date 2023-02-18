@@ -1,4 +1,4 @@
-package bbejeck.spring.boot;
+package bbejeck.spring.application;
 
 import bbejeck.spring.model.LoanApplication;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -24,8 +23,7 @@ import java.util.Map;
  * Date: 10/11/22
  * Time: 6:23 PM
  */
-@SpringBootApplication(scanBasePackages = {"bbejeck.spring.application", "bbejeck.spring.datagen"})
-@EnableKafka
+@SpringBootApplication(scanBasePackages = {"bbejeck.spring.processor", "bbejeck.spring.datagen"})
 @Configuration
 public class LoanApplicationProcessingApplicationAdvanced {
 

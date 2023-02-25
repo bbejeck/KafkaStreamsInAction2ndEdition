@@ -61,4 +61,32 @@ END AS reward_points
 EMIT CHANGES;
 --end join example
 
+-- start enriched join section
 
+CREATE TABLE rewards_members (member_id VARCHAR PRIMARY KEY,
+                              first_name VARCHAR,
+                              last_name VARCHAR,
+                              address VARCHAR,
+                              year_joined INT)
+    WITH (kafka_topic = 'rewards_members',
+        partitions = 1,
+        value_format = 'PROTOBUF'
+        );
+
+INSERT INTO coffee_purchase_stream (custID, drink, drinkSize, price, purchaseDate) VALUES ('12345', 'mocha', 'small', 4.99, UNIX_TIMESTAMP());
+INSERT INTO coffee_purchase_stream (custID, drink, drinkSize, price, purchaseDate) VALUES ('54321', 'drip_coffee', 'large', 2.99, UNIX_TIMESTAMP() + (60 * 1000 * 2));
+INSERT INTO coffee_purchase_stream (custID, drink, drinkSize, price, purchaseDate) VALUES ('98765', 'ice_tea', 'large', 5.99, UNIX_TIMESTAMP() + (60 * 1000 * 3));
+INSERT INTO coffee_purchase_stream (custID, drink, drinkSize, price, purchaseDate) VALUES ('45678', 'mocha', 'large', 7.99, UNIX_TIMESTAMP() + (60 * 1000 * 4));
+
+CREATE STREAM enriched-rewards-stream
+   WITH (kafka_topic='customer_rewards_stream',
+          value_format='PROTOBUF') AS
+SELECT crs.custID as customer_id,
+    rm.first_name + ' ' + rm.last_name as name,
+    rm.year_joined as member_since
+    crs.amount as total_purchase,
+    crs.reward_points as points
+
+FROM customer_rewards_stream crs
+    LEFT OUTER JOIN rewards-members rm
+on crs.customerId = rm.member_id

@@ -73,10 +73,10 @@ CREATE TABLE rewards_members (member_id VARCHAR PRIMARY KEY,
         value_format = 'PROTOBUF'
         );
 
-INSERT INTO coffee_purchase_stream (custID, drink, drinkSize, price, purchaseDate) VALUES ('12345', 'mocha', 'small', 4.99, UNIX_TIMESTAMP());
-INSERT INTO coffee_purchase_stream (custID, drink, drinkSize, price, purchaseDate) VALUES ('54321', 'drip_coffee', 'large', 2.99, UNIX_TIMESTAMP() + (60 * 1000 * 2));
-INSERT INTO coffee_purchase_stream (custID, drink, drinkSize, price, purchaseDate) VALUES ('98765', 'ice_tea', 'large', 5.99, UNIX_TIMESTAMP() + (60 * 1000 * 3));
-INSERT INTO coffee_purchase_stream (custID, drink, drinkSize, price, purchaseDate) VALUES ('45678', 'mocha', 'large', 7.99, UNIX_TIMESTAMP() + (60 * 1000 * 4));
+INSERT INTO rewards_members (member_id, first_name, last_name, address, year_joined) VALUES ('12345', 'John', 'Hechinger', '123 University Blvd', 1980);
+INSERT INTO rewards_members (member_id, first_name, last_name, address, year_joined) VALUES ('54321', 'Art', 'Vandelay', '406 56th Street', 1995);
+INSERT INTO rewards_members (member_id, first_name, last_name, address, year_joined) VALUES ('98765', 'Bob', 'Sacamano', '25 Park Ave West', 1996);
+INSERT INTO rewards_members (member_id, first_name, last_name, address, year_joined) VALUES ('45678', 'Beth', 'Judge', '24 Amber Tree Way', 1999);
 
 CREATE STREAM enriched-rewards-stream
    WITH (kafka_topic='customer_rewards_stream',
@@ -86,7 +86,53 @@ SELECT crs.custID as customer_id,
     rm.year_joined as member_since
     crs.amount as total_purchase,
     crs.reward_points as points
-
 FROM customer_rewards_stream crs
-    LEFT OUTER JOIN rewards-members rm
+    LEFT OUTER JOIN rewards_members rm
 on crs.customerId = rm.member_id
+
+-- JSON nested structures
+
+CREATE STREAM school_event_stream (
+  event_id INT,
+  event STRUCT<type VARCHAR,
+               date VARCHAR,
+               student STRUCT<first_name VARCHAR,
+                              last_name VARCHAR,
+                              id BIGINT,
+                              email VARCHAR
+                              >,
+                class STRUCT<name VARCHAR,
+                             room VARCHAR,
+                             professor STRUCT<first_name VARCHAR,
+                                              last_name VARCHAR,
+                                              other_classes ARRAY<VARCHAR>
+                                             >
+                            >
+                >
+)
+WITH (kafka_topic='financial_txns',
+     value_format='JSON'
+)
+
+"docker exec -i broker /usr/bin/kafka-console-producer --bootstrap-server broker:9092 --topic financial_txns"
+
+{ "event_id": "1", "event": { "type": "registration", "date": "2020-11-18", "student": {"first_name": "", "last_name":"", "id": , "email": ""}, "class": { "name": "Jill", "room": "Smith", "professor": {"first_name": "jsmith@gmail.com", "last_name":"", "other_classes": [] } } } }
+{ "event_id": "2", "event": { "type": "registration", "date": "2020-11-18", "student": {"first_name": "", "last_name":"", "id": , "email": ""}, "class": { "name": "Art", "room": "Vandeley", "professor": {"first_name": "avendleay@gmail.com", "last_name": "", "other_classes": [] } } } }
+{ "event_id": "3", "event": { "type": "registration", "date": "2020-11-18", "student": {"first_name": "", "last_name":"", "id": , "email": ""}, "class": { "name": "John", "room": "England", "professor": {"first_name": "je@gmail.com", "last_name": "", "other_classes": [] } } } }
+{ "event_id": "4", "event": { "type": "registration", "date": "2020-11-18", "student": {"first_name": "", "last_name":"", "id": , "email": ""}, "class": { "name": "Fred", "room": "Pym", "professor": {"first_name": "fjone@gmail.com", "last_name": "", "other_classes": [] } } } }
+
+SELECT
+   event->studuent->id as student_id,
+   event->student->email as student_email,
+   event->class->professor->other_classes as suggested
+FROM
+   school_event_stream
+EMIT CHANGES;
+
+SELECT
+    event->studuent->id as student_id,
+    event->student->email as student_email,
+    event->class->professor->other_classes[0] as suggested
+FROM
+   school_event_stream
+EMIT CHANGES;

@@ -110,19 +110,22 @@ CREATE STREAM school_event_stream (
                             >
                 >
 )
-WITH (kafka_topic='financial_txns',
+WITH (kafka_topic='school_events',
+     partitions=1,
      value_format='JSON'
 )
 
-"docker exec -i broker /usr/bin/kafka-console-producer --bootstrap-server broker:9092 --topic financial_txns"
+SET 'auto.offset.reset' = 'earliest';
 
-{ "event_id": "1", "event": { "type": "registration", "date": "2020-11-18", "student": {"first_name": "", "last_name":"", "id": , "email": ""}, "class": { "name": "Jill", "room": "Smith", "professor": {"first_name": "jsmith@gmail.com", "last_name":"", "other_classes": [] } } } }
-{ "event_id": "2", "event": { "type": "registration", "date": "2020-11-18", "student": {"first_name": "", "last_name":"", "id": , "email": ""}, "class": { "name": "Art", "room": "Vandeley", "professor": {"first_name": "avendleay@gmail.com", "last_name": "", "other_classes": [] } } } }
-{ "event_id": "3", "event": { "type": "registration", "date": "2020-11-18", "student": {"first_name": "", "last_name":"", "id": , "email": ""}, "class": { "name": "John", "room": "England", "professor": {"first_name": "je@gmail.com", "last_name": "", "other_classes": [] } } } }
-{ "event_id": "4", "event": { "type": "registration", "date": "2020-11-18", "student": {"first_name": "", "last_name":"", "id": , "email": ""}, "class": { "name": "Fred", "room": "Pym", "professor": {"first_name": "fjone@gmail.com", "last_name": "", "other_classes": [] } } } }
+"docker exec -it broker /usr/bin/kafka-console-producer --bootstrap-server broker:9092 --topic school_events"
+
+{ "event_id": "1", "event": { "type": "registration", "date": "2023-11-18", "student": {"first_name": "Rocky", "last_name":"Squirrel", "id":12345 , "email": "rsquirrel@gmail.com"}, "class": { "name": "Principals of Flight", "room": "GH0341", "professor": {"first_name": "Boris", "last_name":"Badenov", "other_classes": ["Spying 101", "Surveillance ", "History"] } } } }
+{ "event_id": "2", "event": { "type": "registration", "date": "2023-11-18", "student": {"first_name": "Fred", "last_name":"Flintsone", "id":33456 , "email": "fflintstone@gmail.com"}, "class": { "name": "Geology", "room": "RQ2331", "professor": {"first_name": "Bullwinkle", "last_name": "Moose", "other_classes": ["Frostbite Falls History", "Antler Care"] } } } }
+{ "event_id": "3", "event": { "type": "registration", "date": "2023-11-18", "student": {"first_name": "George", "last_name":"Jetson", "id":44557 , "email": "gjetson@gmail.com"}, "class": { "name": "Sprocket Design", "room": "ENG1123", "professor": {"first_name": "Cosmo", "last_name": "Spacely", "other_classes": ["Sprockets 201", "Advanced Sprocket Design"] } } } }
+{ "event_id": "4", "event": { "type": "registration", "date": "2023-11-18", "student": {"first_name": "Johnny", "last_name":"Quest", "id":72064 , "email": "questguy@gmail.com"}, "class": { "name": "Advanced Navigation", "room": "JG8876", "professor": {"first_name": "Race", "last_name": "Bannon", "other_classes": ["Self Defense", "Flying Jets", "Hand to Hand Combat"] } } } }
 
 SELECT
-   event->studuent->id as student_id,
+   event->student->id as student_id,
    event->student->email as student_email,
    event->class->professor->other_classes as suggested
 FROM
@@ -130,9 +133,9 @@ FROM
 EMIT CHANGES;
 
 SELECT
-    event->studuent->id as student_id,
+    event->student->first_name as student_name,
     event->student->email as student_email,
-    event->class->professor->other_classes[0] as suggested
+    event->class->professor->other_classes[1] as suggested
 FROM
    school_event_stream
 EMIT CHANGES;

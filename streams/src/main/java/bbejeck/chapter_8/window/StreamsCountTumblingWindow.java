@@ -6,7 +6,6 @@ import bbejeck.utils.Topics;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
@@ -15,10 +14,14 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.TimeWindows;
+import org.apache.kafka.streams.kstream.Window;
+import org.apache.kafka.streams.kstream.Windowed;
+import org.apache.kafka.streams.kstream.WindowedSerdes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
@@ -36,16 +39,24 @@ public class StreamsCountTumblingWindow extends BaseStreamsApplication {
         StreamsBuilder builder = new StreamsBuilder();
         Serde<String> stringSerde = Serdes.String();
         Serde<Long> longSerde = Serdes.Long();
-
+        Serde<Windowed<String>> windowedSerdes = WindowedSerdes.timeWindowedSerdeFrom(String.class, 60_000L);
         KStream<String, String> countStream = builder.stream(inputTopic,
                 Consumed.with(stringSerde,stringSerde));
         countStream.groupByKey()
                 .windowedBy(TimeWindows.ofSizeAndGrace(Duration.ofMinutes(1),Duration.ofSeconds(30)))
                 .count(Materialized.as("Tumbling-window-counting-store"))
                 .toStream()
-                .peek(printKV("Tumbling Window results"))
-                .map((windowedKey, value) -> KeyValue.pair(windowedKey.key(), value))
-                .to(outputTopic, Produced.with(stringSerde, longSerde));
+                .peek((windowedKey, aggregation) -> {
+                    Window window = windowedKey.window();
+                    Instant start = window.startTime().truncatedTo(ChronoUnit.SECONDS);
+                    Instant end = window.endTime().truncatedTo(ChronoUnit.SECONDS);
+                    LOG.info("Window started at {} and ended at {} with a value of {}",
+                            start,
+                            end,
+                            aggregation);
+                })
+                //.map((windowedKey, value) -> KeyValue.pair(windowedKey.key(), value))
+                .to(outputTopic, Produced.with(windowedSerdes, longSerde));
 
         return builder.build();
     }

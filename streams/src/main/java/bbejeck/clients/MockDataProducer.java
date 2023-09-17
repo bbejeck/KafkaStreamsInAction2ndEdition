@@ -392,6 +392,8 @@ public class MockDataProducer implements AutoCloseable {
         return ((metadata, exception) -> {
             if (exception != null) {
                 LOG.error("Problem producing record", exception);
+            } else {
+                LOG.info("Produced record with timestamp " + metadata.timestamp());
             }
         });
     }

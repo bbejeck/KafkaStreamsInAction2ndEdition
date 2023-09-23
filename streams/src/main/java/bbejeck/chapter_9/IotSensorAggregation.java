@@ -7,11 +7,11 @@ package bbejeck.chapter_9;
  */
 public class IotSensorAggregation  {
 
-    double highestSeen;
-    double temperatureSum;
-    int numberReadings;
-    int tempThresholdExceededCount;
-    double readingThreshold;
+    private double highestSeen;
+    private double temperatureSum;
+    private int numberReadings;
+    private int tempThresholdExceededCount;
+    private double readingThreshold;
     double averageReading;
 
     public IotSensorAggregation(final double readingThreshold) {
@@ -20,15 +20,11 @@ public class IotSensorAggregation  {
 
     public IotSensorAggregation() {}
 
-    public double getHighestSeen() {
+    public double highestSeen() {
         return highestSeen;
     }
 
-    public void setHighestSeen(double highestSeen) {
-        this.highestSeen = highestSeen;
-    }
-
-    public double getTemperatureSum() {
+    public double temperatureSum() {
         return temperatureSum;
     }
 
@@ -36,7 +32,7 @@ public class IotSensorAggregation  {
         this.temperatureSum = temperatureSum;
     }
 
-    public int getNumberReadings() {
+    public int numberReadings() {
         return numberReadings;
     }
 
@@ -44,7 +40,7 @@ public class IotSensorAggregation  {
         this.numberReadings = numberReadings;
     }
 
-    public int getTempThresholdExceededCount() {
+    public int tempThresholdExceededCount() {
         return tempThresholdExceededCount;
     }
 
@@ -52,7 +48,7 @@ public class IotSensorAggregation  {
         this.tempThresholdExceededCount = tempThresholdExceededCount;
     }
 
-    public double getReadingThreshold() {
+    public double readingThreshold() {
         return readingThreshold;
     }
 
@@ -60,11 +56,15 @@ public class IotSensorAggregation  {
         this.readingThreshold = readingThreshold;
     }
 
-    public double getAverageReading() {
+    public double averageReading() {
         return averageReading;
     }
 
     public void setAverageReading(double averageReading) {
         this.averageReading = averageReading;
+    }
+
+    public void setHighestSeen(double highestSeen) {
+        this.highestSeen = highestSeen;
     }
 }

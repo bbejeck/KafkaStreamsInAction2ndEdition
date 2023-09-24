@@ -1,20 +1,20 @@
 package bbejeck.chapter_7.aggregator;
 
-import bbejeck.chapter_7.proto.StockAggregateProto;
-import bbejeck.chapter_7.proto.StockTransactionProto;
+import bbejeck.chapter_7.proto.Aggregate;
+import bbejeck.chapter_7.proto.Transaction;
 import org.apache.kafka.streams.kstream.Aggregator;
 
 /**
  * The {@link Aggregator} used for the {@link bbejeck.chapter_7.StreamsStockTransactionAggregations} example
  */
-public class StockAggregator implements Aggregator<String, StockTransactionProto.Transaction, StockAggregateProto.Aggregate> {
+public class StockAggregator implements Aggregator<String, Transaction, Aggregate> {
 
     @Override
-    public StockAggregateProto.Aggregate apply(String key,
-                                               StockTransactionProto.Transaction transaction,
-                                               StockAggregateProto.Aggregate aggregate) {
+    public Aggregate apply(String key,
+                                               Transaction transaction,
+                                               Aggregate aggregate) {
 
-        StockAggregateProto.Aggregate.Builder currAggregate = aggregate.toBuilder();
+        Aggregate.Builder currAggregate = aggregate.toBuilder();
         currAggregate.setSymbol(key);
         double transactionDollars = transaction.getNumberShares() * transaction.getSharePrice();
 

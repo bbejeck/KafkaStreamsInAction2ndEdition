@@ -1,6 +1,6 @@
 package bbejeck.chapter_10.punctuator;
 
-import bbejeck.chapter_9.proto.StockPerformanceProto;
+import bbejeck.chapter_9.proto.StockPerformance;
 import bbejeck.utils.TestUtils;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.processor.api.ProcessorContext;
@@ -21,10 +21,10 @@ import static org.mockito.Mockito.*;
 class StockPerformancePunctuatorTest {
 
     private StockPerformancePunctuator stockPerformancePunctuator;
-    private ProcessorContext<String, StockPerformanceProto.StockPerformance> context;
-    private KeyValueStore<String, StockPerformanceProto.StockPerformance> keyValueStore;
+    private ProcessorContext<String, StockPerformance> context;
+    private KeyValueStore<String, StockPerformance> keyValueStore;
 
-    private StockPerformanceProto.StockPerformance.Builder builder = StockPerformanceProto.StockPerformance.newBuilder();
+    private StockPerformance.Builder builder = StockPerformance.newBuilder();
     private final double differentialThreshold = .20D;
 
     @BeforeEach
@@ -37,13 +37,13 @@ class StockPerformancePunctuatorTest {
     @Test
     @DisplayName("Records with correct price differential should get forwarded")
     void shouldPunctuateRecordsTest() {
-        StockPerformanceProto.StockPerformance stockPerformance = getStockPerformance();
+        StockPerformance stockPerformance = getStockPerformance();
 
-        Iterator<KeyValue<String, StockPerformanceProto.StockPerformance>> storeKeyValues =
+        Iterator<KeyValue<String, StockPerformance>> storeKeyValues =
                 List.of(KeyValue.pair("CLFT", stockPerformance)).iterator();
         long timestamp = Instant.now().toEpochMilli();
 
-        Record<String, StockPerformanceProto.StockPerformance> record =
+        Record<String, StockPerformance> record =
                 new Record<>("CFLT", stockPerformance, timestamp);
 
         when(keyValueStore.all()).thenReturn(TestUtils.kvIterator(storeKeyValues));
@@ -54,12 +54,12 @@ class StockPerformancePunctuatorTest {
     }
 
     @NotNull
-    private StockPerformanceProto.StockPerformance getStockPerformance() {
+    private StockPerformance getStockPerformance() {
         List<Double> volumeLookback = new ArrayList<>();
         List<Double> priceLookback = new ArrayList<>();
         volumeLookback.add(2000D);
         priceLookback.add(25.00D);
-        StockPerformanceProto.StockPerformance stockPerformance = builder
+        StockPerformance stockPerformance = builder
                 .setCurrentAveragePrice(25.00)
                 .setCurrentAverageVolume(1000)
                 .setCurrentShareVolume(5000)

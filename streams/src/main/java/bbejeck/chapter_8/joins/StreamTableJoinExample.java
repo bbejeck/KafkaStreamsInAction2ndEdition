@@ -1,8 +1,8 @@
 package bbejeck.chapter_8.joins;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_8.proto.ClickEventProto.ClickEvent;
-import bbejeck.chapter_8.proto.UserProto.User;
+import bbejeck.chapter_8.proto.ClickEvent;
+import bbejeck.chapter_8.proto.User;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.clients.MockDataProducer.JoinData;
 import bbejeck.data.DataGenerator;

@@ -1,7 +1,7 @@
 package bbejeck.chapter_10;
 
-import bbejeck.chapter_7.proto.StockTransactionProto;
-import bbejeck.chapter_9.proto.StockPerformanceProto;
+import bbejeck.chapter_7.proto.Transaction;
+import bbejeck.chapter_9.proto.StockPerformance;
 import bbejeck.utils.SerdeUtil;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
@@ -30,19 +30,19 @@ class StockPerformanceApplicationTest {
 
     private final Deserializer<String> stringDeserializer = Serdes.String().deserializer();
     private final Serializer<String> stringSerializer = Serdes.String().serializer();
-    private final Serde<StockPerformanceProto.StockPerformance> stockPerformanceSerde = SerdeUtil.protobufSerde(StockPerformanceProto.StockPerformance.class);
-    private final Serializer<StockPerformanceProto.StockPerformance> stockPerformanceSerializer = stockPerformanceSerde.serializer();
-    private final Deserializer<StockPerformanceProto.StockPerformance> stockPerformanceDeserializer = stockPerformanceSerde.deserializer();
-    private final Serde<StockTransactionProto.Transaction> stockTransactionSerde = SerdeUtil.protobufSerde(StockTransactionProto.Transaction.class);
-    private final Deserializer<StockTransactionProto.Transaction> stockTransactionDeserializer = stockTransactionSerde.deserializer();
-    private final Serializer<StockTransactionProto.Transaction> stockTransactionSerializer = stockTransactionSerde.serializer();
-    private final StockTransactionProto.Transaction.Builder transactionBuilder = StockTransactionProto.Transaction.newBuilder();
-    private final StockPerformanceProto.StockPerformance.Builder performanceBuilder = StockPerformanceProto.StockPerformance.newBuilder();
+    private final Serde<StockPerformance> stockPerformanceSerde = SerdeUtil.protobufSerde(StockPerformance.class);
+    private final Serializer<StockPerformance> stockPerformanceSerializer = stockPerformanceSerde.serializer();
+    private final Deserializer<StockPerformance> stockPerformanceDeserializer = stockPerformanceSerde.deserializer();
+    private final Serde<Transaction> stockTransactionSerde = SerdeUtil.protobufSerde(Transaction.class);
+    private final Deserializer<Transaction> stockTransactionDeserializer = stockTransactionSerde.deserializer();
+    private final Serializer<Transaction> stockTransactionSerializer = stockTransactionSerde.serializer();
+    private final Transaction.Builder transactionBuilder = Transaction.newBuilder();
+    private final StockPerformance.Builder performanceBuilder = StockPerformance.newBuilder();
     private final Instant instant = Instant.now();
 
-    private final StockTransactionProto.Transaction transactionOne = transactionBuilder.setIsPurchase(true).setNumberShares(1000).setSymbol("ABC").setSharePrice(50).setTimestamp(5000).build();
-    private final StockTransactionProto.Transaction transactionTwo = transactionBuilder.setIsPurchase(true).setNumberShares(5000).setSymbol("ABC").setSharePrice(60).setTimestamp(5000).build();
-    private final StockTransactionProto.Transaction transactionThree = transactionBuilder.setIsPurchase(false).setNumberShares(3000).setSymbol("ABC").setSharePrice(75).setTimestamp(5000).build();
+    private final Transaction transactionOne = transactionBuilder.setIsPurchase(true).setNumberShares(1000).setSymbol("ABC").setSharePrice(50).setTimestamp(5000).build();
+    private final Transaction transactionTwo = transactionBuilder.setIsPurchase(true).setNumberShares(5000).setSymbol("ABC").setSharePrice(60).setTimestamp(5000).build();
+    private final Transaction transactionThree = transactionBuilder.setIsPurchase(false).setNumberShares(3000).setSymbol("ABC").setSharePrice(75).setTimestamp(5000).build();
 
 
     @BeforeEach
@@ -55,8 +55,8 @@ class StockPerformanceApplicationTest {
     void stockPerformancePunctuationTest() {
 
         try (TopologyTestDriver driver = new TopologyTestDriver(topology)) {
-            TestInputTopic<String, StockTransactionProto.Transaction> inputTopic = driver.createInputTopic(StockPerformanceApplication.INPUT_TOPIC, stringSerializer, stockTransactionSerializer);
-            TestOutputTopic<String, StockPerformanceProto.StockPerformance> outputTopic = driver.createOutputTopic(StockPerformanceApplication.OUTPUT_TOPIC, stringDeserializer, stockPerformanceDeserializer);
+            TestInputTopic<String, Transaction> inputTopic = driver.createInputTopic(StockPerformanceApplication.INPUT_TOPIC, stringSerializer, stockTransactionSerializer);
+            TestOutputTopic<String, StockPerformance> outputTopic = driver.createOutputTopic(StockPerformanceApplication.OUTPUT_TOPIC, stringDeserializer, stockPerformanceDeserializer);
 
             inputTopic.pipeInput("ABC", transactionOne, instant);
             inputTopic.pipeInput("ABC", transactionTwo, instant.plus(15, ChronoUnit.SECONDS));
@@ -72,8 +72,8 @@ class StockPerformanceApplicationTest {
     void stockPerformancePunctuationManualTimeAdvanceTest() {
 
         try (TopologyTestDriver driver = new TopologyTestDriver(topology)) {
-            TestInputTopic<String, StockTransactionProto.Transaction> inputTopic = driver.createInputTopic(StockPerformanceApplication.INPUT_TOPIC, stringSerializer, stockTransactionSerializer);
-            TestOutputTopic<String, StockPerformanceProto.StockPerformance> outputTopic = driver.createOutputTopic(StockPerformanceApplication.OUTPUT_TOPIC, stringDeserializer, stockPerformanceDeserializer);
+            TestInputTopic<String, Transaction> inputTopic = driver.createInputTopic(StockPerformanceApplication.INPUT_TOPIC, stringSerializer, stockTransactionSerializer);
+            TestOutputTopic<String, StockPerformance> outputTopic = driver.createOutputTopic(StockPerformanceApplication.OUTPUT_TOPIC, stringDeserializer, stockPerformanceDeserializer);
 
             inputTopic.pipeInput("ABC", transactionOne);
             inputTopic.advanceTime(Duration.ofSeconds(15));
@@ -91,8 +91,8 @@ class StockPerformanceApplicationTest {
     void stockPerformancePunctuationTestNoAdvance() {
 
         try (TopologyTestDriver driver = new TopologyTestDriver(topology)) {
-            TestInputTopic<String, StockTransactionProto.Transaction> inputTopic = driver.createInputTopic(StockPerformanceApplication.INPUT_TOPIC, stringSerializer, stockTransactionSerializer);
-            TestOutputTopic<String, StockPerformanceProto.StockPerformance> outputTopic = driver.createOutputTopic(StockPerformanceApplication.OUTPUT_TOPIC, stringDeserializer, stockPerformanceDeserializer);
+            TestInputTopic<String, Transaction> inputTopic = driver.createInputTopic(StockPerformanceApplication.INPUT_TOPIC, stringSerializer, stockTransactionSerializer);
+            TestOutputTopic<String, StockPerformance> outputTopic = driver.createOutputTopic(StockPerformanceApplication.OUTPUT_TOPIC, stringDeserializer, stockPerformanceDeserializer);
 
             inputTopic.pipeInput("ABC", transactionOne, instant);
             inputTopic.pipeInput("ABC", transactionTwo, instant.plus(15, ChronoUnit.MILLIS));

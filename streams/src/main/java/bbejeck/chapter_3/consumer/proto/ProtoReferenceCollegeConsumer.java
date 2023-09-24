@@ -1,7 +1,7 @@
 package bbejeck.chapter_3.consumer.proto;
 
 import bbejeck.chapter_3.consumer.BaseConsumer;
-import bbejeck.chapter_3.proto.CollegeProto;
+import bbejeck.chapter_3.proto.College;
 import bbejeck.clients.ConsumerRecordsHandler;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializerConfig;
@@ -25,12 +25,12 @@ public class ProtoReferenceCollegeConsumer extends BaseConsumer {
         ProtoReferenceCollegeConsumer collegeConsumer = new ProtoReferenceCollegeConsumer();
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-college-ref-group");
-        overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, CollegeProto.College.class);
+        overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, College.class);
         collegeConsumer.overrideConfigs(overrideConfigs);
 
-        ConsumerRecordsHandler<String, CollegeProto.College> processFunction = consumerRecords ->
+        ConsumerRecordsHandler<String, College> processFunction = consumerRecords ->
                 consumerRecords.forEach(cr -> {
-                    CollegeProto.College collegeRecord = cr.value();
+                    College collegeRecord = cr.value();
                     LOG.info("Found Protobuf college record {}", collegeRecord);
                 });
 

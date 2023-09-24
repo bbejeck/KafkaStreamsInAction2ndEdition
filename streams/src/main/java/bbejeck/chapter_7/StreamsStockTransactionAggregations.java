@@ -2,8 +2,8 @@ package bbejeck.chapter_7;
 
 import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_7.aggregator.StockAggregator;
-import bbejeck.chapter_7.proto.StockAggregateProto.Aggregate;
-import bbejeck.chapter_7.proto.StockTransactionProto.Transaction;
+import bbejeck.chapter_7.proto.Aggregate;
+import bbejeck.chapter_7.proto.Transaction;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;

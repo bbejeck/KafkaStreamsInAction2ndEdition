@@ -1,7 +1,7 @@
 package bbejeck.chapter_3.consumer.proto;
 
 import bbejeck.chapter_3.consumer.BaseConsumer;
-import bbejeck.chapter_3.proto.AvengerProto;
+import bbejeck.chapter_3.proto.Avenger;
 import bbejeck.clients.ConsumerRecordsHandler;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
@@ -31,10 +31,10 @@ public class ProtoConsumer extends BaseConsumer {
 
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-specific-group");
-        overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, AvengerProto.Avenger.class);
+        overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, Avenger.class);
         protoConsumer.overrideConfigs(overrideConfigs);
 
-        ConsumerRecordsHandler<String, AvengerProto.Avenger> specificRecordsConsumer = (consumerRecords ->
+        ConsumerRecordsHandler<String, Avenger> specificRecordsConsumer = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
             var consumedAvenger = cr.value();
             LOG.info("Found specific Proto avenger " + consumedAvenger.getName() + " with real name " + consumedAvenger.getRealName());

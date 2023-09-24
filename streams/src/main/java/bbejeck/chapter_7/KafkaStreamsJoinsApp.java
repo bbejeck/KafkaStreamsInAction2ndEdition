@@ -1,10 +1,10 @@
 package bbejeck.chapter_7;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_6.proto.RetailPurchaseProto.RetailPurchase;
+import bbejeck.chapter_6.proto.RetailPurchase;
 import bbejeck.chapter_7.joiner.PurchaseJoiner;
-import bbejeck.chapter_7.proto.CoffeePurchaseProto.CoffeePurchase;
-import bbejeck.chapter_8.proto.PromotionProto.Promotion;
+import bbejeck.chapter_7.proto.CoffeePurchase;
+import bbejeck.chapter_8.proto.Promotion;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;

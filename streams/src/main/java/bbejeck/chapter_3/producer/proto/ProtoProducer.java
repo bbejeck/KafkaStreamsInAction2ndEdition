@@ -1,7 +1,7 @@
 package bbejeck.chapter_3.producer.proto;
 
 import bbejeck.chapter_3.producer.BaseProducer;
-import bbejeck.chapter_3.proto.AvengerProto;
+import bbejeck.chapter_3.proto.Avenger;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -11,23 +11,23 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 
-public class ProtoProducer extends BaseProducer<String, AvengerProto.Avenger> {
+public class ProtoProducer extends BaseProducer<String, Avenger> {
     static final Logger LOG = LogManager.getLogger(ProtoProducer.class);
 
     public ProtoProducer() {
         super(StringSerializer.class, KafkaProtobufSerializer.class);
     }
 
-    public static List<AvengerProto.Avenger> getRecords() {
-        final var blackWidow = AvengerProto.Avenger.newBuilder().setName("Black Widow")
+    public static List<Avenger> getRecords() {
+        final var blackWidow = Avenger.newBuilder().setName("Black Widow")
                 .setRealName("Natasha Romanova")
                 .addAllMovies(List.of("Avengers", "Infinity Wars", "End Game")).build();
 
-        final var hulk = AvengerProto.Avenger.newBuilder().setName("Hulk")
+        final var hulk = Avenger.newBuilder().setName("Hulk")
                 .setRealName("Dr. Bruce Banner")
                 .addAllMovies(List.of("Avengers", "Ragnarok", "Infinity Wars")).build();
 
-        final var thor = AvengerProto.Avenger.newBuilder().setName("Thor")
+        final var thor = Avenger.newBuilder().setName("Thor")
                 .setRealName("Thor")
                 .addAllMovies(List.of("Dark Universe", "Ragnarok", "Avengers")).build();
 

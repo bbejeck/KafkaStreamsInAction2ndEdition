@@ -1,6 +1,6 @@
 package bbejeck.chapter_4.multi_event.proto;
 
-import bbejeck.chapter_4.proto.EventsProto;
+import bbejeck.chapter_4.proto.Events;
 import bbejeck.data.ConstantProtoEventDataSource;
 import bbejeck.data.DataSource;
 import bbejeck.testcontainers.BaseKafkaContainerTest;
@@ -37,7 +37,7 @@ public class MultiEventProtoProduceConsumeTest extends BaseKafkaContainerTest {
 
     private final String outputTopic = "multi-events-topic";
     private static final Logger LOG = LogManager.getLogger(MultiEventProtoProduceConsumeTest.class);
-    final DataSource<EventsProto.Events> eventsDataSource = new ConstantProtoEventDataSource();
+    final DataSource<Events> eventsDataSource = new ConstantProtoEventDataSource();
 
 
     @BeforeEach
@@ -64,7 +64,7 @@ public class MultiEventProtoProduceConsumeTest extends BaseKafkaContainerTest {
         MultiEventProtoConsumerClient consumerClient = new MultiEventProtoConsumerClient(getConsumerProps());
         consumerClient.runConsumerOnce();
 
-        List<EventsProto.Events> expectedEvents = new ArrayList<>(eventsDataSource.fetch());
+        List<Events> expectedEvents = new ArrayList<>(eventsDataSource.fetch());
 
         assertEquals(expectedEvents, consumerClient.eventsList);
     }
@@ -87,7 +87,7 @@ public class MultiEventProtoProduceConsumeTest extends BaseKafkaContainerTest {
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);
-        consumerProps.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, EventsProto.Events.class);
+        consumerProps.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, Events.class);
         consumerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "mock://localhost:8081");
         consumerProps.put("topic.names", outputTopic);
         return consumerProps;

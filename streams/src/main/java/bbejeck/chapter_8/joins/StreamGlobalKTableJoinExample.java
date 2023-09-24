@@ -1,8 +1,8 @@
 package bbejeck.chapter_8.joins;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_6.proto.SensorProto.Sensor;
-import bbejeck.chapter_8.proto.SensorInfoProto.SensorInfo;
+import bbejeck.chapter_6.proto.Sensor;
+import bbejeck.chapter_8.proto.SensorInfo;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.clients.MockDataProducer.JoinData;
 import bbejeck.data.DataGenerator;

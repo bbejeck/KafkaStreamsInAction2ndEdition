@@ -6,6 +6,7 @@ import "purchase_event.proto";
 import "login_event.proto";
 import "search_event.proto";
 
+option java_multiple_files = true;
 option java_outer_classname = "EventsProto";
 
 message Events {

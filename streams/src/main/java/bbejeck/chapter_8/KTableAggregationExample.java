@@ -1,8 +1,8 @@
 package bbejeck.chapter_8;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_8.proto.SegmentAggregateProto.SegmentAggregate;
-import bbejeck.chapter_8.proto.StockAlertProto.StockAlert;
+import bbejeck.chapter_8.proto.SegmentAggregate;
+import bbejeck.chapter_8.proto.StockAlert;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;

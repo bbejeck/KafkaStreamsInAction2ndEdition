@@ -1,7 +1,7 @@
 package bbejeck.chapter_10.processor;
 
 
-import bbejeck.chapter_9.proto.BearPurchaseProto.BeerPurchase;
+import bbejeck.chapter_9.proto.BeerPurchase;
 import org.apache.kafka.streams.processor.api.ContextualProcessor;
 import org.apache.kafka.streams.processor.api.Record;
 

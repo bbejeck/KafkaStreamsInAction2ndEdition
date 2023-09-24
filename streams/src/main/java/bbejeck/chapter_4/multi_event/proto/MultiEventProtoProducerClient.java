@@ -1,6 +1,6 @@
 package bbejeck.chapter_4.multi_event.proto;
 
-import bbejeck.chapter_4.proto.EventsProto;
+import bbejeck.chapter_4.proto.Events;
 import bbejeck.data.DataSource;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -28,25 +28,25 @@ import java.util.Map;
 public class MultiEventProtoProducerClient {
     private static final Logger LOG = LogManager.getLogger(MultiEventProtoProducerClient.class);
     final Map<String,Object> producerConfigs;
-    final DataSource<EventsProto.Events> dataSource;
+    final DataSource<Events> dataSource;
     volatile boolean keepProducing = true;
     private boolean runOnce;
 
 
     public MultiEventProtoProducerClient(final Map<String, Object> producerConfigs,
-                                         final DataSource<EventsProto.Events> dataSource) {
+                                         final DataSource<Events> dataSource) {
         this.producerConfigs = producerConfigs;
         this.dataSource = dataSource;
     }
 
     public void runProducer() {
-        try (Producer<String, EventsProto.Events> producer = new KafkaProducer<>(producerConfigs)) {
+        try (Producer<String, Events> producer = new KafkaProducer<>(producerConfigs)) {
             final String topicName = (String)producerConfigs.get("topic.name");
             LOG.info("Created producer instance with {}", producerConfigs);
             while(keepProducing) {
-                Collection<EventsProto.Events> events = dataSource.fetch();
+                Collection<Events> events = dataSource.fetch();
                 events.forEach(event -> {
-                    ProducerRecord<String, EventsProto.Events> producerRecord = new ProducerRecord<>(topicName, event.getKey(), event);
+                    ProducerRecord<String, Events> producerRecord = new ProducerRecord<>(topicName, event.getKey(), event);
                     producer.send(producerRecord, (metadata, exception) -> {
                         if (exception != null) {
                             LOG.error("Error producing records ", exception);

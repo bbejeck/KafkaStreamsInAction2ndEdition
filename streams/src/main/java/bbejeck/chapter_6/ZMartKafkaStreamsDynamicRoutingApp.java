@@ -1,10 +1,10 @@
 package bbejeck.chapter_6;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_6.proto.PatternProto;
-import bbejeck.chapter_6.proto.PurchasedItemProto;
-import bbejeck.chapter_6.proto.RetailPurchaseProto;
-import bbejeck.chapter_6.proto.RewardAccumulatorProto;
+import bbejeck.chapter_6.proto.Pattern;
+import bbejeck.chapter_6.proto.PurchasedItem;
+import bbejeck.chapter_6.proto.RetailPurchase;
+import bbejeck.chapter_6.proto.RewardAccumulator;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;
@@ -34,22 +34,22 @@ public class ZMartKafkaStreamsDynamicRoutingApp extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(ZMartKafkaStreamsDynamicRoutingApp.class);
     private static final String CC_NUMBER_REPLACEMENT = "xxxx-xxxx-xxxx-";
 
-    static final ValueMapper<RetailPurchaseProto.RetailPurchase, RetailPurchaseProto.RetailPurchase> creditCardMapper = retailPurchase -> {
+    static final ValueMapper<RetailPurchase, RetailPurchase> creditCardMapper = retailPurchase -> {
         String[] parts = retailPurchase.getCreditCardNumber().split("-");
         String maskedCardNumber = CC_NUMBER_REPLACEMENT + parts[parts.length - 1];
-        return RetailPurchaseProto.RetailPurchase.newBuilder(retailPurchase).setCreditCardNumber(maskedCardNumber).build();
+        return RetailPurchase.newBuilder(retailPurchase).setCreditCardNumber(maskedCardNumber).build();
     };
 
-    static final ValueMapper<PurchasedItemProto.PurchasedItem, PatternProto.Pattern> patternObjectMapper = purchasedItem -> {
-        PatternProto.Pattern.Builder patternBuilder = PatternProto.Pattern.newBuilder();
+    static final ValueMapper<PurchasedItem, Pattern> patternObjectMapper = purchasedItem -> {
+        Pattern.Builder patternBuilder = Pattern.newBuilder();
         patternBuilder.setAmount(purchasedItem.getPrice());
         patternBuilder.setDate(purchasedItem.getPurchaseDate());
         patternBuilder.setItem(purchasedItem.getItem());
         return patternBuilder.build();
     };
 
-    static final ValueMapper<PurchasedItemProto.PurchasedItem, RewardAccumulatorProto.RewardAccumulator> rewardObjectMapper = purchasedItem -> {
-        RewardAccumulatorProto.RewardAccumulator.Builder rewardBuilder = RewardAccumulatorProto.RewardAccumulator.newBuilder();
+    static final ValueMapper<PurchasedItem, RewardAccumulator> rewardObjectMapper = purchasedItem -> {
+        RewardAccumulator.Builder rewardBuilder = RewardAccumulator.newBuilder();
         rewardBuilder.setCustomerId(purchasedItem.getCustomerId());
         rewardBuilder.setPurchaseTotal(purchasedItem.getQuantity() * purchasedItem.getPrice());
         rewardBuilder.setTotalRewardPoints((int) rewardBuilder.getPurchaseTotal() * 4);
@@ -59,14 +59,14 @@ public class ZMartKafkaStreamsDynamicRoutingApp extends BaseStreamsApplication {
     @Override
     public Topology topology(Properties streamProperties) {
         // After uncommenting the block above comment these lines
-        Serde<RetailPurchaseProto.RetailPurchase> retailPurchaseSerde =
-                SerdeUtil.protobufSerde(RetailPurchaseProto.RetailPurchase.class);
+        Serde<RetailPurchase> retailPurchaseSerde =
+                SerdeUtil.protobufSerde(RetailPurchase.class);
         Serde<String> stringSerde = Serdes.String();
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        KStream<String, RetailPurchaseProto.RetailPurchase> retailPurchaseKStream =
+        KStream<String, RetailPurchase> retailPurchaseKStream =
                 streamsBuilder.stream("transactions", Consumed.with(stringSerde, retailPurchaseSerde))
                         .mapValues(creditCardMapper);
-        retailPurchaseKStream.print(Printed.<String, RetailPurchaseProto.RetailPurchase>toSysOut().withLabel("purchases"));
+        retailPurchaseKStream.print(Printed.<String, RetailPurchase>toSysOut().withLabel("purchases"));
         // Run this example first with the PurchaseTopicNameExtractor
         // then comment following line out
         //retailPurchaseKStream.to(new PurchaseTopicNameExtractor(), Produced.with(stringSerde,retailPurchaseSerde));

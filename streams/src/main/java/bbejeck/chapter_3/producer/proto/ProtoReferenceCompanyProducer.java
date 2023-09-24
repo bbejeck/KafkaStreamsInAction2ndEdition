@@ -1,8 +1,8 @@
 package bbejeck.chapter_3.producer.proto;
 
 import bbejeck.chapter_3.producer.BaseProducer;
-import bbejeck.chapter_3.proto.CompanyProto;
-import bbejeck.chapter_3.proto.PersonProto;
+import bbejeck.chapter_3.proto.Company;
+import bbejeck.chapter_3.proto.Person;
 import bbejeck.utils.Topics;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -16,26 +16,26 @@ import java.util.List;
  * Example of using schema references with Protobuf.  This example nests a
  * Person object in the Company object
  */
-public class ProtoReferenceCompanyProducer extends BaseProducer<String, CompanyProto.Company> {
+public class ProtoReferenceCompanyProducer extends BaseProducer<String, Company> {
     private static final Logger LOG = LogManager.getLogger(ProtoReferenceCompanyProducer.class);
     public ProtoReferenceCompanyProducer() {
         super(StringSerializer.class, KafkaProtobufSerializer.class);
     }
 
-    static List<CompanyProto.Company> getRecords() {
-        PersonProto.Person gordonGekko = PersonProto.Person.newBuilder()
+    static List<Company> getRecords() {
+        Person gordonGekko = Person.newBuilder()
                 .setAddress("345 Park Ave, NY, NY")
                 .setName("Gordon Gekko")
                 .setAge(60)
                 .build();
 
-        PersonProto.Person budFox = PersonProto.Person.newBuilder()
+        Person budFox = Person.newBuilder()
                 .setAddress("123 57th Ave, NY, NY")
                 .setName("Bud Fox")
                 .setAge(30)
                 .build();
 
-        CompanyProto.Company companyProto = CompanyProto.Company.newBuilder()
+        Company companyProto = Company.newBuilder()
                 .setName("BlueStar")
                 .addAllExecutives(List.of(gordonGekko, budFox))
                 .build();

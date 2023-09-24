@@ -1,6 +1,6 @@
 package bbejeck.chapter_6.mapper;
 
-import bbejeck.chapter_6.proto.RetailPurchaseProto.RetailPurchase;
+import bbejeck.chapter_6.proto.RetailPurchase;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.KeyValueMapper;
 

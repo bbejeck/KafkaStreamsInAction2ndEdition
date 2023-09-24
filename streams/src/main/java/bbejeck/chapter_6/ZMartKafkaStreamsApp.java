@@ -1,10 +1,10 @@
 package bbejeck.chapter_6;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_6.proto.PatternProto.Pattern;
-import bbejeck.chapter_6.proto.PurchasedItemProto.PurchasedItem;
-import bbejeck.chapter_6.proto.RetailPurchaseProto.RetailPurchase;
-import bbejeck.chapter_6.proto.RewardAccumulatorProto.RewardAccumulator;
+import bbejeck.chapter_6.proto.Pattern;
+import bbejeck.chapter_6.proto.PurchasedItem;
+import bbejeck.chapter_6.proto.RetailPurchase;
+import bbejeck.chapter_6.proto.RewardAccumulator;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;

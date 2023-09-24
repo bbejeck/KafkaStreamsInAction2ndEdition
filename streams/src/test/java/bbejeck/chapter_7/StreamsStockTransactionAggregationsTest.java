@@ -1,8 +1,8 @@
 package bbejeck.chapter_7;
 
 
-import bbejeck.chapter_7.proto.StockAggregateProto;
-import bbejeck.chapter_7.proto.StockTransactionProto;
+import bbejeck.chapter_7.proto.Aggregate;
+import bbejeck.chapter_7.proto.Transaction;
 import bbejeck.utils.SerdeUtil;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
@@ -36,26 +36,26 @@ class StreamsStockTransactionAggregationsTest {
         try (final TopologyTestDriver testDriver = new TopologyTestDriver(topology, properties)) {
 
             Serde<String> stringSerde = Serdes.String();
-            Serde<StockTransactionProto.Transaction> txnSerde =
-                    SerdeUtil.protobufSerde(StockTransactionProto.Transaction.class);
-            Serde<StockAggregateProto.Aggregate> aggregateSerde =
-                    SerdeUtil.protobufSerde(StockAggregateProto.Aggregate.class);
+            Serde<Transaction> txnSerde =
+                    SerdeUtil.protobufSerde(Transaction.class);
+            Serde<Aggregate> aggregateSerde =
+                    SerdeUtil.protobufSerde(Aggregate.class);
 
             Serializer<String> stringSerializer = stringSerde.serializer();
-            Serializer<StockTransactionProto.Transaction> transactionSerializer = txnSerde.serializer();
+            Serializer<Transaction> transactionSerializer = txnSerde.serializer();
             Deserializer<String> stringDeserializer = stringSerde.deserializer();
-            Deserializer<StockAggregateProto.Aggregate> aggregateDeserializer = aggregateSerde.deserializer();
+            Deserializer<Aggregate> aggregateDeserializer = aggregateSerde.deserializer();
 
-            TestInputTopic<String, StockTransactionProto.Transaction> inputTopic = testDriver.createInputTopic("stock-transactions", stringSerializer, transactionSerializer);
-            TestOutputTopic<String, StockAggregateProto.Aggregate> outputTopic = testDriver.createOutputTopic("stock-aggregations", stringDeserializer, aggregateDeserializer);
+            TestInputTopic<String, Transaction> inputTopic = testDriver.createInputTopic("stock-transactions", stringSerializer, transactionSerializer);
+            TestOutputTopic<String, Aggregate> outputTopic = testDriver.createOutputTopic("stock-aggregations", stringDeserializer, aggregateDeserializer);
             
-            StockTransactionProto.Transaction.Builder txnbuilder = StockTransactionProto.Transaction.newBuilder();
-            StockTransactionProto.Transaction purchaseTransaction = txnbuilder.setSymbol("CFLT").setIsPurchase(true).setSharePrice(100.00).setNumberShares(1000).build();
-            StockTransactionProto.Transaction sellTransaction = txnbuilder.setSymbol("CFLT").setIsPurchase(false).setSharePrice(200.00).setNumberShares(500).build();
+            Transaction.Builder txnbuilder = Transaction.newBuilder();
+            Transaction purchaseTransaction = txnbuilder.setSymbol("CFLT").setIsPurchase(true).setSharePrice(100.00).setNumberShares(1000).build();
+            Transaction sellTransaction = txnbuilder.setSymbol("CFLT").setIsPurchase(false).setSharePrice(200.00).setNumberShares(500).build();
 
             inputTopic.pipeKeyValueList(List.of(KeyValue.pair("CFLT", purchaseTransaction), KeyValue.pair("CFLT", sellTransaction)));
 
-            StockAggregateProto.Aggregate firstAggregate = outputTopic.readValue();
+            Aggregate firstAggregate = outputTopic.readValue();
             Assertions.assertAll(() -> assertEquals("CFLT", firstAggregate.getSymbol()),
                     () -> assertEquals(100.00, firstAggregate.getLowestPrice()),
                     () -> assertEquals(100.00, firstAggregate.getHighestPrice()),
@@ -64,7 +64,7 @@ class StreamsStockTransactionAggregationsTest {
                     () -> assertEquals(0, firstAggregate.getSalesShareVolume()),
                     () -> assertEquals(1000, firstAggregate.getPurchaseShareVolume()));
 
-            StockAggregateProto.Aggregate secondAggregate = outputTopic.readValue();
+            Aggregate secondAggregate = outputTopic.readValue();
             Assertions.assertAll(() -> assertEquals("CFLT", secondAggregate.getSymbol()),
                     () -> assertEquals(100.00, secondAggregate.getLowestPrice()),
                     () -> assertEquals(200.00, secondAggregate.getHighestPrice()),

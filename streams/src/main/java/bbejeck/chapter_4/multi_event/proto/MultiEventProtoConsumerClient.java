@@ -1,9 +1,9 @@
 package bbejeck.chapter_4.multi_event.proto;
 
-import bbejeck.chapter_4.proto.EventsProto;
-import bbejeck.chapter_4.proto.LoginEventProto;
-import bbejeck.chapter_4.proto.PurchaseEventProto;
-import bbejeck.chapter_4.proto.SearchEventProto;
+import bbejeck.chapter_4.proto.Events;
+import bbejeck.chapter_4.proto.LoginEvent;
+import bbejeck.chapter_4.proto.PurchaseEvent;
+import bbejeck.chapter_4.proto.SearchEvent;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -36,10 +36,10 @@ public class MultiEventProtoConsumerClient {
     final Map<String,Object> consumerConfigs;
     volatile boolean keepConsuming = true;
 
-    List<PurchaseEventProto.PurchaseEvent> purchases = new ArrayList<>();
-    List<LoginEventProto.LoginEvent> logins = new ArrayList<>();
-    List<SearchEventProto.SearchEvent> searches = new ArrayList<>();
-    List<EventsProto.Events> eventsList = new ArrayList<>();
+    List<PurchaseEvent> purchases = new ArrayList<>();
+    List<LoginEvent> logins = new ArrayList<>();
+    List<SearchEvent> searches = new ArrayList<>();
+    List<Events> eventsList = new ArrayList<>();
 
     public MultiEventProtoConsumerClient(final Map<String,Object> consumerConfigs) {
         this.consumerConfigs = consumerConfigs;
@@ -48,11 +48,11 @@ public class MultiEventProtoConsumerClient {
     public void runConsumer() {
         LOG.info("Starting runConsumer method using properties {}", consumerConfigs);
         var topicNames = List.of(((String)consumerConfigs.get("topic.names")).split(","));
-        try (final Consumer<String, EventsProto.Events> consumer = new KafkaConsumer<>(consumerConfigs)) {
+        try (final Consumer<String, Events> consumer = new KafkaConsumer<>(consumerConfigs)) {
             LOG.info("Subscribing to {}", topicNames);
             consumer.subscribe(topicNames);
             while (keepConsuming) {
-                ConsumerRecords<String, EventsProto.Events> consumerRecords = consumer.poll(Duration.ofSeconds(1));
+                ConsumerRecords<String, Events> consumerRecords = consumer.poll(Duration.ofSeconds(1));
                 consumerRecords.forEach(record -> LOG.info("Found event {} for user {}", getEventTypeByEnum(record.value()), record.key()));
                 if (runOnce) {
                     close();
@@ -67,7 +67,7 @@ public class MultiEventProtoConsumerClient {
         runConsumer();
     }
 
-    private String getEventTypeByEnum(final EventsProto.Events event){
+    private String getEventTypeByEnum(final Events event){
         eventsList.add(event);
         String typeString = null;
         switch (event.getTypeCase()) {
@@ -87,18 +87,18 @@ public class MultiEventProtoConsumerClient {
         return typeString;
     }
 
-    private String getEventType(final EventsProto.Events event) {
+    private String getEventType(final Events event) {
         eventsList.add(event);
         if(event.hasLoginEvent()) {
-            LoginEventProto.LoginEvent login = event.getLoginEvent();
+            LoginEvent login = event.getLoginEvent();
             logins.add(login);
             return login.toString();
         } else if (event.hasSearchEvent()) {
-            SearchEventProto.SearchEvent search = event.getSearchEvent();
+            SearchEvent search = event.getSearchEvent();
             searches.add(search);
             return search.toString();
         } else {
-            PurchaseEventProto.PurchaseEvent purchase = event.getPurchaseEvent();
+            PurchaseEvent purchase = event.getPurchaseEvent();
             purchases.add(purchase);
             return purchase.toString();
         }

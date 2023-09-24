@@ -4,7 +4,7 @@ package bbejeck.chapter_10;
 import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_10.processor.BeerPurchaseProcessor;
 import bbejeck.chapter_10.processor.LoggingProcessor;
-import bbejeck.chapter_9.proto.BearPurchaseProto.BeerPurchase;
+import bbejeck.chapter_9.proto.BeerPurchase;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;

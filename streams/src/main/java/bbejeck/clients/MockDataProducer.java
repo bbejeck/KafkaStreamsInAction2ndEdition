@@ -1,10 +1,10 @@
 package bbejeck.clients;
 
-import bbejeck.chapter_6.proto.RetailPurchaseProto;
-import bbejeck.chapter_6.proto.SensorProto;
-import bbejeck.chapter_7.proto.CoffeePurchaseProto;
-import bbejeck.chapter_7.proto.StockTransactionProto;
-import bbejeck.chapter_8.proto.StockAlertProto;
+import bbejeck.chapter_6.proto.RetailPurchase;
+import bbejeck.chapter_6.proto.Sensor;
+import bbejeck.chapter_7.proto.CoffeePurchase;
+import bbejeck.chapter_7.proto.Transaction;
+import bbejeck.chapter_8.proto.StockAlert;
 import bbejeck.data.DataGenerator;
 import bbejeck.serializers.ProtoSerializer;
 import com.google.protobuf.AbstractMessage;
@@ -84,14 +84,14 @@ public class MockDataProducer implements AutoCloseable {
                 } else {
                     configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProtoSerializer.class);
                 }
-                try (Producer<String, RetailPurchaseProto.RetailPurchase> producer = new KafkaProducer<>(configs)) {
+                try (Producer<String, RetailPurchase> producer = new KafkaProducer<>(configs)) {
                     LOG.info("Producer created now getting ready to send records");
                     while (keepRunning) {
-                        Collection<RetailPurchaseProto.RetailPurchase> purchases = DataGenerator.generatePurchasedItems(100);
+                        Collection<RetailPurchase> purchases = DataGenerator.generatePurchasedItems(100);
                         LOG.info("Generated {} records to send", purchases.size());
                         purchases.stream()
                                 .map(purchase -> {
-                                    ProducerRecord<String, RetailPurchaseProto.RetailPurchase> producerRecord =
+                                    ProducerRecord<String, RetailPurchase> producerRecord =
                                             new ProducerRecord<>(TRANSACTIONS_TOPIC, NULL_KEY, purchase);
                                     addHeader(purchase, producerRecord);
                                     return producerRecord;
@@ -110,8 +110,8 @@ public class MockDataProducer implements AutoCloseable {
         executorService.submit(generateTask);
     }
 
-    private void addHeader(RetailPurchaseProto.RetailPurchase purchase,
-                           ProducerRecord<String, RetailPurchaseProto.RetailPurchase> producerRecord) {
+    private void addHeader(RetailPurchase purchase,
+                           ProducerRecord<String, RetailPurchase> producerRecord) {
         String department = purchase.getDepartment();
         String headerValue;
         if (department.equals("coffee")
@@ -153,9 +153,9 @@ public class MockDataProducer implements AutoCloseable {
             final Map<String, Object> configs = producerConfigs();
             final Callback callback = callback();
             configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProtoSerializer.class);
-            try (Producer<String, StockAlertProto.StockAlert> producer = new KafkaProducer<>(configs)) {
+            try (Producer<String, StockAlert> producer = new KafkaProducer<>(configs)) {
                 while (keepRunning) {
-                    List<StockAlertProto.StockAlert> stockAlerts = (List) DataGenerator.generateStockAlertsForKTableAggregateExample();
+                    List<StockAlert> stockAlerts = (List) DataGenerator.generateStockAlertsForKTableAggregateExample();
                     stockAlerts.stream()
                             .map(alert -> new ProducerRecord<>(topic, alert.getSymbol(), alert))
                             .forEach(pr -> producer.send(pr, callback));
@@ -208,10 +208,10 @@ public class MockDataProducer implements AutoCloseable {
             try (Producer<String, ? extends AbstractMessage> producer = new KafkaProducer<>(configs)) {
                 while (keepRunning) {
                   Map<String, Collection<? extends AbstractMessage>> records = DataGenerator.generateJoinExampleData(25);
-                  records.get("retail").stream().map(p -> new ProducerRecord(purchaseTopic,((RetailPurchaseProto.RetailPurchase)p).getCustomerId(), p))
+                  records.get("retail").stream().map(p -> new ProducerRecord(purchaseTopic,((RetailPurchase)p).getCustomerId(), p))
                           .forEach(pr -> producer.send(pr, callback));
                   LOG.info("Join example store purchases sent");
-                  records.get("coffee").stream().map(p -> new ProducerRecord(coffeeTopic, ((CoffeePurchaseProto.CoffeePurchase)p).getCustomerId(), p))
+                  records.get("coffee").stream().map(p -> new ProducerRecord(coffeeTopic, ((CoffeePurchase)p).getCustomerId(), p))
                           .forEach(pr -> producer.send(pr, callback));
                   LOG.info("Join example coffee purchases sent");
                   Thread.sleep(6000);
@@ -251,9 +251,9 @@ public class MockDataProducer implements AutoCloseable {
             final Map<String, Object> configs = producerConfigs();
             final Callback callback = callback();
             configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProtoSerializer.class);
-            try (Producer<String, StockTransactionProto.Transaction> producer = new KafkaProducer<>(configs)) {
+            try (Producer<String, Transaction> producer = new KafkaProducer<>(configs)) {
                 while (keepRunning) {
-                    List<StockTransactionProto.Transaction> stockTxn = (List) DataGenerator.generateStockTransactions(50);
+                    List<Transaction> stockTxn = (List) DataGenerator.generateStockTransactions(50);
                     stockTxn.stream()
                             .map(txn -> new ProducerRecord<>(topic, "", txn))
                             .forEach(pr -> producer.send(pr, callback));
@@ -347,9 +347,9 @@ public class MockDataProducer implements AutoCloseable {
             final Map<String, Object> configs = producerConfigs();
             final Callback callback = callback();
             configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProtoSerializer.class);
-            try (Producer<String, SensorProto.Sensor> producer = new KafkaProducer<>(configs)) {
+            try (Producer<String, Sensor> producer = new KafkaProducer<>(configs)) {
                 while (keepRunning) {
-                    Map<String, List<SensorProto.Sensor>> sensorValuesMap = DataGenerator.generateSensorReadings(120);
+                    Map<String, List<Sensor>> sensorValuesMap = DataGenerator.generateSensorReadings(120);
                     sensorValuesMap.forEach((topic, value) -> {
                         value.stream().map(sensor -> new ProducerRecord<>(topic, NULL_KEY, sensor))
                                 .forEach(pr -> producer.send(pr, callback));

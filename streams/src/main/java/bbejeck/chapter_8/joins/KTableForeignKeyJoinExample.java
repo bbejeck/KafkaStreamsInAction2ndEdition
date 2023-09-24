@@ -1,8 +1,8 @@
 package bbejeck.chapter_8.joins;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_6.proto.RetailPurchaseProto.RetailPurchase;
-import bbejeck.chapter_8.proto.EmployeeProto.Employee;
+import bbejeck.chapter_6.proto.RetailPurchase;
+import bbejeck.chapter_8.proto.Employee;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.clients.MockDataProducer.JoinData;
 import bbejeck.data.DataGenerator;

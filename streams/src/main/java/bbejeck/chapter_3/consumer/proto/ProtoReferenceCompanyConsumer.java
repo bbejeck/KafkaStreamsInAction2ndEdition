@@ -1,7 +1,7 @@
 package bbejeck.chapter_3.consumer.proto;
 
 import bbejeck.chapter_3.consumer.BaseConsumer;
-import bbejeck.chapter_3.proto.CompanyProto;
+import bbejeck.chapter_3.proto.Company;
 import bbejeck.clients.ConsumerRecordsHandler;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializerConfig;
@@ -25,12 +25,12 @@ public class ProtoReferenceCompanyConsumer extends BaseConsumer {
         ProtoReferenceCompanyConsumer companyConsumer = new ProtoReferenceCompanyConsumer();
         Map<String, Object> overrideConfigs = new HashMap<>();
         overrideConfigs.put(ConsumerConfig.GROUP_ID_CONFIG,"proto-company-ref-group");
-        overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, CompanyProto.Company.class);
+        overrideConfigs.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, Company.class);
         companyConsumer.overrideConfigs(overrideConfigs);
 
-        ConsumerRecordsHandler<String, CompanyProto.Company> processFunction = (consumerRecords ->
+        ConsumerRecordsHandler<String, Company> processFunction = (consumerRecords ->
                 consumerRecords.forEach(cr -> {
-                    CompanyProto.Company companyRecord = cr.value();
+                    Company companyRecord = cr.value();
                     LOG.info("Found Protobuf company record {}", companyRecord);
                 }));
 

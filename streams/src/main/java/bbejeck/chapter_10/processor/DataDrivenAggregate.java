@@ -1,7 +1,7 @@
 package bbejeck.chapter_10.processor;
 
-import bbejeck.chapter_6.proto.SensorProto.Sensor;
-import bbejeck.chapter_9.proto.SensorAggregationProto.SensorAggregation;
+import bbejeck.chapter_6.proto.Sensor;
+import bbejeck.chapter_9.proto.SensorAggregation;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.processor.PunctuationType;
 import org.apache.kafka.streams.processor.api.ContextualProcessor;

@@ -1,9 +1,9 @@
 package bbejeck.data;
 
-import bbejeck.chapter_4.proto.EventsProto;
-import bbejeck.chapter_4.proto.LoginEventProto;
-import bbejeck.chapter_4.proto.PurchaseEventProto;
-import bbejeck.chapter_4.proto.SearchEventProto;
+import bbejeck.chapter_4.proto.Events;
+import bbejeck.chapter_4.proto.LoginEvent;
+import bbejeck.chapter_4.proto.PurchaseEvent;
+import bbejeck.chapter_4.proto.SearchEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,14 +13,14 @@ import java.util.Collection;
  * returns the same 3 Protobuf events with each call to {@link DataSource#fetch()}
  * useful for testing scenarios
  */
-public class ConstantProtoEventDataSource implements DataSource<EventsProto.Events> {
+public class ConstantProtoEventDataSource implements DataSource<Events> {
 
     @Override
-    public Collection<EventsProto.Events> fetch() {
-        var events = new ArrayList<EventsProto.Events>();
-        var searchBuilder = SearchEventProto.SearchEvent.newBuilder();
-        var logInBuilder = LoginEventProto.LoginEvent.newBuilder();
-        var purchaseBuilder = PurchaseEventProto.PurchaseEvent.newBuilder();
+    public Collection<Events> fetch() {
+        var events = new ArrayList<Events>();
+        var searchBuilder = SearchEvent.newBuilder();
+        var logInBuilder = LoginEvent.newBuilder();
+        var purchaseBuilder = PurchaseEvent.newBuilder();
 
         var searchEvent = searchBuilder.setSearchedItem("fish-eggs")
                 .setUserId("grogu")
@@ -41,7 +41,7 @@ public class ConstantProtoEventDataSource implements DataSource<EventsProto.Even
                                                                         .setAmount(25.00)
                                                                         .setUserId("grogu").build();
 
-        var eventBuilder = EventsProto.Events.newBuilder();
+        var eventBuilder = Events.newBuilder();
         events.add(eventBuilder.setKey(searchEvent.getUserId()).setSearchEvent(searchEvent).build());
         eventBuilder.clear();
         events.add(eventBuilder.setKey(logInEvent.getUserId()).setLoginEvent(logInEvent).build());

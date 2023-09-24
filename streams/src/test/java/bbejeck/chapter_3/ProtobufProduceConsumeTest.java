@@ -18,7 +18,7 @@ package bbejeck.chapter_3;
 
 import bbejeck.chapter_3.consumer.proto.ProtoConsumer;
 import bbejeck.chapter_3.producer.proto.ProtoProducer;
-import bbejeck.chapter_3.proto.AvengerProto;
+import bbejeck.chapter_3.proto.Avenger;
 import bbejeck.clients.ConsumerRecordsHandler;
 import bbejeck.testcontainers.BaseKafkaContainerTest;
 import com.google.protobuf.Descriptors;
@@ -83,15 +83,15 @@ public class ProtobufProduceConsumeTest extends BaseKafkaContainerTest {
     @DisplayName("Produce and Consume specific protobuf types")
     public void shouldProduceAndConsumeSpecificTypes() {
         protoProducer.overrideConfigs(getProducerConfigs());
-        List<AvengerProto.Avenger> expectedAvengers = ProtoProducer.getRecords();
+        List<Avenger> expectedAvengers = ProtoProducer.getRecords();
         protoProducer.send(outputTopic, expectedAvengers);
         LOG.debug("Produced records {}", expectedAvengers);
 
-        List<AvengerProto.Avenger> actualAvengers = new ArrayList<>();
+        List<Avenger> actualAvengers = new ArrayList<>();
 
         protoConsumer.overrideConfigs(getConsumerConfigs(true));
-        ConsumerRecordsHandler<String, AvengerProto.Avenger> consumerRecordsHandler = consumerRecords -> {
-            for (ConsumerRecord<String, AvengerProto.Avenger> consumerRecord : consumerRecords) {
+        ConsumerRecordsHandler<String, Avenger> consumerRecordsHandler = consumerRecords -> {
+            for (ConsumerRecord<String, Avenger> consumerRecord : consumerRecords) {
                 actualAvengers.add(consumerRecord.value());
             }
         };
@@ -105,7 +105,7 @@ public class ProtobufProduceConsumeTest extends BaseKafkaContainerTest {
     @DisplayName("Produce and Consume protobuf dynamic messages")
     public void shouldProduceAndConsumeDynamicTypes() {
         protoProducer.overrideConfigs(getProducerConfigs());
-        List<AvengerProto.Avenger> expectedAvengers = ProtoProducer.getRecords();
+        List<Avenger> expectedAvengers = ProtoProducer.getRecords();
         protoProducer.send(outputTopic, expectedAvengers);
         LOG.debug("Produced records {}", expectedAvengers);
 
@@ -120,7 +120,7 @@ public class ProtobufProduceConsumeTest extends BaseKafkaContainerTest {
         actualAvengers.forEach(dynamicAvenger -> {
             Descriptors.FieldDescriptor realNameDescriptor = dynamicAvenger.getDescriptorForType().findFieldByName("real_name");
             Descriptors.FieldDescriptor nameDescriptor = dynamicAvenger.getDescriptorForType().findFieldByName("name");
-            AvengerProto.Avenger expectedAvenger = expectedAvengers.get(counter++);
+            Avenger expectedAvenger = expectedAvengers.get(counter++);
             assertEquals(expectedAvenger.getName(), dynamicAvenger.getField(nameDescriptor));
             assertEquals(expectedAvenger.getRealName(), dynamicAvenger.getField(realNameDescriptor));
         });
@@ -145,7 +145,7 @@ public class ProtobufProduceConsumeTest extends BaseKafkaContainerTest {
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);
         if (isSpecific) {
-            consumerProps.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, AvengerProto.Avenger.class);
+            consumerProps.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, Avenger.class);
         }
         consumerProps.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "mock://localhost:8081");
         consumerProps.put("topic.names", outputTopic);

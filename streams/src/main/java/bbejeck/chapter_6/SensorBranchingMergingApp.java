@@ -1,7 +1,7 @@
 package bbejeck.chapter_6;
 
 import bbejeck.BaseStreamsApplication;
-import bbejeck.chapter_6.proto.SensorProto;
+import bbejeck.chapter_6.proto.Sensor;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.utils.SerdeUtil;
 import bbejeck.utils.Topics;
@@ -31,8 +31,8 @@ import java.util.Properties;
 public class SensorBranchingMergingApp extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(SensorBranchingMergingApp.class);
 
-    static final ValueMapper<SensorProto.Sensor, SensorProto.Sensor> feetToMetersMapper = sensor -> {
-        SensorProto.Sensor.Builder sensorBuilder = SensorProto.Sensor.newBuilder(sensor);
+    static final ValueMapper<Sensor, Sensor> feetToMetersMapper = sensor -> {
+        Sensor.Builder sensorBuilder = Sensor.newBuilder(sensor);
         double distanceInFeet = sensor.getReading();
         sensorBuilder.setReading(distanceInFeet / 0.3048);
         return sensorBuilder.build();
@@ -40,26 +40,26 @@ public class SensorBranchingMergingApp extends BaseStreamsApplication {
 
     @Override
     public Topology topology(Properties streamProperties) {
-        Serde<SensorProto.Sensor> sensorSerde = SerdeUtil.protobufSerde(SensorProto.Sensor.class);
+        Serde<Sensor> sensorSerde = SerdeUtil.protobufSerde(Sensor.class);
         Serde<String> stringSerde = Serdes.String();
 
         StreamsBuilder builder = new StreamsBuilder();
-        Consumed<String, SensorProto.Sensor> sensorConsumed = Consumed.with(stringSerde, sensorSerde);
+        Consumed<String, Sensor> sensorConsumed = Consumed.with(stringSerde, sensorSerde);
 
-        KStream<String, SensorProto.Sensor> legacySensorStream =
+        KStream<String, Sensor> legacySensorStream =
                 builder.stream("combined-sensors", sensorConsumed);
-        KStream<String, SensorProto.Sensor> temperatureSensorStream =
+        KStream<String, Sensor> temperatureSensorStream =
                 builder.stream("temperature-sensors", sensorConsumed);
-        KStream<String, SensorProto.Sensor> proximitySensorStream =
+        KStream<String, Sensor> proximitySensorStream =
                 builder.stream("proximity-sensors", sensorConsumed);
 
 
-        Predicate<String, SensorProto.Sensor> isProximitySensor =
-                (key, reading) -> reading.getSensorType() == SensorProto.Sensor.Type.PROXIMITY;
-        Predicate<String, SensorProto.Sensor> isTemperatureSensor =
-                (key, reading) -> reading.getSensorType() == SensorProto.Sensor.Type.TEMPERATURE;
+        Predicate<String, Sensor> isProximitySensor =
+                (key, reading) -> reading.getSensorType() == Sensor.Type.PROXIMITY;
+        Predicate<String, Sensor> isTemperatureSensor =
+                (key, reading) -> reading.getSensorType() == Sensor.Type.TEMPERATURE;
 
-        Map<String, KStream<String, SensorProto.Sensor>> sensorMap =
+        Map<String, KStream<String, Sensor>> sensorMap =
                 legacySensorStream.split(Named.as("sensor-"))
                         .branch(isTemperatureSensor, Branched.as("temperature"))
                         .branch(isProximitySensor,

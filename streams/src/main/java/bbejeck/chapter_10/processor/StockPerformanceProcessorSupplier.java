@@ -1,7 +1,7 @@
 package bbejeck.chapter_10.processor;
 
-import bbejeck.chapter_7.proto.StockTransactionProto.Transaction;
-import bbejeck.chapter_9.proto.StockPerformanceProto.StockPerformance;
+import bbejeck.chapter_7.proto.Transaction;
+import bbejeck.chapter_9.proto.StockPerformance;
 import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.processor.api.ProcessorSupplier;
 import org.apache.kafka.streams.state.StoreBuilder;

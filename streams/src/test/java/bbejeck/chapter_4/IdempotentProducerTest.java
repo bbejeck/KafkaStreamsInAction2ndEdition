@@ -48,7 +48,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * (parameterized, one actual test method) one with the producer
  * in non-idempotent mode which will have duplicate records and the other uses
  * idempotent mode and will have no duplicates.
- *
  * This class has a {@link Tag} with the label of "long" as this test
  * simulates a network partition to force the producer to
  * resend records and

@@ -15,13 +15,19 @@
  */
 package bbejeck.chapter_3;
 
+import bbejeck.chapter_3.consumer.json.JsonSchemaConsumer;
+import bbejeck.chapter_3.json.AvengerJson;
+import bbejeck.chapter_3.producer.json.JsonSchemaProducer;
+import bbejeck.clients.ConsumerRecordsHandler;
 import bbejeck.testcontainers.BaseKafkaContainerTest;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializer;
+import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializerConfig;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -29,23 +35,29 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 /**
  * Test for demo of using producer and consumer with JSONSchema schemas
  */
-@Disabled("Don't run until fixed")
 public class JsonSchemaProduceConsumeTest extends BaseKafkaContainerTest {
 
 
     private final String outputTopic = "json-schema-test-topic";
+    private JsonSchemaConsumer jsonSchemaConsumer;
+    private JsonSchemaProducer jsonSchemaProducer;
+    private int counter = 0;
     private static final Logger LOG = LogManager.getLogger(JsonSchemaProduceConsumeTest.class);
 
 
@@ -54,6 +66,8 @@ public class JsonSchemaProduceConsumeTest extends BaseKafkaContainerTest {
         final Properties props = new Properties();
         props.put("bootstrap.servers", KAFKA.getBootstrapServers());
         createTopic(props, outputTopic, 1, (short) 1);
+        jsonSchemaConsumer = new JsonSchemaConsumer();
+        jsonSchemaProducer = new JsonSchemaProducer();
     }
 
     @AfterEach
@@ -67,7 +81,50 @@ public class JsonSchemaProduceConsumeTest extends BaseKafkaContainerTest {
     @Test
     @DisplayName("Produce and Consume Json Schema")
     public void shouldProduceConsumeJsonSchema() throws Exception {
+        jsonSchemaProducer.overrideConfigs(getProducerConfigs());
+        List<AvengerJson> expectedAvengers = JsonSchemaProducer.getRecords();
+        jsonSchemaProducer.send(outputTopic, expectedAvengers);
+        LOG.debug("Produced records {}", expectedAvengers);
 
+        List<AvengerJson> actualAvengers = new ArrayList<>();
+        Map<String, Object> consumerConfigs = getConsumerConfigs();
+        consumerConfigs.put(KafkaJsonSchemaDeserializerConfig.JSON_VALUE_TYPE, AvengerJson.class.getName());
+        jsonSchemaConsumer.overrideConfigs(consumerConfigs);
+        ConsumerRecordsHandler<String, AvengerJson> consumerRecordsHandler = consumerRecords -> {
+            for (ConsumerRecord<String, AvengerJson> consumerRecord : consumerRecords) {
+                actualAvengers.add(consumerRecord.value());
+            }
+        };
+
+        jsonSchemaConsumer.consume(outputTopic, consumerRecordsHandler);
+        LOG.debug("Consumed JSON Schema records {}", actualAvengers);
+        assertIterableEquals(expectedAvengers, actualAvengers);
+    }
+
+    @Test
+    @DisplayName("Produce and Consume Json Schema Generic types")
+    public void shouldProduceConsumeGenericObjects() throws Exception {
+        jsonSchemaProducer.overrideConfigs(getProducerConfigs());
+        List<AvengerJson> expectedAvengers = JsonSchemaProducer.getRecords();
+        jsonSchemaProducer.send(outputTopic, expectedAvengers);
+        LOG.debug("Produced records {}", expectedAvengers);
+
+        List<Map<String,Object>> actualAvengers = new ArrayList<>();
+        jsonSchemaConsumer.overrideConfigs(getConsumerConfigs());
+        ConsumerRecordsHandler<String, Map<String,Object>> consumerRecordsHandler = consumerRecords -> {
+            for (ConsumerRecord<String, Map<String, Object>> consumerRecord : consumerRecords) {
+                actualAvengers.add(consumerRecord.value());
+            }
+        };
+
+        jsonSchemaConsumer.consume(outputTopic, consumerRecordsHandler);
+        LOG.debug("Consumed JSON Schema records {}", actualAvengers);
+
+        actualAvengers.forEach(genericAvenger ->{
+            AvengerJson avengerAvro = expectedAvengers.get(counter++);
+            assertEquals(genericAvenger.get("name"), avengerAvro.getName());
+            assertEquals(genericAvenger.get("realName"), avengerAvro.getRealName());
+        });
     }
 
 

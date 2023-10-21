@@ -80,7 +80,7 @@ public class KTableForeignKeyJoinExample extends BaseStreamsApplication {
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "ktable-foreign-key-join-example");
         //Need to set this to zero to see results faster
-        properties.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
+        properties.put(StreamsConfig.STATESTORE_CACHE_MAX_BYTES_CONFIG, 0);
         Topology topology = kTableForeignKeyJoinExample.topology(properties);
 
         JoinData<RetailPurchase, Employee, String, String> foreignKeyJoinData = new JoinData<>(kTableForeignKeyJoinExample.purchaseTableTopic,

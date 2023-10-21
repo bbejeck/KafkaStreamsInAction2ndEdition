@@ -30,14 +30,11 @@ public abstract class BaseProxyInterceptingKafkaContainerTest {
         Properties properties = System.getProperties();
         String os = properties.getProperty("os.arch", "");
         Network network = Network.newNetwork();
-        KAFKA = new ProxyInterceptingKafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.1.0"))
+        KAFKA = new ProxyInterceptingKafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.1"))
                 .withExposedPorts(9093)
                 .withNetwork(network);
 
-        DockerImageName toxiProxyImage = os.equals("aarch64") ? TOXIPROXY_AMD64_IMAGE : TOXIPROXY_X86_IMAGE;
-        LOG.info("Using ToxiProxy image {}", toxiProxyImage);
-
-        TOXIPROXY = new ToxiproxyContainer(toxiProxyImage)
+        TOXIPROXY = new ToxiproxyContainer("ghcr.io/shopify/toxiproxy:2.5.0")
                 .withNetwork(network)
                 .withNetworkAliases(TOXIPROXY_NETWORK_ALIAS);
 

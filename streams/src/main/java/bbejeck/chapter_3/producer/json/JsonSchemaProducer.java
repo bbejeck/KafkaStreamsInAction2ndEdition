@@ -18,7 +18,7 @@ public class JsonSchemaProducer extends BaseProducer<String, AvengerJson> {
         super(StringSerializer.class, KafkaJsonSchemaSerializer.class);
     }
 
-    static List<AvengerJson> getRecords() {
+    public static List<AvengerJson> getRecords() {
         final var blackWidow = new AvengerJson()
                 .withName("Black Widow")
                 .withRealName("Natasha Romanova")

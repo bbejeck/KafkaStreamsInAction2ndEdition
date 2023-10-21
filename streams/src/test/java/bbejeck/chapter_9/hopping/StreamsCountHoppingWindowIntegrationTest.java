@@ -42,7 +42,7 @@ class StreamsCountHoppingWindowIntegrationTest {
 
     @Container
     private static final KafkaContainer kafka =
-            new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.3.0.arm64"));
+            new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.1"));
 
     @BeforeEach
     public void setUp() {

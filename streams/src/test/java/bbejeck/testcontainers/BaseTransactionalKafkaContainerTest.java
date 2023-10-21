@@ -14,7 +14,7 @@ public abstract class BaseTransactionalKafkaContainerTest {
     public static final KafkaContainer TXN_KAFKA;
 
     static {
-        TXN_KAFKA = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.1.0"))
+        TXN_KAFKA = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.1"))
                 // NOTE: These settings are required to run transactions with a single broker container
                 // otherwise you're expected to have a 3 broker minimum for using
                 // transactions in a production environment

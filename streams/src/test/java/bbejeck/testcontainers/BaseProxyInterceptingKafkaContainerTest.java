@@ -34,7 +34,7 @@ public abstract class BaseProxyInterceptingKafkaContainerTest {
                 .withExposedPorts(9093)
                 .withNetwork(network);
 
-        TOXIPROXY = new ToxiproxyContainer("ghcr.io/shopify/toxiproxy:2.5.0")
+        TOXIPROXY = new ToxiproxyContainer("ghcr.io/shopify/toxiproxy:2.6.0")
                 .withNetwork(network)
                 .withNetworkAliases(TOXIPROXY_NETWORK_ALIAS);
 

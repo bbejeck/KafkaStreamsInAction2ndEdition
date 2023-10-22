@@ -67,7 +67,7 @@ public class IdempotentProducerTest extends BaseProxyInterceptingKafkaContainerT
     @BeforeAll
     public static void init() {
 
-        adminProps.put("bootstrap.servers", KAFKA.getBootstrapServers());
+        adminProps.put("bootstrap.servers", KAFKA_CONTAINER.getBootstrapServers());
     }
 
     @BeforeEach
@@ -141,7 +141,7 @@ public class IdempotentProducerTest extends BaseProxyInterceptingKafkaContainerT
 
     private KafkaProducer<String, Integer> getProducer(final boolean enableIdempotence) {
         Map<String, Object> producerProps = new HashMap<>();
-        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
+        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
         producerProps.put(ProducerConfig.ACKS_CONFIG, "all");
         producerProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, enableIdempotence);
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -152,7 +152,7 @@ public class IdempotentProducerTest extends BaseProxyInterceptingKafkaContainerT
 
     private KafkaConsumer<String, Integer> getConsumer(final String groupId) {
         Map<String, Object> consumerProps = new HashMap<>();
-        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

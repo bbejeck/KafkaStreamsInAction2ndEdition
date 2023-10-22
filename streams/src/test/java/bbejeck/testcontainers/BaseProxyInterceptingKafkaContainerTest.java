@@ -18,11 +18,8 @@ public abstract class BaseProxyInterceptingKafkaContainerTest {
 
     private static final Logger LOG = LogManager.getLogger(BaseProxyInterceptingKafkaContainerTest.class);
     private static final String TOXIPROXY_NETWORK_ALIAS = "toxiproxy";
-    private static final ToxiproxyContainer TOXIPROXY;
-    private static final DockerImageName TOXIPROXY_AMD64_IMAGE = DockerImageName.parse("ghcr.io/shopify/toxiproxy:v2.4-amd64").asCompatibleSubstituteFor("shopify/toxiproxy");
-    private static final DockerImageName TOXIPROXY_X86_IMAGE = DockerImageName.parse("ghcr.io/shopify/toxiproxy:v2.4").asCompatibleSubstituteFor("shopify/toxiproxy");
-
-    public static final KafkaContainer KAFKA;
+    private static final ToxiproxyContainer TOXIPROXY_CONTAINER;
+    public static final KafkaContainer KAFKA_CONTAINER;
     public static final ToxiproxyContainer.ContainerProxy PROXY;
 
     static {
@@ -30,17 +27,17 @@ public abstract class BaseProxyInterceptingKafkaContainerTest {
         Properties properties = System.getProperties();
         String os = properties.getProperty("os.arch", "");
         Network network = Network.newNetwork();
-        KAFKA = new ProxyInterceptingKafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.1"))
+        KAFKA_CONTAINER = new ProxyInterceptingKafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.1"))
                 .withExposedPorts(9093)
                 .withNetwork(network);
 
-        TOXIPROXY = new ToxiproxyContainer("ghcr.io/shopify/toxiproxy:2.6.0")
+        TOXIPROXY_CONTAINER = new ToxiproxyContainer("ghcr.io/shopify/toxiproxy:2.6.0")
                 .withNetwork(network)
                 .withNetworkAliases(TOXIPROXY_NETWORK_ALIAS);
 
-        TOXIPROXY.start();
-        PROXY = TOXIPROXY.getProxy(KAFKA, 9093);
-        KAFKA.start();
+        TOXIPROXY_CONTAINER.start();
+        PROXY = TOXIPROXY_CONTAINER.getProxy(KAFKA_CONTAINER, 9093);
+        KAFKA_CONTAINER.start();
     }
 
 

@@ -17,6 +17,7 @@ import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.common.utils.Time;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -66,6 +67,7 @@ public class IdempotentProducerTest extends BaseProxyInterceptingKafkaContainerT
     private static Proxy proxy;
     private final String topicName = "idempotent-producer-test-topic";
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final Time time = Time.SYSTEM;
 
     @BeforeAll
     public static void init() throws IOException {
@@ -114,10 +116,10 @@ public class IdempotentProducerTest extends BaseProxyInterceptingKafkaContainerT
                 return counter;
             };
             Future<Integer> produceResult = executorService.submit(produceThread);
-            Thread.sleep(1000);
+            time.sleep(1000);
             proxy.toxics().bandwidth("CUT_CONNECTION_DOWNSTREAM", ToxicDirection.DOWNSTREAM, 0);
             proxy.toxics().bandwidth("CUT_CONNECTION_UPSTREAM", ToxicDirection.UPSTREAM, 0);
-            Thread.sleep(45_000L);
+            time.sleep(45_000L);
             proxy.toxics().get("CUT_CONNECTION_DOWNSTREAM").remove();
             proxy.toxics().get("CUT_CONNECTION_UPSTREAM").remove();
             totalSent = produceResult.get();

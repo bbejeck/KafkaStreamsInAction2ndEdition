@@ -2,6 +2,9 @@ package bbejeck.chapter_4;
 
 import bbejeck.testcontainers.BaseProxyInterceptingKafkaContainerTest;
 import bbejeck.utils.Topics;
+import eu.rekawek.toxiproxy.Proxy;
+import eu.rekawek.toxiproxy.ToxiproxyClient;
+import eu.rekawek.toxiproxy.model.ToxicDirection;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -26,6 +29,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.testcontainers.containers.ToxiproxyContainer;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,14 +63,14 @@ public class IdempotentProducerTest extends BaseProxyInterceptingKafkaContainerT
     private static final Logger LOG = LogManager.getLogger(IdempotentProducerTest.class);
     private static final int NUMBER_RECORDS_TO_PRODUCE = 100_000;
     private static final Properties adminProps = new Properties();
-
-
+    private static Proxy proxy;
     private final String topicName = "idempotent-producer-test-topic";
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @BeforeAll
-    public static void init() {
-
+    public static void init() throws IOException {
+        ToxiproxyClient toxiproxyClient = new ToxiproxyClient(TOXIPROXY_CONTAINER.getHost(), TOXIPROXY_CONTAINER.getControlPort());
+        proxy = toxiproxyClient.createProxy("broker", "0.0.0.0:8666", "broker:9093");
         adminProps.put("bootstrap.servers", KAFKA_CONTAINER.getBootstrapServers());
     }
 
@@ -111,9 +115,11 @@ public class IdempotentProducerTest extends BaseProxyInterceptingKafkaContainerT
             };
             Future<Integer> produceResult = executorService.submit(produceThread);
             Thread.sleep(1000);
-            PROXY.setConnectionCut(true);
+            proxy.toxics().bandwidth("CUT_CONNECTION_DOWNSTREAM", ToxicDirection.DOWNSTREAM, 0);
+            proxy.toxics().bandwidth("CUT_CONNECTION_UPSTREAM", ToxicDirection.UPSTREAM, 0);
             Thread.sleep(45_000L);
-            PROXY.setConnectionCut(false);
+            proxy.toxics().get("CUT_CONNECTION_DOWNSTREAM").remove();
+            proxy.toxics().get("CUT_CONNECTION_UPSTREAM").remove();
             totalSent = produceResult.get();
             consumer.subscribe(Collections.singletonList(topicName));
             boolean keepConsuming = true;

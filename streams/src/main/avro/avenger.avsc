@@ -2,12 +2,20 @@
   "namespace": "bbejeck.chapter_3.avro",
   "type": "record",
   "name": "AvengerAvro",
+  "doc": "Schema of a Marvel character",
   "fields": [
-    {"name": "name", "type": "string"},
-    {"name": "real_name", "type": "string"},
+    {"name": "name",
+      "type": "string",
+      "doc": "The super hero name"
+    },
+    {"name": "real_name",
+      "type": "string",
+      "doc": "Real life name"
+    },
     {"name": "movies", "type":
-                      {"type": "array", "items": "string"},                     
-      "default": []
+                      {"type": "array", "items": "string"},
+      "default": [],
+      "doc": "Movies the super hero is featured in"
     }
     ]
 }

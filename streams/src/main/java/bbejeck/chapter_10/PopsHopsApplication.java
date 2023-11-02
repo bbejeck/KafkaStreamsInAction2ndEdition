@@ -91,7 +91,7 @@ public class PopsHopsApplication extends BaseStreamsApplication {
         Serializer<BeerPurchase> beerPurchaseSerializer = SerdeUtil.protobufSerde(BeerPurchase.class).serializer();
         try (KafkaStreams streams = new KafkaStreams(topology, properties);
              MockDataProducer mockDataProducer = new MockDataProducer()) {
-            mockDataProducer.produceWithProducerRecordSupplier(
+            mockDataProducer.produceWithRecordSupplier(
                     beerPurchaseProducerRecordSupplier,
                     new StringSerializer(),
                     beerPurchaseSerializer

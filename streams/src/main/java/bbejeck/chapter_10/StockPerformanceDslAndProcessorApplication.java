@@ -75,7 +75,7 @@ public class StockPerformanceDslAndProcessorApplication extends BaseStreamsAppli
         Topology topology = stockPerformanceDslAndProcessorApplication.topology(properties);
         try (KafkaStreams streams = new KafkaStreams(topology, properties);
              MockDataProducer mockDataProducer = new MockDataProducer()) {
-            mockDataProducer.produceWithProducerRecordSupplier(transactionProducerRecordSupplier,
+            mockDataProducer.produceWithRecordSupplier(transactionProducerRecordSupplier,
                     new StringSerializer(),
                     transactionSerializer);
             streams.start();

@@ -90,7 +90,7 @@ public class SensorAlertingApplication extends BaseStreamsApplication {
         Serializer<Sensor> sensorSerializer = SerdeUtil.protobufSerde(Sensor.class).serializer();
         try (KafkaStreams streams = new KafkaStreams(topology, properties);
                 MockDataProducer mockDataProducer = new MockDataProducer()) {
-                mockDataProducer.produceWithProducerRecordSupplier(sensorProducerRecordSupplier,
+                mockDataProducer.produceWithRecordSupplier(sensorProducerRecordSupplier,
                         new StringSerializer(),
                         sensorSerializer);
             streams.start();

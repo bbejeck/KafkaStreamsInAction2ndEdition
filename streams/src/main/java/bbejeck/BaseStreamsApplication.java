@@ -2,9 +2,12 @@ package bbejeck;
 
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.ForeachAction;
+import org.apache.kafka.streams.kstream.Windowed;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 
 /**
@@ -30,6 +33,16 @@ public abstract class BaseStreamsApplication {
 
     public <K, V> ForeachAction<K, V> printKV(String label) {
         return (key, value) -> System.out.printf("%s: key[%s] value[%s] %n",label, key, value);
+    }
+
+    public String fmtInstant(Instant instant){
+       return instant.truncatedTo(ChronoUnit.SECONDS).toString();
+    }
+
+    public <K> String fmtWindowed(Windowed<K> windowed) {
+        return String.format("%s@ open %s - close %s", windowed.key(),
+                windowed.window().startTime().truncatedTo(ChronoUnit.SECONDS),
+                windowed.window().endTime().truncatedTo(ChronoUnit.SECONDS));
     }
 
 }

@@ -318,9 +318,9 @@ public class MockDataProducer implements AutoCloseable {
         executorService.submit(generateTask);
     }
 
-    public <K, V> void produceWithProducerRecordSupplier(Supplier<ProducerRecord<K, V>> producerRecordSupplier,
-                                                         Serializer<K> keySerializer,
-                                                         Serializer<V> valueSerializer) {
+    public <K, V> void produceWithRecordSupplier(Supplier<ProducerRecord<K, V>> producerRecordSupplier,
+                                                 Serializer<K> keySerializer,
+                                                 Serializer<V> valueSerializer) {
         Callable<Void> generateTask = () -> {
             final Map<String, Object> configs = producerConfigs();
             final Callback callback = callback();

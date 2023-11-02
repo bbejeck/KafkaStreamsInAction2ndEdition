@@ -3,13 +3,12 @@ package bbejeck.chapter_9.tumbling;
 import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_9.IotSensorAggregation;
 import bbejeck.chapter_9.aggregator.IotStreamingAggregator;
+import bbejeck.clients.MockDataProducer;
 import bbejeck.serializers.JsonDeserializer;
 import bbejeck.serializers.JsonSerializer;
 import bbejeck.serializers.SerializationConfig;
-import org.apache.kafka.common.serialization.Deserializer;
-import org.apache.kafka.common.serialization.Serde;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.serialization.Serializer;
+import bbejeck.utils.Topics;
+import org.apache.kafka.common.serialization.*;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
@@ -29,6 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
+import static bbejeck.chapter_9.tumbling.IotStreamingAggregationEmitOnCloseTumblingWindow.TEMP_THRESHOLD;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.kafka.streams.StreamsConfig.APPLICATION_ID_CONFIG;
 import static org.apache.kafka.streams.StreamsConfig.BOOTSTRAP_SERVERS_CONFIG;
@@ -41,6 +41,8 @@ import static org.apache.kafka.streams.StreamsConfig.BOOTSTRAP_SERVERS_CONFIG;
 public class IotStreamingAggregationTumblingWindows extends BaseStreamsApplication {
 
      private static final Logger LOG = LoggerFactory.getLogger(IotStreamingAggregationTumblingWindows.class);
+     static String inputTopic = "heat-sensor-input";
+     static String outputTopic = "sensor-agg-output-tumbling";
     @Override
     public Topology topology(Properties streamProperties) {
         StreamsBuilder builder = new StreamsBuilder();
@@ -59,15 +61,18 @@ public class IotStreamingAggregationTumblingWindows extends BaseStreamsApplicati
                 WindowedSerdes.timeWindowedSerdeFrom(String.class,
                         60_000L
                 );
-        KStream<String,Double> iotHeatSensorStream = builder.stream("heat-sensor-input",
+        KStream<String,Double> iotHeatSensorStream = builder.stream(inputTopic,
                 Consumed.with(stringSerde, doubleSerde));
-        iotHeatSensorStream.groupByKey()
+        iotHeatSensorStream
+                .peek((key, value) -> LOG.info("Incoming records key=[{}] value=[{}]", key, value))
+                .groupByKey()
                 .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(1)))
           .aggregate(() ->  new IotSensorAggregation(tempThreshold),
                    aggregator,
                   Materialized.with(stringSerde, aggregationSerde))
           .toStream()
-                .to("sensor-agg-output-tumbling", Produced.with(
+                .peek((key, value) -> LOG.info("Tumbling records key=[{}] value=[{}]", fmtWindowed(key), value))
+                .to(outputTopic, Produced.with(
                         windowedSerdes, aggregationSerde));
 
 
@@ -76,12 +81,17 @@ public class IotStreamingAggregationTumblingWindows extends BaseStreamsApplicati
     }
 
     public static void main(String[] args) throws Exception {
+        Topics.maybeDeleteThenCreate(inputTopic, outputTopic);
         IotStreamingAggregationTumblingWindows iotStreamingAggregationTumblingWindows = new IotStreamingAggregationTumblingWindows();
         Properties properties = new Properties();
         properties.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(APPLICATION_ID_CONFIG, "iot-streaming-aggregation-tumbling-windows");
         Topology topology = iotStreamingAggregationTumblingWindows.topology(properties);
-        try (KafkaStreams streams = new KafkaStreams(topology, properties)) {
+        try (KafkaStreams streams = new KafkaStreams(topology, properties);
+             MockDataProducer mockDataProducer = new MockDataProducer()) {
+            mockDataProducer.produceWithRecordSupplier(new IotTumblingWindowRecordSupplier(inputTopic,TEMP_THRESHOLD),
+                    new StringSerializer(),
+                    new DoubleSerializer());
             streams.start();
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatch.await(60, SECONDS);

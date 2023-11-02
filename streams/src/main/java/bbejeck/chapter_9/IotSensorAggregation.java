@@ -1,5 +1,7 @@
 package bbejeck.chapter_9;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * User: Bill Bejeck
  * Date: 9/17/23
@@ -20,10 +22,12 @@ public class IotSensorAggregation  {
 
     public IotSensorAggregation() {}
 
+    @JsonProperty
     public double highestSeen() {
         return highestSeen;
     }
 
+    @JsonProperty
     public double temperatureSum() {
         return temperatureSum;
     }
@@ -32,6 +36,7 @@ public class IotSensorAggregation  {
         this.temperatureSum = temperatureSum;
     }
 
+    @JsonProperty
     public int numberReadings() {
         return numberReadings;
     }
@@ -40,6 +45,7 @@ public class IotSensorAggregation  {
         this.numberReadings = numberReadings;
     }
 
+    @JsonProperty
     public int tempThresholdExceededCount() {
         return tempThresholdExceededCount;
     }
@@ -48,6 +54,7 @@ public class IotSensorAggregation  {
         this.tempThresholdExceededCount = tempThresholdExceededCount;
     }
 
+    @JsonProperty
     public double readingThreshold() {
         return readingThreshold;
     }
@@ -56,6 +63,7 @@ public class IotSensorAggregation  {
         this.readingThreshold = readingThreshold;
     }
 
+    @JsonProperty
     public double averageReading() {
         return averageReading;
     }
@@ -66,5 +74,17 @@ public class IotSensorAggregation  {
 
     public void setHighestSeen(double highestSeen) {
         this.highestSeen = highestSeen;
+    }
+
+    @Override
+    public String toString() {
+        return "IotSensorAggregation{" +
+                "highestSeen=" + highestSeen +
+                ", temperatureSum=" + temperatureSum +
+                ", numberReadings=" + numberReadings +
+                ", tempThresholdExceededCount=" + tempThresholdExceededCount +
+                ", readingThreshold=" + readingThreshold +
+                ", averageReading=" + averageReading +
+                '}';
     }
 }

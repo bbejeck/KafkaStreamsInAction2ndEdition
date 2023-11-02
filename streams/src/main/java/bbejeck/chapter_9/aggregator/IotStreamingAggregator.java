@@ -8,7 +8,7 @@ public class IotStreamingAggregator implements Aggregator<String, Double, IotSen
     public IotSensorAggregation apply(String key, Double reading, IotSensorAggregation aggregate) {
         aggregate.setTemperatureSum(aggregate.temperatureSum() + reading);
         aggregate.setNumberReadings(aggregate.numberReadings() + 1);
-        if (aggregate.highestSeen() > reading) {
+        if (aggregate.highestSeen() < reading) {
             aggregate.setHighestSeen(reading);
         }
         if (reading >= aggregate.readingThreshold()) {

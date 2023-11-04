@@ -2,6 +2,7 @@ package bbejeck.chapter_9.session;
 
 import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_9.aggregator.PageViewAggregator;
+import bbejeck.chapter_9.data.PageViewSessionsRecordSupplier;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.serializers.JsonDeserializer;
 import bbejeck.serializers.JsonSerializer;

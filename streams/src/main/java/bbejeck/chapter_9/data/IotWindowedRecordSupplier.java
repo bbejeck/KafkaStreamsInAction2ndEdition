@@ -1,4 +1,4 @@
-package bbejeck.chapter_9.tumbling;
+package bbejeck.chapter_9.data;
 
 import net.datafaker.Faker;
 import net.datafaker.providers.base.Number;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-class IotTumblingWindowRecordSupplier implements Supplier<ProducerRecord<String, Double>> {
+public class IotWindowedRecordSupplier implements Supplier<ProducerRecord<String, Double>> {
     private final Faker faker = new Faker();
     private final Number number = faker.number();
     private final List<String> sensorIds;
@@ -22,7 +22,7 @@ class IotTumblingWindowRecordSupplier implements Supplier<ProducerRecord<String,
     }
     private final Map<String, WindowTracker> iotTime = new HashMap<>();
 
-    public IotTumblingWindowRecordSupplier(final String topic, final double tempThreshold) {
+    public IotWindowedRecordSupplier(final String topic, final double tempThreshold) {
         this.topic = topic;
         this.tempThreshold = tempThreshold;
         sensorIds = Stream.generate(() -> faker.idNumber().valid()).limit(5).toList();
@@ -52,8 +52,8 @@ class IotTumblingWindowRecordSupplier implements Supplier<ProducerRecord<String,
     }
 
     public static void main(String[] args) {
-        IotTumblingWindowRecordSupplier supplier =
-                new IotTumblingWindowRecordSupplier("input", 115.0);
+        IotWindowedRecordSupplier supplier =
+                new IotWindowedRecordSupplier("input", 115.0);
         Map<String, List<Double>> map = new HashMap<>();
         for (int i = 0; i < 40; i++) {
             ProducerRecord<String, Double> pr = supplier.get();

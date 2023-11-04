@@ -3,12 +3,18 @@ package bbejeck.chapter_9.tumbling;
 import bbejeck.BaseStreamsApplication;
 import bbejeck.chapter_9.IotSensorAggregation;
 import bbejeck.chapter_9.aggregator.IotStreamingAggregator;
+import bbejeck.chapter_9.data.IotWindowedRecordSupplier;
 import bbejeck.clients.MockDataProducer;
 import bbejeck.serializers.JsonDeserializer;
 import bbejeck.serializers.JsonSerializer;
 import bbejeck.serializers.SerializationConfig;
 import bbejeck.utils.Topics;
-import org.apache.kafka.common.serialization.*;
+import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.DoubleSerializer;
+import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.serialization.Serializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
@@ -89,7 +95,7 @@ public class IotStreamingAggregationTumblingWindows extends BaseStreamsApplicati
         Topology topology = iotStreamingAggregationTumblingWindows.topology(properties);
         try (KafkaStreams streams = new KafkaStreams(topology, properties);
              MockDataProducer mockDataProducer = new MockDataProducer()) {
-            mockDataProducer.produceWithRecordSupplier(new IotTumblingWindowRecordSupplier(inputTopic,TEMP_THRESHOLD),
+            mockDataProducer.produceWithRecordSupplier(new IotWindowedRecordSupplier(inputTopic,TEMP_THRESHOLD),
                     new StringSerializer(),
                     new DoubleSerializer());
             streams.start();

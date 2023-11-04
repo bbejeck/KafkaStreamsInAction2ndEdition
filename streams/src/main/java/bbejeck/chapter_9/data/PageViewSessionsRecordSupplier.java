@@ -1,4 +1,4 @@
-package bbejeck.chapter_9.session;
+package bbejeck.chapter_9.data;
 
 import net.datafaker.Faker;
 import net.datafaker.providers.base.Number;
@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * Date: 10/28/23
  * Time: 3:57 PM
  */
-class PageViewSessionsRecordSupplier implements Supplier<ProducerRecord<String, String>> {
+public class PageViewSessionsRecordSupplier implements Supplier<ProducerRecord<String, String>> {
     private final Faker faker = new Faker();
     private final Number number = faker.number();
     private final List<String> users;

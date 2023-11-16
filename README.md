@@ -76,7 +76,7 @@ you'll have shortcuts for some command-line commands you'll encounter. For examp
 
 You'll notice the project contains six modules
 
-1. [custom-connector](custom-connector) - Source code for Chapter 5 Kafka Connect
+1. [custom-connector](custom-connector) - Source code for Chapter 5 Kafka Connect.  The README.md file in the `custom-connector` module contains details on running the example code.
 2. [spring-kafka](spring-kafka) - Source code for chapters 12 Spring Kafka and 13 Interactive Queries
 3. [sr-backward](sr-backward) - Source code for Appendix A - Schema compatibility workshop
 4. [sr-forward](sr-forward) - Source code for Appendix A - Schema compatibility workshop

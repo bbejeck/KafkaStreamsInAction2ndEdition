@@ -23,8 +23,10 @@ plugins {
     id 'com.adarshr.test-logger' version '3.2.0'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
@@ -38,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.protobuf:protobuf-java:3.19.6'
+    implementation 'com.google.protobuf:protobuf-java:3.25.0'
     implementation "org.apache.avro:avro:1.10.0"
     implementation "com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39"
     implementation 'javax.validation:validation-api:1.1.0.CR2'
@@ -83,10 +85,8 @@ dependencies {
 }
 
 protobuf {
-    generatedFilesBaseDir = "${project.buildDir}/generated-main-proto-java"
-
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.18.0'
+        artifact = 'com.google.protobuf:protoc:3.25.0'
     }
 }
 
@@ -95,7 +95,7 @@ jsonSchema2Pojo {
     generateBuilders = true
     annotationStyle = "JACKSON2"
     source = files("${project.projectDir}/src/main/json")
-    targetDirectory = file("${project.buildDir}/generated-main-json-java")
+    targetDirectory = file("${project.DEFAULT_BUILD_DIR_NAME}/generated-main-json-java")
     includeJsr303Annotations = false
     propertyWordDelimiters = ['_'] as char[]
 }

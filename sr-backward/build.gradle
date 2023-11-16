@@ -17,13 +17,15 @@ plugins {
     id 'java'
     id 'idea'
     id 'com.github.eirnym.js2p' version '1.0'
-    id "com.google.protobuf" version "0.8.18"
+    id "com.google.protobuf" version "0.9.4"
     id "com.github.imflog.kafka-schema-registry-gradle-plugin" version "1.1.1"
     id "com.github.davidmc24.gradle.plugin.avro" version "1.0.0"
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
@@ -37,6 +39,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.google.protobuf:protobuf-java:3.25.0'
     implementation "org.apache.avro:avro:1.10.0"
     implementation "com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39"
     implementation 'javax.validation:validation-api:1.1.0.CR2'
@@ -63,10 +66,8 @@ dependencies {
 }
 
 protobuf {
-    generatedFilesBaseDir = "${project.buildDir}/generated-main-proto-java"
-
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.18.0'
+        artifact = 'com.google.protobuf:protoc:3.25.0'
     }
 }
 
@@ -75,7 +76,7 @@ jsonSchema2Pojo {
     generateBuilders = true
     annotationStyle = "JACKSON2"
     source = files("${project.projectDir}/src/main/json")
-    targetDirectory = file("${project.buildDir}/generated-main-json-java")
+    targetDirectory = file("${project.DEFAULT_BUILD_DIR_NAME}/generated-main-json-java")
     includeJsr303Annotations = false
     propertyWordDelimiters = ['_'] as char[]
 }

@@ -17,9 +17,7 @@ import java.util.Map;
 import static bbejeck.chapter_5.connector.StockTickerSourceConnectorConfig.*;
 
 /**
- * User: Bill Bejeck
- * Date: 6/10/22
- * Time: 6:30 PM
+ * The SourceConnector for reading in stock values from a ticker service
  */
 public class StockTickerSourceConnector extends SourceConnector {
     private static final Logger LOG = LoggerFactory.getLogger(StockTickerSourceConnector.class);

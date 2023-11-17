@@ -19,9 +19,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * User: Bill Bejeck
- * Date: 7/21/22
- * Time: 8:20 PM
+ * Thread that monitors changes for the ticker symbols to track
  */
 public class StockTickerSourceConnectorMonitorThread extends Thread {
 

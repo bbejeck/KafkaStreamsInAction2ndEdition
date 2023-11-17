@@ -32,9 +32,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * User: Bill Bejeck
- * Date: 6/11/22
- * Time: 1:43 PM
+ * The SourceTask for the connector implementation, it contains the logic that
+ * actually drives the connector
  */
 public class StockTickerSourceTask extends SourceTask {
     private static final Logger LOG = LoggerFactory.getLogger(StockTickerSourceTask.class);

@@ -11,9 +11,7 @@ import static spark.Spark.get;
 
 
 /**
- * User: Bill Bejeck
- * Date: 1/3/23
- * Time: 7:03 PM
+ * The web server that provides the ticker symbols to track, dynamically changes
  */
 public class TickerServer {
     private static final Logger LOG = LoggerFactory.getLogger(TickerServer.class);

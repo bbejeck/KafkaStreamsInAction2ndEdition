@@ -24,9 +24,7 @@ import static org.apache.kafka.connect.transforms.util.Requirements.requireMap;
 import static org.apache.kafka.connect.transforms.util.Requirements.requireStruct;
 
 /**
- * User: Bill Bejeck
- * Date: 6/19/22
- * Time: 2:48 PM
+ * Multi field extractor that pulls designated fields from a JSON payload
  */
 public abstract class MultiFieldExtract<R extends ConnectRecord<R>> implements Transformation<R> {
     private static final Logger LOG = LoggerFactory.getLogger(MultiFieldExtract.class);

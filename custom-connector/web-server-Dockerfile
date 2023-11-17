@@ -1,3 +1,3 @@
 FROM openjdk:17.0.1
-COPY ./build/libs/custom-connector.jar custom-connector.jar
+COPY ./build/libs/custom-connector-all.jar custom-connector.jar
 CMD ["java", "-jar", "custom-connector.jar"]

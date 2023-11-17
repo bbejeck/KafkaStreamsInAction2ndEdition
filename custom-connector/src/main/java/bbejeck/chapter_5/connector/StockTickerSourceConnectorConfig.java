@@ -6,9 +6,7 @@ import org.apache.kafka.common.config.ConfigDef;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 7/21/22
- * Time: 7:55 PM
+ * Source configurations
  */
 public class StockTickerSourceConnectorConfig extends AbstractConfig {
 

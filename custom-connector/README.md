@@ -2,21 +2,21 @@
  
 Chapter 5 has several moving parts so here are some basic commands for running the code covered in the chapter.
 
+### Prerequisites
+
+Before starting with the examples make sure you run 
+```bash
+./gradlew clean build shadowJar
+```
+to ensure the custom connector is build and all required dependencies are included in the uber jar `custom-connector-all.jar` found in the `build/libs` directory.
+
 ### Starting Docker 
 
-#### arm64
-Run this command `docker-compose -f arm64-connect-docker-compose.yml up --build` from the root of the `custom-connector` module to start docker.
-
-#### x86
-For Intel based mac/PC run use this command `docker-compose -f x86-connect-docker-compose.yml up --build` from the root of the `custom-connector` module to start docker.
+Run this command `docker compose up --build` from the root of the `custom-connector` module to start docker.
 
 ### Stopping Docker
 
-#### arm64
-To stop docker run `docker-compose -f arm64-connect-docker-compose.yml down -v` from the root of the `custom-connector` module
-
-#### x86
-`docker-compose -f x86-connect-docker-compose.yml down -v` from the root of the `custom-connector` module
+Run `docker compose down -v` from the root of the `custom-connector` module to stop docker
 
 ### Launching the JDBC Connector
 To run the source JDBC Connector run this `curl` command from a terminal window after you've started `docker-compose` 

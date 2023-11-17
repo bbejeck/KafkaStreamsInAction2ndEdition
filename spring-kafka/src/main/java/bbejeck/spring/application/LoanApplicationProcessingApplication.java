@@ -9,9 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * User: Bill Bejeck
- * Date: 10/11/22
- * Time: 6:23 PM
+ * SpringBoot application for simple loan processing
  */
 @SpringBootApplication(scanBasePackages = {"bbejeck.spring.processor", "bbejeck.spring.datagen" })
 @Configuration

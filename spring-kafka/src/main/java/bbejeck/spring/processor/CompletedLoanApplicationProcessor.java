@@ -7,9 +7,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 /**
- * User: Bill Bejeck
- * Date: 10/14/22
- * Time: 6:32 PM
+ * KafkaListener handling the different completed loan applications
  */
 @Component
 public class CompletedLoanApplicationProcessor {

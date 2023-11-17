@@ -19,9 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 10/11/22
- * Time: 6:23 PM
+ * A more advanced Spring Kafka application 
  */
 @SpringBootApplication(scanBasePackages = {"bbejeck.spring.processor", "bbejeck.spring.datagen"})
 @Configuration

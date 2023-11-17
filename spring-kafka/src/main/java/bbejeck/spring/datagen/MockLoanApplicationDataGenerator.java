@@ -17,9 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 /**
- * User: Bill Bejeck
- * Date: 10/15/22
- * Time: 2:56 PM
+ * Data generation for examples
  */
 @Component
 public class MockLoanApplicationDataGenerator {

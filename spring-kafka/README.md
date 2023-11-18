@@ -39,7 +39,23 @@ The Kafka Streams application is an implementation of the loan processing scenar
 
 
 ## How to run the examples
-TODO
+To run the main application [KafkaStreamsContainerLoanApplicationApplication](src/main/java/bbejeck/spring/streams/container/KafkaStreamsContainerLoanApplicationApplication.java) of this chapter you need to take these steps
+
+First create the jar file:
+
+```commandline
+  ./gradlew clean build
+```
+
+Then run:
+
+```commandline
+ java -jar build/libs/spring-kafka.jar 
+```
+
+    
+To run one of the other applications contained in the repo you would do the following:
+
 
 
 

@@ -53,6 +53,9 @@ Then run:
  java -jar build/libs/spring-kafka.jar 
 ```
 
+Once the application is running, point your browser to `localhost:7076` and you'll see Interactive Queries in action as you'll see a table summary of the loan transactions which is a live view of the loan application aggregation that Kafka Streams is performing.
+
+//SCREEN SHOT HERE
     
 To run one of the other applications contained in the repo you would do the following:
 

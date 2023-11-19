@@ -25,9 +25,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.stereotype.Component;
 
 /**
- * User: Bill Bejeck
- * Date: 11/5/22
- * Time: 10:43 AM
+ * Kafka Streams loan application example application
  */
 @Component
 public class LoanApplicationTopology {

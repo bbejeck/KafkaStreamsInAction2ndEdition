@@ -51,7 +51,8 @@ test {
 }
 
 springBoot {
-    mainClass = 'bbejeck.spring.streams.container.KafkaStreamsContainerLoanApplicationApplication'
+    // Using the PropertiesLauncher allows for dynamic main class name when starting the application
+    mainClass = 'org.springframework.boot.loader.PropertiesLauncher'
 }
 
 clean {

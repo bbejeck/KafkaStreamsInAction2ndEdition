@@ -2,8 +2,7 @@
 
 
 This module contains the source code from Chapters 12(Spring and Kafka) and 13(Interactive Queries).
-All applications are runnable and are best executed from within an IDE such as IntelliJ
-
+All applications are runnable and are best executed from within an IDE such as IntelliJ, but they can be run from the commandline and instructions for doing so are contained in [How to run the examples](#how-to-run-the-examples).
 
 ## Kafka Applications
 
@@ -39,25 +38,67 @@ The Kafka Streams application is an implementation of the loan processing scenar
 
 
 ## How to run the examples
-To run the main application [KafkaStreamsContainerLoanApplicationApplication](src/main/java/bbejeck/spring/streams/container/KafkaStreamsContainerLoanApplicationApplication.java) of this chapter you need to take these steps
 
-First create the jar file:
+Make sure you have a Kafka broker running.  You can use the [docker-compose.yml](../docker-compose.yml) file at the root of the repo.  Then create the jar file:
 
 ```commandline
   ./gradlew clean build
 ```
 
-Then run:
+Then run one of the following commands depending on the application you'd like to run. Note that the `build.gradle` file uses this config for the main class:
+
+```groovy
+ springBoot {
+    mainClass = 'org.springframework.boot.loader.PropertiesLauncher'
+}
+```
+By using the `PropertiesLauncher` as the `mainClass` attribute, we can specify one of the four applications in this project by setting the `loader.main` property on the commandline.
+
+### Kafka Streams loan processing   
+For the [KafkaStreamsContainerLoanApplicationApplication](src/main/java/bbejeck/spring/streams/container/KafkaStreamsContainerLoanApplicationApplication.java)
 
 ```commandline
- java -jar build/libs/spring-kafka.jar 
+ java -jar -Dloader.main=bbejeck.spring.streams.container.KafkaStreamsContainerLoanApplicationApplication build/libs/spring-kafka.jar
 ```
+   
+#### Interactive Queries
+Once the application is running, point your browser to `localhost:7076` and you'll see Interactive Queries in action with dynamic HTML table summary of loan processing transactions which is a live view of the Kafka Streams aggregations.
 
-Once the application is running, point your browser to `localhost:7076` and you'll see Interactive Queries in action as you'll see a table summary of the loan transactions which is a live view of the loan application aggregation that Kafka Streams is performing.
+![Loan Processing IQ Application](img/iq-dashboard.png)
+  
+### Spring-Kafka loan processing
+To run the Spring-Kafka version of the loan processing application you would run this from the commandline
 
-//SCREEN SHOT HERE
-    
-To run one of the other applications contained in the repo you would do the following:
+```commandline
+java -jar -Dloader.main=bbejeck.spring.application.LoanApplicationProcessingApplication build/libs/spring-kafka.jar
+```
+        
+This performs the same functionality as the Kafka Streams loan processing application, just with plain consumers and producers.
+
+#### Spring Boot version of Kafka Streams
+To run the Spring Boot version of the Kafka Steams loan processing you'd use this command:
+```commandline
+java -jar -Dloader.main=bbejeck.spring.streams.boot.KafkaStreamsBootLoanApplicationApplication  build/libs/spring-kafka.jar
+```
+It offers the exact same functionality, but for completeness you can run this version.
+
+#### Spring-Kafka loan processing with a consumer per partition
+Finally, there is the advanced version of the Spring-Kafka application:
+
+```commandline
+java -jar -Dloader.main=bbejeck.spring.application.LoanApplicationProcessingApplicationAdvanced build/libs/spring-kafka.jar
+```
+This also offers the same functionality as the previous Spring-Kafka application, but it allows you to see the performance of having a Consumer per partition. 
+
+
+
+
+
+
+
+
+
+
 
 
 

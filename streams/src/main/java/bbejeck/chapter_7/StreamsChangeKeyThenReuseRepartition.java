@@ -3,7 +3,9 @@ package bbejeck.chapter_7;
 import bbejeck.BaseStreamsApplication;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.JoinWindows;
@@ -15,6 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Example demonstrating when making a key changing operation Kafka Streams will automatically create a
@@ -49,10 +53,16 @@ public class StreamsChangeKeyThenReuseRepartition extends BaseStreamsApplication
         return builder.build();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         StreamsChangeKeyThenReuseRepartition streamsChangeKeyThenReuseRepartition = new StreamsChangeKeyThenReuseRepartition();
-        Topology topology = streamsChangeKeyThenReuseRepartition.topology(new Properties());
-        LOG.info("Topology with redundant repartition nodes {}", topology.describe());
-        //TODO get application running
+        Properties properties = new Properties();
+        properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "streams-change-key-then-reuse-repartition");
+        Topology topology = streamsChangeKeyThenReuseRepartition.topology(properties);
+        try (KafkaStreams streams = new KafkaStreams(topology, properties)) {
+            streams.start();
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            countDownLatch.await(60, TimeUnit.SECONDS);
+        }
     }
 }

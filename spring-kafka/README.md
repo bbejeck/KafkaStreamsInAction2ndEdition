@@ -55,14 +55,14 @@ Then run one of the following commands depending on the application you'd like t
 By using the `PropertiesLauncher` as the `mainClass` attribute, we can specify one of the four applications in this project by setting the `loader.main` property on the commandline.
 
 ### Kafka Streams loan processing   
-For the [KafkaStreamsContainerLoanApplicationApplication](src/main/java/bbejeck/spring/streams/container/KafkaStreamsContainerLoanApplicationApplication.java)
+For the [KafkaStreamsContainerLoanApplicationApplication] you'll use this command(src/main/java/bbejeck/spring/streams/container/KafkaStreamsContainerLoanApplicationApplication.java)
 
 ```commandline
  java -jar -Dloader.main=bbejeck.spring.streams.container.KafkaStreamsContainerLoanApplicationApplication build/libs/spring-kafka.jar
 ```
    
 #### Interactive Queries
-Once the application is running, point your browser to `localhost:7076` and you'll see Interactive Queries in action with dynamic HTML table summary of loan processing transactions which is a live view of the Kafka Streams aggregations.
+When the Spring Boot application starts it also kicks off a webserver as well, so point your browser to `localhost:7076` and you'll see Interactive Queries in action with dynamic HTML table summary of loan processing transactions which is a live view of the Kafka Streams aggregations.  The [index](src/main/resources/public/index.html) page executes a JSON driven REST call every second getting an update for a given loan category.
 
 ![Loan Processing IQ Application](img/iq-dashboard.png)
   

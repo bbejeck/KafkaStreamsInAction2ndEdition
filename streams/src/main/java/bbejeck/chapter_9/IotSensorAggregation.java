@@ -3,9 +3,7 @@ package bbejeck.chapter_9;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * User: Bill Bejeck
- * Date: 9/17/23
- * Time: 12:41 PM
+ * Aggregation object for Iot sensor windowing examples
  */
 public class IotSensorAggregation  {
 

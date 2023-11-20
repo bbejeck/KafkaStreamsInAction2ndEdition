@@ -3,6 +3,7 @@ package bbejeck.chapter_7;
 import bbejeck.BaseStreamsApplication;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
@@ -16,6 +17,11 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.apache.kafka.streams.StreamsConfig.APPLICATION_ID_CONFIG;
+import static org.apache.kafka.streams.StreamsConfig.BOOTSTRAP_SERVERS_CONFIG;
 
 /**
  * Example showing how to eliminate redundant repartition nodes by using the
@@ -50,10 +56,16 @@ public class OptimizingStreamsRepartition extends BaseStreamsApplication {
         return builder.build(streamProperties);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         OptimizingStreamsRepartition optimizingStreamsRepartition = new OptimizingStreamsRepartition();
-        Topology topology = optimizingStreamsRepartition.topology(new Properties());
-        LOG.info("Optimized topology {}", topology.describe());
-        //TODO get application running
+        Properties properties = new Properties();
+        properties.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(APPLICATION_ID_CONFIG, "optimizing-streams-repartition");
+        Topology topology = optimizingStreamsRepartition.topology(properties);
+        try (KafkaStreams streams = new KafkaStreams(topology, properties)) {
+            streams.start();
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            countDownLatch.await(60, TimeUnit.SECONDS);
+        }
     }
 }

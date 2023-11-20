@@ -26,11 +26,7 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-/**
- * User: Bill Bejeck
- * Date: 9/17/23
- * Time: 4:42 PM
- */
+
 public class IotStreamingAggregationNoWindows extends BaseStreamsApplication {
 
      private static final Logger LOG = LoggerFactory.getLogger(IotStreamingAggregationNoWindows.class);

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
 public class IotWindowedRecordSupplier implements Supplier<ProducerRecord<String, Double>> {
     private final Faker faker = new Faker();
     private final Number number = faker.number();

@@ -37,11 +37,6 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-/**
- * User: Bill Bejeck
- * Date: 10/25/23
- * Time: 7:44 PM
- */
 public class IotStreamingAggregationEmitOnCloseTumblingWindow extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(IotStreamingAggregationEmitOnCloseTumblingWindow.class);
     static String inputTopic = "iot-emit-on-close-input";

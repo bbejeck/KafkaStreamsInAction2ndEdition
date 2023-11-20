@@ -34,9 +34,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * User: Bill Bejeck
- * Date: 9/18/23
- * Time: 6:12 PM
+ * Session windows for a page-view simulation
  */
 public class PageViewSessionWindows extends BaseStreamsApplication {
       private static final Logger LOG = LoggerFactory.getLogger(PageViewSessionWindows.class);

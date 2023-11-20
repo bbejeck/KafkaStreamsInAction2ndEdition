@@ -3,7 +3,9 @@ package bbejeck.chapter_7;
 import bbejeck.BaseStreamsApplication;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.JoinWindows;
@@ -16,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  *  Example demonstrating how to use the {@link KStream#repartition(Repartitioned)} operation
@@ -52,11 +56,17 @@ public class ProactiveStreamsRepartition extends BaseStreamsApplication {
         return builder.build();
     }
 
-    public static void main(String[] args) {
-         ProactiveStreamsRepartition proactiveStreamsRepartition = new ProactiveStreamsRepartition();
-         Topology topology = proactiveStreamsRepartition.topology(new Properties());
-         LOG.info("Proactive repartition results {}", topology.describe());
-         //TODO get app running with code
+    public static void main(String[] args) throws Exception {
+        ProactiveStreamsRepartition proactiveStreamsRepartition = new ProactiveStreamsRepartition();
+        Properties properties = new Properties();
+        properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, "proactive-streams-repartition");
+        Topology topology = proactiveStreamsRepartition.topology(properties);
+        try (KafkaStreams streams = new KafkaStreams(topology, properties)) {
+            streams.start();
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            countDownLatch.await(60, TimeUnit.SECONDS);
+        }
     }
 
 }

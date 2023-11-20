@@ -39,11 +39,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.kafka.streams.StreamsConfig.APPLICATION_ID_CONFIG;
 import static org.apache.kafka.streams.StreamsConfig.BOOTSTRAP_SERVERS_CONFIG;
 
-/**
- * User: Bill Bejeck
- * Date: 9/17/23
- * Time: 4:42 PM
- */
 public class IotStreamingAggregationTumblingWindows extends BaseStreamsApplication {
 
      private static final Logger LOG = LoggerFactory.getLogger(IotStreamingAggregationTumblingWindows.class);

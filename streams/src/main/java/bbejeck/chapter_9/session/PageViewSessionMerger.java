@@ -5,9 +5,7 @@ import org.apache.kafka.streams.kstream.Merger;
 import java.util.Map;
 
 /**
- * User: Bill Bejeck
- * Date: 9/18/23
- * Time: 6:47 PM
+ * Session merger implementation
  */
 public class PageViewSessionMerger implements Merger<String, Map<String, Integer>> {
 

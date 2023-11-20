@@ -33,11 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-/**
- * User: Bill Bejeck
- * Date: 5/7/22
- * Time: 6:58 PM
- */
+
 public class SensorAlertingApplication extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(SensorAlertingApplication.class);
     public static final String INPUT_TOPIC = "sensor-alert-input";

@@ -7,11 +7,6 @@ import org.apache.kafka.streams.processor.Punctuator;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.KeyValueStore;
 
-/**
- * User: Bill Bejeck
- * Date: 8/14/17
- * Time: 7:06 PM
- */
 public class StockPerformancePunctuatorOldProcessorAPI implements Punctuator {
 
 

@@ -9,11 +9,6 @@ import org.apache.kafka.streams.state.StoreBuilder;
 import java.util.Collections;
 import java.util.Set;
 
-/**
- * User: Bill Bejeck
- * Date: 4/11/22
- * Time: 9:16 PM
- */
 public class StockPerformanceProcessorSupplier implements ProcessorSupplier<String, Transaction, String, StockPerformance> {
     StoreBuilder<?> storeBuilder;
 

@@ -1,6 +1,6 @@
 -- noinspection SqlNoDataSourceInspectionForFile
-from terminal window docker exec -it ksqldb-cli ksql http://ksqldb-server:8088
-from IntelliJ terminal  ksql http://ksqldb-server:8088
+-- from terminal window docker exec -it ksqldb-cli ksql http://ksqldb-server:8088
+-- from IntelliJ terminal  ksql http://ksqldb-server:8088
 
 CREATE STREAM input_stream (phrase VARCHAR) WITH (kafka_topic='src-topic', partitions=1, value_format='KAFKA');
 

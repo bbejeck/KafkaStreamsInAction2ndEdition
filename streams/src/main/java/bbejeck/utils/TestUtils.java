@@ -22,9 +22,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * User: Bill Bejeck
- * Date: 12/21/22
- * Time: 12:11 PM
+ * Utilities for Kafka Streams integration tests
  */
 public class TestUtils {
     private static final Logger LOG = LoggerFactory.getLogger(TestUtils.class);

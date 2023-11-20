@@ -3,7 +3,7 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 
 -- instructions to set up ksqlCLI
--- start docker compose with file appropriate for your chip architecture
+-- start docker compose
 -- then from terminal window docker exec -it ksqldb_cli ksql http://ksqldb_server:8088
 -- or from IntelliJ terminal  ksql http://ksqldb_server:8088
 

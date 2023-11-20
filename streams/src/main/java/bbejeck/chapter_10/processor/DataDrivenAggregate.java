@@ -20,11 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-/**
- * User: Bill Bejeck
- * Date: 5/3/22
- * Time: 7:22 PM
- */
 public class DataDrivenAggregate implements ProcessorSupplier<String, Sensor, String, SensorAggregation> {
 
     private final StoreBuilder<?> storeBuilder;

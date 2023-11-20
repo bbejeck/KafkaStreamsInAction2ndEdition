@@ -118,7 +118,7 @@ I wanted to isolate each module in the spirit of independent changes.  The purpo
 how you handle schema changes within different compatibility modes. Not how you set up sub-modules within a main gradle
 project
 
-## Testing with containers
+## Testing
 
 Several tests (both unit and integration) use [testcontainers](https://www.testcontainers.org/).  In order to 
 reduce the overhead of the tests use singleton containers.  You get a singleton container by extending one of three

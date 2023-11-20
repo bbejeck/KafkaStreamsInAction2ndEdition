@@ -2,13 +2,13 @@
 
 Windowing allows you to create discrete aggregation results for a given time period vs. having infinitely increasing aggregations.
 
-[aggregator](aggregator) Package containing `Aggregator` implementations
-[data](data) Package containing record `Supplier`s for running the examples
+The [aggregator](aggregator) package containing `Aggregator` implementations
+The [data](data) package containing record `Supplier`s for running the examples
  
 
-[IotStreamingAggregationNoWindows](IotStreamingAggregationNoWindows.java) IoT aggregation example without windowing for comparison purposes to the windowing examples.
+* [IotStreamingAggregationNoWindows](IotStreamingAggregationNoWindows.java) IoT aggregation example without windowing for comparison purposes to the windowing examples.
 
-[IotSensorAggregation](IotSensorAggregation.java) The model object containing aggregation results 
+* [IotSensorAggregation](IotSensorAggregation.java) The model object containing aggregation results 
 
 ## Hopping Windows
 

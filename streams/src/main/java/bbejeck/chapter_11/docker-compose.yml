@@ -27,7 +27,7 @@ services:
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:7.3.0
+    image: confluentinc/cp-schema-registry:7.5.1
     hostname: schema-registry
     container_name: schema-registry
     depends_on:

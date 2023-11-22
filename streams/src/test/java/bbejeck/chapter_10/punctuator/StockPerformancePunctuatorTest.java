@@ -27,6 +27,7 @@ class StockPerformancePunctuatorTest {
     private StockPerformance.Builder builder = StockPerformance.newBuilder();
     private final double differentialThreshold = .20D;
 
+    @SuppressWarnings("unchecked")
     @BeforeEach
     public void setUp() {
         context = mock(ProcessorContext.class);

@@ -95,7 +95,7 @@ public class StockTickerSourceConnectorMonitorThread extends Thread {
             throw fail(e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

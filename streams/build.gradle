@@ -17,11 +17,12 @@ plugins {
     id 'java'
     id 'idea'
     id 'com.github.eirnym.js2p' version '1.0'
-    id "com.google.protobuf" version "0.8.18"
-    id "com.github.imflog.kafka-schema-registry-gradle-plugin" version "1.1.1"
-    id "com.github.davidmc24.gradle.plugin.avro" version "1.0.0"
+    id "com.google.protobuf" version "0.9.4"
+    id "com.github.imflog.kafka-schema-registry-gradle-plugin" version "1.12.0"
+    id "com.github.davidmc24.gradle.plugin.avro" version "1.9.1"
     id 'com.adarshr.test-logger' version '3.2.0'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'org.barfuin.gradle.taskinfo' version '2.1.0'
 }
 
 java {
@@ -42,7 +43,7 @@ repositories {
 
 dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.25.0'
-    implementation "org.apache.avro:avro:1.10.0"
+    implementation "org.apache.avro:avro:1.11.1"
     implementation "com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39"
     implementation 'javax.validation:validation-api:1.1.0.CR2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
@@ -89,6 +90,14 @@ protobuf {
     protoc {
         artifact = 'com.google.protobuf:protoc:3.25.0'
     }
+}
+
+compileJava {
+    dependsOn(generateProto)
+}
+
+processResources {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
 
 jsonSchema2Pojo {

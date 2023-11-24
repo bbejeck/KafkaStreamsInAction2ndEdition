@@ -28,6 +28,7 @@ prerequisites you'll need to make sure you have installed to get everything work
    the included Gradle "wrapper" script will install it if needed.  Use `./gradlew` for mac OS/'nix and `gradlew.bat` on Windows.
 3. [Docker Desktop](https://www.docker.com/products/docker-desktop) version 4.25.0
 4. [Git](https://git-scm.com/) version 2.42.1
+5. [jq](https://jqlang.github.io/jq/) version 1.7
 
 I've tried to make everything platform neutral, but just for context here's the environment
 that everything was developed and tested:

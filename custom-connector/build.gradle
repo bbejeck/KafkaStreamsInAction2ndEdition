@@ -77,6 +77,7 @@ clean {
 }
 
 jar {
+    dependsOn(shadowJar)
     manifest {
         attributes(
                 "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(" "),

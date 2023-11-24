@@ -4,9 +4,11 @@ Chapter 5 has several moving parts so here are some basic commands for running t
 
 ### Prerequisites
 
+You'll need to have [jq](https://jqlang.github.io/jq/) installed to view the results of several commands.
+
 Before starting with the examples make sure you run 
 ```bash
-./gradlew clean build shadowJar
+./gradlew clean build
 ```
 to ensure the custom connector is build and all required dependencies are included in the uber jar `custom-connector-all.jar` found in the `build/libs` directory.
 
@@ -105,7 +107,7 @@ curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
 
 To see the monitoring thread in action, open a browser add some ticker symbols by entering a command like this 
 ```shell
-  http://localhost:4567/add/BRDCY,MSFT
+ curl  http://localhost:4567/add/BRDCY,MSFT
 ```
 in the address bar
 

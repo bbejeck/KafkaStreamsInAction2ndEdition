@@ -105,9 +105,9 @@ curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
 	  }'
 ```
 
-To see the monitoring thread in action, open a browser add some ticker symbols by entering a command like this 
+To see the monitoring thread in action, open a terminal window add some ticker symbols by running a command like this
 ```shell
- curl  http://localhost:4567/add/BRDCY,MSFT
+ curl -X GET http://localhost:4567/add/BRDCY,MSFT
 ```
 in the address bar
 
@@ -116,9 +116,9 @@ Here are some commands to inspect the local ElasticSearch viewing results of the
 
 - `curl -X GET 'http://localhost:9200/_cat/indices?v' -u elastic:elastic`
 - `curl -X GET 'http://localhost:9200/postgres_orientation_students/_search'  -u elastic:elastic`
-- `curl -XGET localhost:9200/`
+- `curl -X GET localhost:9200/ -u elastic:elastic`
 
 ### List All Available Connectors
-`curl -s -XGET http://localhost:8083/connector-plugins | jq '.[].class'`
+`curl -s -X GET http://localhost:8083/connector-plugins | jq '.[].class'`
 
 

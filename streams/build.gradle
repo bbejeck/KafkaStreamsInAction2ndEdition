@@ -47,7 +47,7 @@ dependencies {
     implementation "com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39"
     implementation 'javax.validation:validation-api:1.1.0.CR2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
-    implementation 'net.datafaker:datafaker:2.0.1'
+    implementation 'net.datafaker:datafaker:2.0.2'
 
     implementation 'org.apache.kafka:connect-api:3.5.1'
     implementation 'org.apache.kafka:connect-transforms:3.5.1'

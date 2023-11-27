@@ -22,7 +22,7 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
 import org.apache.kafka.streams.state.Stores;
-import org.apache.kafka.streams.state.internals.RocksDbKeyValueBytesStoreSupplier;
+import org.apache.kafka.streams.state.internals.RocksDBKeyValueBytesStoreSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class SensorAlertingApplication extends BaseStreamsApplication {
         Deserializer<String> stringDeserializer = stringSerde.deserializer();
 
         StoreBuilder<KeyValueStore<String, SensorAggregation>> storeBuilder =
-                Stores.keyValueStoreBuilder(new RocksDbKeyValueBytesStoreSupplier("aggregation-store", false),
+                Stores.keyValueStoreBuilder(new RocksDBKeyValueBytesStoreSupplier("aggregation-store", false),
                         stringSerde,
                         aggregationSerde);
 

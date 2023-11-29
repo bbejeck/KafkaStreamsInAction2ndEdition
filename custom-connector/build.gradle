@@ -81,13 +81,6 @@ application {
     mainClass = "bbejeck.chapter_5.web_server.TickerServer"
 }
 
-jar {
-    manifest {
-        attributes(
-                "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(" "))
-    }
-}
-
 shadowJar {
     minimize()
 }

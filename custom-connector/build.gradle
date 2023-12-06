@@ -16,6 +16,7 @@ buildscript {
 plugins {
     id 'java'
     id 'idea'
+    id 'application'
     id 'com.adarshr.test-logger' version '4.0.0'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
@@ -46,9 +47,9 @@ dependencies {
     implementation 'net.datafaker:datafaker:2.0.2'
 
 
-    implementation "org.apache.logging.log4j:log4j-api:2.17.1"
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
-    implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.17.1"
+    implementation "org.apache.logging.log4j:log4j-api:2.22.0"
+    implementation 'org.apache.logging.log4j:log4j-core:2.22.0'
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:2.22.0"
 
     testRuntimeOnly    "org.junit.platform:junit-platform-launcher:1.9.2"
     testImplementation "org.junit.jupiter:junit-jupiter:5.10.1"
@@ -76,14 +77,8 @@ clean {
     delete 'out'
 }
 
-jar {
-    dependsOn(shadowJar)
-    manifest {
-        attributes(
-                "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(" "),
-                "Main-Class": "bbejeck.chapter_5.web_server.TickerServer"
-        )
-    }
+application {
+    mainClass = "bbejeck.chapter_5.web_server.TickerServer"
 }
 
 shadowJar {

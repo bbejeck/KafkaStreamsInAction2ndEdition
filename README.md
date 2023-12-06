@@ -16,7 +16,7 @@ Table of Contents
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 # Kafka Streams in Action 2nd Edition
-Source code repository for the 2nd Edition of Kafka Streams in Action
+Source code repository for [Kafka Streams in Action 2nd Edition](https://www.manning.com/books/kafka-streams-in-action-second-edition)
 
 ## Prerequisites
 

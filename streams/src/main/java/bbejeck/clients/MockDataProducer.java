@@ -277,7 +277,7 @@ public class MockDataProducer implements AutoCloseable {
             AtomicInteger logCounter = new AtomicInteger(0);
             try (Producer<String, String> producer = new KafkaProducer<>(configs)) {
                 while (keepRunning) {
-                    List<String> textValues = (List) DataGenerator.generateRandomText();
+                    List<String> textValues = (List<String>) DataGenerator.generateRandomText();
                     textValues.set(random.nextInt(textValues.size()), null);
                     textValues.set(random.nextInt(textValues.size()), null);
                     textValues.stream()

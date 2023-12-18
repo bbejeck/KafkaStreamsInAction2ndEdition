@@ -87,7 +87,7 @@ curl -i -X PUT localhost:8083/connectors/stock-feed-connector/config \
     -H "Content-Type: application/json" \
 	-d '{
 	     "connector.class": "bbejeck.chapter_5.connector.StockTickerSourceConnector",
-		 "api.url": "https://query1.finance.yahoo.com/v7/finance/quote",
+		 "api.url": "http://web-server:4567/finance/quote",
 		 "service.url": "http://web-server:4567/symbols",
 		 "tasks.max": "1",
 		 "topic": "yahoo_feed_results",

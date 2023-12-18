@@ -14,8 +14,6 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -25,21 +23,21 @@ import java.util.function.Function;
  */
 public class KTableCountExample extends BaseStreamsApplication {
     private static final Logger LOG = LoggerFactory.getLogger(KTableCountExample.class);
-    private Map<String, Integer> mapCounter = new HashMap<>();
+    private static final String EVEN = "even";
+    private static final String ODD = "odd";
 
     @Override
     public Topology topology(Properties streamProperties) {
         final StreamsBuilder builder = new StreamsBuilder();
-        AtomicInteger counter = new AtomicInteger(0);
         builder.table("table-input",
                 Consumed.with(Serdes.String(), Serdes.String()))
                 .groupBy((key, value) -> {
-                    int num = counter.getAndIncrement();
+                    int num = Integer.parseInt(key);
                     String newKey;
                     if (num % 2 == 0 ) {
-                        newKey = "A";
+                        newKey = EVEN;
                     } else {
-                        newKey ="B";
+                        newKey = ODD;
                     }
                     return KeyValue.pair(newKey, value);
                 })

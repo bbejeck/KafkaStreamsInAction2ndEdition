@@ -1,6 +1,8 @@
 package bbejeck.chapter_5.web_server;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.datafaker.Faker;
@@ -21,15 +23,18 @@ import static spark.Spark.get;
  */
 public class TickerServer {
     private static final Logger LOG = LoggerFactory.getLogger(TickerServer.class);
-    static List<String> symbols = new ArrayList<>(Arrays.asList("CFLT", "AAPL", "GOOG"));
     static List<JsonNode> stockFeed = new ArrayList<>();
     // JsonNode for quoteResponse -> JsonNode -> result -> JsonArray
     static Map<String, String> symbolToDisplayName = new HashMap<>();
 
     private static final Faker faker = new Faker();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectNode results = JsonNodeFactory.instance.objectNode();
+    private static final ObjectNode quoteResponse = JsonNodeFactory.instance.objectNode();
 
     public static void main(String[] args) {
         LOG.info("Starting the webserver");
+        List<String> symbols = new ArrayList<>(Arrays.asList("CFLT", "AAPL", "GOOG"));
         symbols.forEach(symbol -> symbolToDisplayName.put(symbol, faker.company().name()));
         LOG.info("Populated the symbolToDisplayName map {}", symbolToDisplayName);
         symbolToDisplayName.forEach((key, value) -> stockFeed.add(createNode(key, value, faker)));
@@ -39,19 +44,28 @@ public class TickerServer {
             String[] symbolsToAdd = req.params(":symbols").split(",");
             List<String> newSymbols = Arrays.asList(symbolsToAdd);
             newSymbols.forEach(symbol -> symbolToDisplayName.put(symbol, faker.company().name()));
-            symbols.addAll(newSymbols);
             return String.format("Added symbols %s -> %s",
                     Arrays.toString(symbolsToAdd),
-                    String.join(",", symbols));
+                    String.join(",", symbolToDisplayName.keySet()));
         });
         get("/remove/:symbols", (req, resp) -> {
             String[] symbolsToRemove = req.params(":symbols").split(",");
             List<String> removeSymbols = Arrays.asList(symbolsToRemove);
             removeSymbols.forEach(symbol -> symbolToDisplayName.remove(symbol));
-            symbols.removeAll(removeSymbols);
             return String.format("Removed symbol %s -> %s",
                     Arrays.toString(symbolsToRemove),
-                    String.join(",", symbols));
+                    String.join(",", symbolToDisplayName.keySet()));
+        });
+
+        get("/finance/quote", (req, resp) -> {
+            ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
+            symbolToDisplayName.forEach((key, value) -> {
+                JsonNode jsonNode = createNode(key, value, faker);
+                arrayNode.add(jsonNode);
+            });
+            results.set("results", arrayNode);
+            quoteResponse.set("quoteResponse", results);
+           return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(quoteResponse);
         });
 
     }

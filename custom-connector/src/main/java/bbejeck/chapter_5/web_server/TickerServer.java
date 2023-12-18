@@ -24,7 +24,6 @@ import static spark.Spark.get;
 public class TickerServer {
     private static final Logger LOG = LoggerFactory.getLogger(TickerServer.class);
     static List<JsonNode> stockFeed = new ArrayList<>();
-    // JsonNode for quoteResponse -> JsonNode -> result -> JsonArray
     static Map<String, String> symbolToDisplayName = new HashMap<>();
 
     private static final Faker faker = new Faker();

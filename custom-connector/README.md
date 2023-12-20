@@ -16,10 +16,6 @@ to ensure the custom connector is build and all required dependencies are includ
 
 Run this command `docker compose up --build` from the root of the `custom-connector` module to start docker.
 
-### Stopping Docker
-
-Run `docker compose down -v` from the root of the `custom-connector` module to stop docker
-
 ### Launching the JDBC Connector
 To run the source JDBC Connector run this `curl` command from a terminal window after you've started `docker-compose` 
 ```bash
@@ -109,7 +105,6 @@ To see the monitoring thread in action, open a terminal window add some ticker s
 ```shell
  curl -X GET http://localhost:4567/add/BRDCY,MSFT
 ```
-in the address bar
 
 ### ElasticSearch Commands
 Here are some commands to inspect the local ElasticSearch viewing results of the sink connector
@@ -120,5 +115,9 @@ Here are some commands to inspect the local ElasticSearch viewing results of the
 
 ### List All Available Connectors
 `curl -s -X GET http://localhost:8083/connector-plugins | jq '.[].class'`
+
+### Stopping Docker
+
+After you're done working with the connectors, run `docker compose down -v` from the root of the `custom-connector` module to stop docker
 
 

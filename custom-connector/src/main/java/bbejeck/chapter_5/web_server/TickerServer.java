@@ -38,7 +38,7 @@ public class TickerServer {
         LOG.info("Populated the symbolToDisplayName map {}", symbolToDisplayName);
         symbolToDisplayName.forEach((key, value) -> stockFeed.add(createNode(key, value, faker)));
 
-        get("/symbols", (req, resp) -> String.join(",", symbols));
+        get("/symbols", (req, resp) -> String.join(",", symbolToDisplayName.keySet()));
         get("/add/:symbols", (req, resp) -> {
             String[] symbolsToAdd = req.params(":symbols").split(",");
             List<String> newSymbols = Arrays.asList(symbolsToAdd);
@@ -56,12 +56,22 @@ public class TickerServer {
                     String.join(",", symbolToDisplayName.keySet()));
         });
 
+        /*   Originally the custom connector used the Yahoo stock feed, but Yahoo
+             has turned it off.  While there are other stock feed APIs available,
+             all of them require setting up an account and obtaining a security
+             token.  So for the ease of running the custom connector example,
+             I decided the TickerServer would supply the stock feed.
+         */
+        
         get("/finance/quote", (req, resp) -> {
+            String[] quoteSymbols = req.queryParams("symbols").split(",");
+            LOG.info("Processing request for these ticker symbols {}", Arrays.toString(quoteSymbols));
             ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
-            symbolToDisplayName.forEach((key, value) -> {
-                JsonNode jsonNode = createNode(key, value, faker);
-                arrayNode.add(jsonNode);
-            });
+            Arrays.stream(quoteSymbols).forEach(symbol -> {
+                    String displayName = symbolToDisplayName.get(symbol);
+                    JsonNode jsonNode = createNode(symbol, displayName, faker);
+                    arrayNode.add(jsonNode);
+                });
             results.set("results", arrayNode);
             quoteResponse.set("quoteResponse", results);
            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(quoteResponse);

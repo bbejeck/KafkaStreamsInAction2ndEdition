@@ -12,6 +12,10 @@ public class IotSensorAggregation  {
     private int numberReadings;
     private int tempThresholdExceededCount;
     private double readingThreshold;
+
+    private long windowStart;
+
+    private long windowEnd;
     double averageReading;
 
     public IotSensorAggregation(final double readingThreshold) {
@@ -74,6 +78,22 @@ public class IotSensorAggregation  {
         this.highestSeen = highestSeen;
     }
 
+    public void setWindowStart(long windowStart) {
+        this.windowStart = windowStart;
+    }
+    @JsonProperty
+    public long windowStart() {
+        return this.windowStart;
+    }
+
+    public void setWindowEnd(long windowEnd) {
+        this.windowEnd = windowEnd;
+    }
+     @JsonProperty
+    public long windowEnd() {
+        return this.windowEnd;
+    }
+
     @Override
     public String toString() {
         return "IotSensorAggregation{" +
@@ -82,6 +102,8 @@ public class IotSensorAggregation  {
                 ", numberReadings=" + numberReadings +
                 ", tempThresholdExceededCount=" + tempThresholdExceededCount +
                 ", readingThreshold=" + readingThreshold +
+                ", windowStart=" + windowStart +
+                ", windowEnd=" + windowEnd +
                 ", averageReading=" + averageReading +
                 '}';
     }

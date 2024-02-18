@@ -24,19 +24,19 @@ public class WindowedStreamsPartitioner<K, V> implements StreamPartitioner<Windo
 
     @Override
     public Integer partition(String topic, Windowed<K> windowedKey, V value, int numPartitions) {
-        if(windowedKey == null) {
-            return null;
-        }
-        byte[] keyBytes = keySerializer.serialize(topic, windowedKey.key());
-        if (keyBytes == null) {
-            return null;
-        }
-        return  Utils.toPositive(Utils.murmur2(keyBytes)) % numPartitions;
+          throw new UnsupportedOperationException("This method is deprecated");
     }
 
     @Override
     public Optional<Set<Integer>> partitions(String topic, Windowed<K> windowedKey, V value, int numPartitions) {
-              Integer partition = partition(topic, windowedKey,value,numPartitions);
-        return partition == null ? Optional.empty() : Optional.of(Collections.singleton(partition));
+        if(windowedKey == null) {
+            return Optional.empty();
+        }
+        byte[] keyBytes = keySerializer.serialize(topic, windowedKey.key());
+        if (keyBytes == null) {
+            return Optional.empty();
+        }
+        Integer partition =  Utils.toPositive(Utils.murmur2(keyBytes)) % numPartitions;
+        return Optional.of(Collections.singleton(partition));
     }
 }

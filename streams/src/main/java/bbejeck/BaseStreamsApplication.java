@@ -40,7 +40,7 @@ public abstract class BaseStreamsApplication {
     }
 
     public <K> String fmtWindowed(Windowed<K> windowed) {
-        return String.format("%s@ open %s - close %s%n", windowed.key(),
+        return String.format("%s@ open %s - close %s", windowed.key(),
                 windowed.window().startTime().truncatedTo(ChronoUnit.SECONDS),
                 windowed.window().endTime().truncatedTo(ChronoUnit.SECONDS));
     }

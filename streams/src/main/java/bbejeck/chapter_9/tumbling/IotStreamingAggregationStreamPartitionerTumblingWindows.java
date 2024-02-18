@@ -25,7 +25,8 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.TimeWindows;
-import org.apache.kafka.streams.processor.StreamPartitioner;
+import org.apache.kafka.streams.kstream.Windowed;
+import org.apache.kafka.streams.kstream.WindowedSerdes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,10 @@ public class IotStreamingAggregationStreamPartitionerTumblingWindows extends Bas
         Aggregator<String, Double, IotSensorAggregation> aggregator = new IotStreamingAggregator();
         WindowedStreamsPartitioner<String, IotSensorAggregation> windowedStreamsPartitioner = new WindowedStreamsPartitioner<>(stringSerde.serializer());
 
+        Serde<Windowed<String>> windowedSerdes =
+                WindowedSerdes.timeWindowedSerdeFrom(String.class,
+                        60_000L
+                );
 
         KStream<String,Double> iotHeatSensorStream = builder.stream(inputTopic,
                 Consumed.with(stringSerde, doubleSerde));
@@ -72,7 +77,7 @@ public class IotStreamingAggregationStreamPartitionerTumblingWindows extends Bas
           .toStream()
                 .peek((key, value) -> LOG.info("Tumbling records key=[{}] value=[{}]", fmtWindowed(key), value))
                 .to(outputTopic, Produced.with(
-                        stringSerde, aggregationSerde).withStreamPartitioner((StreamPartitioner)windowedStreamsPartitioner));
+                        windowedSerdes, aggregationSerde).withStreamPartitioner(windowedStreamsPartitioner));
 
 
 

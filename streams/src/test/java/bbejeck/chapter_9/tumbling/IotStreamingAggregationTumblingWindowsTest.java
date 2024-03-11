@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static java.time.LocalDate.EPOCH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class IotStreamingAggregationTumblingWindowsTest {

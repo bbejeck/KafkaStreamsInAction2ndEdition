@@ -38,20 +38,21 @@ class StockPerformancePunctuatorTest {
     @Test
     @DisplayName("Records with correct price differential should get forwarded")
     void shouldPunctuateRecordsTest() {
+        String marketSegment = "CFLT";
         StockPerformance stockPerformance = getStockPerformance();
 
-        Iterator<KeyValue<String, StockPerformance>> storeKeyValues =
-                List.of(KeyValue.pair("CLFT", stockPerformance)).iterator();
         long timestamp = Instant.now().toEpochMilli();
 
-        Record<String, StockPerformance> record =
-                new Record<>("CFLT", stockPerformance, timestamp);
+        Record<String, StockPerformance> expectedRecord =
+                new Record<>(marketSegment, stockPerformance, timestamp);
+
+        Iterator<KeyValue<String, StockPerformance>> storeKeyValues =
+                List.of(KeyValue.pair(marketSegment, stockPerformance)).iterator();
 
         when(keyValueStore.all()).thenReturn(TestUtils.kvIterator(storeKeyValues));
-        context.forward(record);
 
         stockPerformancePunctuator.punctuate(timestamp);
-        verify(context, times(1)).forward(record);
+        verify(context, times(1)).forward(expectedRecord);
     }
 
     @NotNull

@@ -41,3 +41,4 @@ out
 *.out
 !/gradle/wrapper/gradle-wrapper.jar
 /custom-connector/src/main/java/bbejeck/chapter_5/chap_5_scratch.txt
+.profileconfig.json

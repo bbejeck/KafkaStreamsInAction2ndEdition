@@ -1,9 +1,8 @@
 ---
-version: '2'
 
 services:
   broker:
-    image: confluentinc/cp-kafka:7.5.1
+    image: apache/kafka-native:latest
     hostname: broker
     container_name: broker
     ports:

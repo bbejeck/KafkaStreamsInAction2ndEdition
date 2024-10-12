@@ -1,6 +1,6 @@
 package bbejeck.testcontainers;
 
-import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
@@ -14,7 +14,7 @@ public abstract class BaseKafkaContainerTest {
     }
 
     static {
-        KAFKA = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.1")).withKraft();
+        KAFKA = new KafkaContainer(DockerImageName.parse("apache/kafka-native:3.8.0"));
         KAFKA.start();
     }
     
